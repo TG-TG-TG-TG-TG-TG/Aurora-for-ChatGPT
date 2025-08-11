@@ -1,0 +1,133 @@
+/* =========================================================
+   ChatGPT Ambient Blur — FULL styles.css
+   - Ambient background with bottom gradient
+   - 10% white haze over image
+   - Glass composer only when NOT in legacy
+   - Legacy composer = stock gray, untouched
+   - Upload chips/previews stay visible
+   - Bottom bar/fade removed in BOTH modes
+   ========================================================= */
+
+/* only make the page transparent when our bg is active */
+html.cgpt-ambient-on,
+html.cgpt-ambient-on body {
+  background: transparent !important;
+}
+
+/* fixed, behind everything, non-interactive */
+#cgpt-ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* stretch inner elements */
+#cgpt-ambient-bg picture,
+#cgpt-ambient-bg img,
+#cgpt-ambient-bg .haze,
+#cgpt-ambient-bg .overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* blur + slightly darker image */
+#cgpt-ambient-bg img {
+  object-fit: cover;
+  transform: scale(1.08);
+  filter: blur(60px) brightness(0.55);
+  opacity: 0.58;
+  will-change: transform, filter;
+}
+
+/* ===== 10% white haze (subtle frost) ===== */
+#cgpt-ambient-bg .haze {
+  background: rgba(255, 255, 255, 0.10);
+  pointer-events: none;
+}
+
+/* bottom gradient (black → transparent) */
+html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
+  pointer-events: none !important;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.92) 0%,
+    rgba(0, 0, 0, 0.75) 18%,
+    rgba(0, 0, 0, 0.50) 36%,
+    rgba(0, 0, 0, 0.24) 60%,
+    rgba(0, 0, 0, 0.00) 80%
+  ) !important;
+}
+
+/* =========================================================
+   Composer styling
+   ========================================================= */
+
+/* Glass look — ONLY when NOT in legacy mode */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  form[data-type="unified-composer"]
+  > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
+  background: rgba(255,255,255,0.10) !important;
+  border: 1px solid rgba(255,255,255,0.28) !important;
+  box-shadow: 0 6px 26px rgba(0,0,0,.20) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+  backdrop-filter: blur(14px) saturate(140%) !important;
+}
+@media (prefers-color-scheme: dark) {
+  html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+    form[data-type="unified-composer"]
+    > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
+    background: rgba(0,0,0,0.35) !important;
+    border: 1px solid rgba(255,255,255,0.14) !important;
+    box-shadow: 0 8px 30px rgba(0,0,0,.40) !important;
+  }
+}
+
+/* keep the editor area transparent only in glass mode */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  form[data-type="unified-composer"] .ProseMirror,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  form[data-type="unified-composer"] textarea {
+  background: transparent !important;
+}
+
+/* Legacy mode: DO NOT override the composer;
+   let the site’s stock gray render naturally */
+
+/* =========================================================
+   Safer page neutralization
+   ========================================================= */
+
+/* only neutralize the big page wrappers */
+html.cgpt-ambient-on :is(main, #__next) {
+  background-color: transparent !important;
+}
+
+/* ===== remove the bottom page bar/fade in BOTH modes ===== */
+html.cgpt-ambient-on #thread-bottom-container {
+  background: transparent !important;   /* kills the gray bar surface */
+  box-shadow: none !important;
+}
+
+/* remove any gradient mask it applies */
+html.cgpt-ambient-on #thread-bottom-container.content-fade,
+html.cgpt-ambient-on #thread-bottom-container .content-fade {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* some builds paint the fade via pseudos — strip those */
+html.cgpt-ambient-on #thread-bottom-container::before,
+html.cgpt-ambient-on #thread-bottom-container::after,
+html.cgpt-ambient-on #thread-bottom-container .content-fade::before,
+html.cgpt-ambient-on #thread-bottom-container .content-fade::after {
+  content: none !important;
+  background: none !important;
+}
+
+/* footer line (“ChatGPT can make mistakes…”) — ensure no bar */
+html.cgpt-ambient-on #thread-bottom-container .text-token-text-secondary {
+  background: transparent !important;
+}

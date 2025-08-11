@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Ambient Blur Settings</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 12px; min-width: 260px; color: inherit; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; }
+    .label { font-size: 14px; line-height: 1.3; }
+    /* Toggle */
+    .switch { position: relative; width: 46px; height: 26px; flex: 0 0 auto; }
+    .switch input { display: none; }
+    .track { position: absolute; inset: 0; border-radius: 999px; background: #c8ccd1; transition: background .2s ease; }
+    input:checked + .track { background: #4f8cff; }
+    .thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
+    input:checked + .track .thumb { transform: translateX(20px); }
+    .hint { margin-top: 8px; font-size: 12px; opacity: .7; }
+    hr { border: 0; border-top: 1px solid color-mix(in oklab, currentColor 22%, transparent); margin: 8px 0; }
+    .credit { margin-top: 10px; font-size: 12px; opacity: .7; text-align: center; }
+    .credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <div class="row">
+    <div class="label">Show background in chats</div>
+    <label class="switch" title="Toggle background visibility on /c/... chat pages">
+      <input type="checkbox" id="showInChats">
+      <span class="track"><span class="thumb"></span></span>
+    </label>
+  </div>
+  <div class="hint">Applies to URLs like <code>/c/&lt;id&gt;</code>. Other pages always show the background.</div>
+
+  <hr>
+
+  <div class="row">
+    <div class="label">Legacy composer (no glass)</div>
+    <label class="switch" title="Use the site’s standard composer styling">
+      <input type="checkbox" id="legacyComposer">
+      <span class="track"><span class="thumb"></span></span>
+    </label>
+  </div>
+
+  <div class="credit">
+    Made by <a href="https://x.com/test_tm7873" target="_blank" rel="noopener noreferrer">@test_tm7873</a> on X
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
