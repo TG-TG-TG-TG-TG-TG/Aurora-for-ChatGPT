@@ -1,7 +1,7 @@
 /* =========================================================
    ChatGPT Ambient Blur — FULL styles.css
    - Ambient background with bottom gradient
-   - 10% white haze over image
+   - Top-weighted white haze over image (Option A)
    - Glass composer only when NOT in legacy
    - Legacy composer = stock gray, untouched
    - Upload chips/previews stay visible
@@ -40,17 +40,27 @@ html.cgpt-ambient-on body {
   filter: blur(60px) brightness(0.55);
   opacity: 0.58;
   will-change: transform, filter;
+  z-index: 0; /* base layer */
 }
 
-/* ===== 10% white haze (subtle frost) ===== */
+/* ===== Option A: top-weighted white haze ABOVE the black overlay ===== */
 #cgpt-ambient-bg .haze {
-  background: rgba(255, 255, 255, 0.10);
   pointer-events: none;
+  z-index: 2; /* sits above .overlay */
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.16) 0%,
+    rgba(255,255,255,0.10) 22%,
+    rgba(255,255,255,0.06) 45%,
+    rgba(255,255,255,0.02) 68%,
+    rgba(255,255,255,0.00) 85%
+  );
 }
 
-/* bottom gradient (black → transparent) */
+/* bottom gradient (black → transparent), kept UNDER the haze */
 html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   pointer-events: none !important;
+  z-index: 1; /* below .haze, above the image */
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.92) 0%,
@@ -130,4 +140,65 @@ html.cgpt-ambient-on #thread-bottom-container .content-fade::after {
 /* footer line (“ChatGPT can make mistakes…”) — ensure no bar */
 html.cgpt-ambient-on #thread-bottom-container .text-token-text-secondary {
   background: transparent !important;
+}
+
+/* =========================================================
+   Transparent top header (keep content, remove gray bar)
+   ========================================================= */
+
+html.cgpt-ambient-on header#page-header {
+  /* nuke the gray box */
+  background: transparent !important;
+  box-shadow: none !important;          /* kills [box-shadow:var(--sharp-edge-top-shadow)] */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* just in case any pseudo paints it */
+html.cgpt-ambient-on header#page-header::before,
+html.cgpt-ambient-on header#page-header::after {
+  content: none !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* if the site sets the gray via this token class on the header element */
+html.cgpt-ambient-on header#page-header.bg-token-main-surface-primary {
+  background-color: transparent !important;
+}
+
+/* =========================================================
+   Popovers & dropdown menus — glass (respects Legacy toggle)
+   ========================================================= */
+
+/* main popover panel (Radix menu content) */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  .popover.bg-token-main-surface-primary[data-radix-menu-content] {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+  backdrop-filter: blur(14px) saturate(140%) !important;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45) !important; /* a touch deeper than composer */
+}
+
+/* dark scheme tweak */
+@media (prefers-color-scheme: dark) {
+  html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+    .popover.bg-token-main-surface-primary[data-radix-menu-content] {
+    background: rgba(0, 0, 0, 0.35) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+  }
+}
+
+/* keep section separators visible on glass (optional) */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  .popover[data-radix-menu-content] [role="group"]::before {
+  /* replaces token separator color with a subtle line */
+  background: color-mix(in oklab, currentColor 24%, transparent) !important;
+}
+
+/* nicer hover inside glass menus (optional) */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  .popover[data-radix-menu-content] .__menu-item:hover {
+  background: color-mix(in oklab, currentColor 12%, transparent) !important;
 }
