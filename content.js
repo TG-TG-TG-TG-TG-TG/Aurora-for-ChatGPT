@@ -72,13 +72,30 @@
   }
 
   function startObservers() {
-    const mo = new MutationObserver(() => applyVisibility());
-    mo.observe(document.documentElement, { childList: true, subtree: true });
+    // Lightweight URL change detection - no MutationObserver
+    let lastUrl = location.href;
+    const checkUrl = () => {
+      if (location.href !== lastUrl) {
+        lastUrl = location.href;
+        applyVisibility();
+      }
+    };
 
-    let last = location.href;
-    setInterval(() => {
-      if (location.href !== last) { last = location.href; applyVisibility(); }
-    }, 400);
+    window.addEventListener('popstate', checkUrl, { passive: true });
+    
+    // Override history methods for SPA navigation
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+    
+    history.pushState = function(...args) {
+      originalPushState.apply(this, args);
+      setTimeout(checkUrl, 0);
+    };
+    
+    history.replaceState = function(...args) {
+      originalReplaceState.apply(this, args);
+      setTimeout(checkUrl, 0);
+    };
   }
 
   // Init
