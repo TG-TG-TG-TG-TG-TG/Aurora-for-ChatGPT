@@ -37,7 +37,7 @@ html.cgpt-ambient-on body {
 #cgpt-ambient-bg img {
   object-fit: cover;
   transform: scale(1.08);
-  filter: blur(60px) brightness(0.55);
+  filter: blur(50px) brightness(0.75);
   opacity: 0.58;
   will-change: transform, filter;
   z-index: 0; /* base layer */
@@ -63,9 +63,9 @@ html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   z-index: 1; /* below .haze, above the image */
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.92) 0%,
-    rgba(0, 0, 0, 0.75) 18%,
-    rgba(0, 0, 0, 0.50) 36%,
+    rgba(0, 0, 0, 0.76) 0%,
+    rgba(0, 0, 0, 0.60) 18%,
+    rgba(0, 0, 0, 0.46) 36%,
     rgba(0, 0, 0, 0.24) 60%,
     rgba(0, 0, 0, 0.00) 80%
   ) !important;
@@ -82,8 +82,8 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   background: rgba(255,255,255,0.10) !important;
   border: 1px solid rgba(255,255,255,0.28) !important;
   box-shadow: 0 6px 26px rgba(0,0,0,.20) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-  backdrop-filter: blur(14px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+  backdrop-filter: blur(8px) saturate(140%) !important;
 }
 @media (prefers-color-scheme: dark) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer)
@@ -92,6 +92,15 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
     background: rgba(0,0,0,0.35) !important;
     border: 1px solid rgba(255,255,255,0.14) !important;
     box-shadow: 0 8px 30px rgba(0,0,0,.40) !important;
+    transition: all 0.1s ease-in-out;
+  }
+
+  html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+    form[data-type="unified-composer"]
+    > div:is(.bg-token-bg-primary, [class*="dark:bg"]):focus-within {
+    background: rgba(0, 0, 0, 0.35) !important;
+    border: 1px solid rgba(255, 255, 255, 0.452) !important;
+    box-shadow: 0 0px 30px rgba(185, 185, 185, 0.404) !important;
   }
 }
 
@@ -201,4 +210,60 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   .popover[data-radix-menu-content] .__menu-item:hover {
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
+}
+
+
+/* ============================
+   1) Glass containers (expanded + tiny)
+   ============================ */
+html.cgpt-ambient-on #stage-slideover-sidebar,
+html.cgpt-ambient-on #stage-sidebar-tiny-bar {
+  background: rgba(0, 0, 0, 0.15) !important;
+  border-right: 1px solid rgba(255,255,255,0.14) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+  backdrop-filter: blur(14px) saturate(140%) !important;
+  box-shadow: 2px 0 20px rgba(0,0,0,0.4) !important;
+}
+
+/* Hover/focus affordance (optional) */
+html.cgpt-ambient-on #stage-slideover-sidebar:focus-within,
+html.cgpt-ambient-on #stage-sidebar-tiny-bar:hover {
+  background: rgba(0, 0, 0, 0.15) !important;
+  border-right-color: rgba(255,255,255,0.28) !important;
+  box-shadow: 2px 0 28px rgba(0,0,0,0.55) !important;
+}
+
+/* ============================
+   2) Make EVERYTHING inside the expanded sidebar transparent
+   (buttons, history cards, scroll wrappers, etc.)
+   ============================ */
+
+/* Kill backgrounds on all descendants and their pseudos */
+html.cgpt-ambient-on #stage-slideover-sidebar *,
+html.cgpt-ambient-on #stage-slideover-sidebar *::before,
+html.cgpt-ambient-on #stage-slideover-sidebar *::after {
+  background: transparent !important;
+  background-color: transparent !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  box-shadow: none !important; /* prevents “card” fills that fake a bg */
+}
+
+/* Overwrite ChatGPT’s token utility classes that force solid surfaces */
+html.cgpt-ambient-on #stage-slideover-sidebar [class*="bg-token"],
+html.cgpt-ambient-on #stage-slideover-sidebar [class*="bg-"],
+html.cgpt-ambient-on #stage-slideover-sidebar [class*="surface"],
+html.cgpt-ambient-on #stage-slideover-sidebar .border-token,
+html.cgpt-ambient-on #stage-slideover-sidebar .bg-token-main-surface-primary,
+html.cgpt-ambient-on #stage-slideover-sidebar .bg-token-main-surface-secondary,
+html.cgpt-ambient-on #stage-slideover-sidebar .bg-token-sidebar-surface-primary,
+html.cgpt-ambient-on #stage-slideover-sidebar .bg-token-sidebar-surface-secondary {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Selection/hover cues for items (keep totally transparent if you want; this is UX sugar) */
+html.cgpt-ambient-on #stage-slideover-sidebar [role="button"]:hover,
+html.cgpt-ambient-on #stage-slideover-sidebar [data-selected="true"] {
+  background: rgba(255,255,255,0.06) !important; /* set to transparent if you want zero cue */
 }
