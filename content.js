@@ -3,7 +3,8 @@
   const ID = 'cgpt-ambient-bg';
   const HTML_CLASS = 'cgpt-ambient-on';
   const LEGACY_CLASS = 'cgpt-legacy-composer';
-  const DEFAULTS = { showInChats: true, legacyComposer: false };
+  const LIGHT_CLASS = 'cgpt-light-mode';
+  const DEFAULTS = { showInChats: true, legacyComposer: false, lightMode: false };
   let settings = { ...DEFAULTS };
 
   const isChatPage = () => location.pathname.startsWith('/c/');
@@ -46,6 +47,7 @@
   function applyRootFlags() {
     document.documentElement.classList.toggle(HTML_CLASS, shouldShow());
     document.documentElement.classList.toggle(LEGACY_CLASS, !!settings.legacyComposer);
+    document.documentElement.classList.toggle(LIGHT_CLASS, !!settings.lightMode);
   }
 
   function showBg() {
@@ -109,6 +111,7 @@
       if (area !== 'sync') return;
       if ('showInChats' in changes) settings.showInChats = changes.showInChats.newValue;
       if ('legacyComposer' in changes) settings.legacyComposer = changes.legacyComposer.newValue;
+      if ('lightMode' in changes) settings.lightMode = changes.lightMode.newValue;
       applyVisibility();
     });
   } else {

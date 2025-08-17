@@ -202,3 +202,50 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   .popover[data-radix-menu-content] .__menu-item:hover {
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
 }
+
+/* =========================================================
+   Light mode overrides
+   ========================================================= */
+
+/* lighten the blurred image and invert gradient emphasis */
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img {
+  filter: blur(60px) brightness(1.1);
+  opacity: 0.74;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .haze {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.14) 0%,
+    rgba(0,0,0,0.08) 22%,
+    rgba(0,0,0,0.04) 45%,
+    rgba(0,0,0,0.02) 68%,
+    rgba(0,0,0,0.00) 85%
+  );
+}
+
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
+  background: linear-gradient(
+    to top,
+    rgba(255,255,255,0.90) 0%,
+    rgba(255,255,255,0.70) 18%,
+    rgba(255,255,255,0.45) 36%,
+    rgba(255,255,255,0.20) 60%,
+    rgba(255,255,255,0.00) 80%
+  ) !important;
+}
+
+/* composer glass defaults for forced light mode */
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
+  form[data-type="unified-composer"]
+  > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
+  background: rgba(255,255,255,0.10) !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+  box-shadow: 0 6px 26px rgba(0,0,0,.20) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
+  .popover.bg-token-main-surface-primary[data-radix-menu-content] {
+  background: rgba(255,255,255,0.28) !important;
+  border-color: rgba(0,0,0,0.06) !important;
+}
