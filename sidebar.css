@@ -15,15 +15,17 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
 
 @media (prefers-color-scheme: light) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
-    --glass-bg: rgba(255, 255, 255, 0.28);
-    --glass-stroke: rgba(0, 0, 0, 0.06);
+    /* ~10% brighter than previous light pass */
+    --glass-bg: rgba(255, 255, 255, 0.22);   /* was 0.20 */
+    --glass-stroke: rgba(0, 0, 0, 0.072);    /* was 0.08 (lighter edge) */
     --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   }
 }
 
+/* explicit light-mode class (mirrors the media rule) */
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
-  --glass-bg: rgba(255, 255, 255, 0.28);
-  --glass-stroke: rgba(0, 0, 0, 0.06);
+  --glass-bg: rgba(255, 255, 255, 0.22);
+  --glass-stroke: rgba(0, 0, 0, 0.072);
   --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
