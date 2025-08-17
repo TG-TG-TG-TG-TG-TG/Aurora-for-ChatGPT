@@ -1,20 +1,18 @@
 /* =========================================================
    ChatGPT Ambient Blur — FULL styles.css
    - Ambient background with bottom gradient
-   - Top-weighted white haze over image (Option A)
-   - Glass composer only when NOT in legacy
-   - Legacy composer = stock gray, untouched
-   - Upload chips/previews stay visible
-   - Bottom bar/fade removed in BOTH modes
+   - Top-weighted white haze over image
+   - Glass effects for composer, popovers, and sidebar
+   - Legacy composer support (disables glass effects)
    ========================================================= */
 
-/* only make the page transparent when our bg is active */
+/* Page-level transparency when the background is active */
 html.cgpt-ambient-on,
 html.cgpt-ambient-on body {
   background: transparent !important;
 }
 
-/* fixed, behind everything, non-interactive */
+/* Fixed container for the blurred background image and overlays */
 #cgpt-ambient-bg {
   position: fixed;
   inset: 0;
@@ -22,7 +20,7 @@ html.cgpt-ambient-on body {
   pointer-events: none;
 }
 
-/* stretch inner elements */
+/* Ensure inner layers stretch to fill the container */
 #cgpt-ambient-bg picture,
 #cgpt-ambient-bg img,
 #cgpt-ambient-bg .haze,
@@ -33,20 +31,20 @@ html.cgpt-ambient-on body {
   height: 100%;
 }
 
-/* blur + slightly darker image */
+/* Background image styling: blurred, scaled, and slightly dimmed */
 #cgpt-ambient-bg img {
   object-fit: cover;
   transform: scale(1.08);
   filter: blur(60px) brightness(0.55);
   opacity: 0.58;
   will-change: transform, filter;
-  z-index: 0; /* base layer */
+  z-index: 0; /* Base layer */
 }
 
-/* ===== Option A: top-weighted white haze ABOVE the black overlay ===== */
+/* Top-weighted white haze for a softer look */
 #cgpt-ambient-bg .haze {
   pointer-events: none;
-  z-index: 2; /* sits above .overlay */
+  z-index: 2; /* Sits above the black overlay */
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,0.16) 0%,
@@ -57,10 +55,10 @@ html.cgpt-ambient-on body {
   );
 }
 
-/* bottom gradient (black → transparent), kept UNDER the haze */
+/* Bottom gradient overlay (black to transparent) */
 html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   pointer-events: none !important;
-  z-index: 1; /* below .haze, above the image */
+  z-index: 1; /* Below haze, above image */
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.92) 0%,
@@ -72,16 +70,16 @@ html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
 }
 
 /* =========================================================
-   Composer styling
+   Composer Styling
    ========================================================= */
 
-/* Glass look — ONLY when NOT in legacy mode */
+/* Glass look for the composer, only when not in legacy mode */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   form[data-type="unified-composer"]
   > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
   background: rgba(255,255,255,0.10) !important;
   border: 1px solid rgba(255,255,255,0.28) !important;
-  box-shadow: 0 6px 26px rgba(0,0,0,0.20) !important;
+  box-shadow: 0 6px 26px rgba(0,0,0,.20) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
 }
@@ -91,44 +89,37 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
     > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
     background: rgba(0,0,0,0.35) !important;
     border: 1px solid rgba(255,255,255,0.14) !important;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.40) !important;
+    box-shadow: 0 8px 30px rgba(0,0,0,.40) !important;
   }
 }
 
-/* keep the editor area transparent only in glass mode */
+/* Ensure the text input area is also transparent in glass mode */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"] .ProseMirror,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"] textarea {
+  form[data-type="unified-composer"] :is(.ProseMirror, textarea) {
   background: transparent !important;
 }
 
-/* Legacy mode: DO NOT override the composer;
-   let the site’s stock gray render naturally */
-
 /* =========================================================
-   Safer page neutralization
+   Page Element Neutralization
    ========================================================= */
 
-/* only neutralize the big page wrappers */
-html.cgpt-ambient-on :is(main, #__next) {
+/* Make main content wrappers and key containers transparent */
+html.cgpt-ambient-on :is(main, #__next, .bg-token-bg-primary.sticky) {
   background-color: transparent !important;
 }
 
-/* ===== remove the bottom page bar/fade in BOTH modes ===== */
+/* Remove the bottom page fade/bar in all modes */
 html.cgpt-ambient-on #thread-bottom-container {
-  background: transparent !important;   /* kills the gray bar surface */
+  background: transparent !important;
   box-shadow: none !important;
 }
 
-/* remove any gradient mask it applies */
 html.cgpt-ambient-on #thread-bottom-container.content-fade,
 html.cgpt-ambient-on #thread-bottom-container .content-fade {
   -webkit-mask-image: none !important;
   mask-image: none !important;
 }
 
-/* some builds paint the fade via pseudos — strip those */
 html.cgpt-ambient-on #thread-bottom-container::before,
 html.cgpt-ambient-on #thread-bottom-container::after,
 html.cgpt-ambient-on #thread-bottom-container .content-fade::before,
@@ -137,137 +128,104 @@ html.cgpt-ambient-on #thread-bottom-container .content-fade::after {
   background: none !important;
 }
 
-/* footer line (“ChatGPT can make mistakes…”) — ensure no bar */
+/* Ensure footer text has no background bar */
 html.cgpt-ambient-on #thread-bottom-container .text-token-text-secondary {
   background: transparent !important;
 }
 
 /* =========================================================
-   Transparent top header (keep content, remove gray bar)
+   Headers & Sticky Bars
    ========================================================= */
 
-html.cgpt-ambient-on header#page-header {
-  /* nuke the gray box */
+/* Make all sticky top bars transparent by default */
+html.cgpt-ambient-on
+  :is(header#page-header,
+      .sticky.top-0.bg-token-main-surface-primary,
+      div.sticky.top-14[class*="bg-token-bg-primary"]
+  ) {
   background: transparent !important;
-  box-shadow: none !important;          /* kills [box-shadow:var(--sharp-edge-top-shadow)] */
+  box-shadow: none !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
 
-/* just in case any pseudo paints it */
-html.cgpt-ambient-on header#page-header::before,
-html.cgpt-ambient-on header#page-header::after {
+/* Strip any pseudo-elements that might paint a background */
+html.cgpt-ambient-on
+  :is(header#page-header,
+      .sticky.top-0.bg-token-main-surface-primary,
+      div.sticky.top-14[class*="bg-token-bg-primary"]
+  )::before,
+html.cgpt-ambient-on
+  :is(header#page-header,
+      .sticky.top-0.bg-token-main-surface-primary,
+      div.sticky.top-14[class*="bg-token-bg-primary"]
+  )::after {
   content: none !important;
   background: none !important;
   box-shadow: none !important;
 }
 
-/* if the site sets the gray via this token class on the header element */
-html.cgpt-ambient-on header#page-header.bg-token-main-surface-primary {
-  background-color: transparent !important;
-}
-
 /* =========================================================
-   Popovers, dropdown menus & dialogs — glass (respects Legacy toggle)
+   Glass UI Surfaces
    ========================================================= */
 
-/* main popover panel (Radix menu content) and Settings Dialog */
+/* Apply glass to popovers, dialogs, menus, and specific UI components */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover.bg-token-main-surface-primary[data-radix-menu-content],
-html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover.bg-token-main-surface-primary[role="dialog"] {
+  :is(
+    .popover.bg-token-main-surface-primary[data-radix-menu-content],
+    .popover.bg-token-main-surface-primary[role="dialog"],
+    .popover.bg-token-main-surface-primary.max-w-xs, /* Keyboard shortcuts */
+    div.sticky.top-14.bg-token-main-surface-primary, /* GPTs category bar */
+    input#search[placeholder="Search GPTs"], /* GPTs search bar */
+    /* MODIFIED: Target textareas in Customize ChatGPT modal */
+    textarea.bg-token-main-surface-primary.border-token-border-default
+  ) {
   background: rgba(255, 255, 255, 0.10) !important;
   border: 1px solid rgba(255, 255, 255, 0.28) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
-  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45) !important; /* a touch deeper than composer */
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45) !important;
 }
 
-/* dark scheme tweak */
+/* Dark mode adjustments for glass */
 @media (prefers-color-scheme: dark) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-    .popover.bg-token-main-surface-primary[data-radix-menu-content],
-  html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-    .popover.bg-token-main-surface-primary[role="dialog"] {
+    :is(
+      .popover.bg-token-main-surface-primary[data-radix-menu-content],
+      .popover.bg-token-main-surface-primary[role="dialog"],
+      .popover.bg-token-main-surface-primary.max-w-xs,
+      div.sticky.top-14.bg-token-main-surface-primary,
+      input#search[placeholder="Search GPTs"],
+      /* MODIFIED: Target textareas in Customize ChatGPT modal */
+      textarea.bg-token-main-surface-primary.border-token-border-default
+    ) {
     background: rgba(0, 0, 0, 0.35) !important;
     border-color: rgba(255, 255, 255, 0.14) !important;
   }
 }
 
-/* Make sure the inner container of the settings dialog is also transparent */
+/* Ensure inner containers of dialogs are also transparent */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   .popover[role="dialog"]
-  .md\:flex-row.flex-col.h-\[100\%\].flex {
+  .md\:flex-row.flex-col {
   background-color: transparent !important;
 }
 
-/* keep section separators visible on glass (optional) */
+/* Keep group separators visible on glass */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover[data-radix-menu-content] [role="group"]::before,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover[role="dialog"] [role="group"]::before {
-  /* replaces token separator color with a subtle line */
+  :is(.popover[data-radix-menu-content], .popover[role="dialog"]) [role="group"]::before {
   background: color-mix(in oklab, currentColor 24%, transparent) !important;
 }
 
-/* nicer hover inside glass menus (optional) */
+/* Softer hover effect for items inside glass menus */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover[data-radix-menu-content] .__menu-item:hover,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover[role="dialog"] .__menu-item:hover {
+  :is(.popover[data-radix-menu-content], .popover[role="dialog"]) .__menu-item:hover {
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
 }
 
 /* =========================================================
-   Light mode overrides  (now ~10% brighter than last pass)
+   Custom Additions
    ========================================================= */
-
-/* slightly brighter image in Light mode */
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img {
-  /* previous: brightness(0.90) opacity:0.68 */
-  filter: blur(60px) brightness(0.99) contrast(1);
-  opacity: 0.72;
-}
-
-/* reduce the dark top haze a bit (~10%) */
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .haze {
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.153) 0%,
-    rgba(0,0,0,0.09) 22%,
-    rgba(0,0,0,0.045) 45%,
-    rgba(0,0,0,0.0225) 68%,
-    rgba(0,0,0,0.00) 85%
-  );
-}
-
-/* nudge the white overlay up ~10% to lift overall luminance */
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
-  background: linear-gradient(
-    to top,
-    rgba(255,255,255,0.693) 0%,
-    rgba(255,255,255,0.539) 18%,
-    rgba(255,255,255,0.346) 36%,
-    rgba(255,255,255,0.154) 60%,
-    rgba(255,255,255,0.00) 80%
-  ) !important;
-}
-
-/* composer glass in Light mode: slightly brighter fill, softer edge */
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"]
-  > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
-  /* previous bg 0.08 → 0.088 (~+10%) */
-  background: rgba(255,255,255,0.088) !important;
-  /* previous border rgba(0,0,0,0.08) → 0.072 (a touch lighter) */
-  border: 1px solid rgba(0,0,0,0.072) !important;
-  box-shadow: 0 6px 26px rgba(0,0,0,0.20) !important;
-}
-
-/* popovers in Light mode: lift bg ~10%, lighten border a touch */
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
-  .popover.bg-token-main-surface-primary[data-radix-menu-content] {
-  /* previous 0.22 → 0.242 */
-  background: rgba(255,255,255,0.242) !important;
-  border-color: rgba(0,0,0,0.072) !important;
+.cgpt-gpt5-limit-hidden {
+    display: none !important;
 }

@@ -4,8 +4,41 @@
   const HTML_CLASS = 'cgpt-ambient-on';
   const LEGACY_CLASS = 'cgpt-legacy-composer';
   const LIGHT_CLASS = 'cgpt-light-mode';
-  const DEFAULTS = { showInChats: true, legacyComposer: false, lightMode: false };
+  const DEFAULTS = { showInChats: true, legacyComposer: false, lightMode: false, hideGpt5Limit: false };
   let settings = { ...DEFAULTS };
+
+  // --- GPT-5 Limit Popup Logic ---
+  const LIMIT_POPUP_SELECTOR = '.dark\\:bg-token-main-surface-secondary.text-token-text-primary.bg-token-main-surface-primary.border-token-border-default.md\\:items-center.shadow-xxs.dark\\:border-transparent.lg\\:mx-auto.\\[text-wrap\\:pretty\\].text-sm.pe-3.ps-5.py-4.border.rounded-3xl.gap-4.items-start.w-full.flex';
+  const HIDE_CLASS = 'cgpt-gpt5-limit-hidden';
+  const TIMESTAMP_KEY = 'gpt5LimitHitTimestamp';
+  const FIVE_MINUTES_MS = 5 * 60 * 1000;
+
+  function manageGpt5LimitPopup() {
+    const popup = document.querySelector(LIMIT_POPUP_SELECTOR);
+
+    if (!settings.hideGpt5Limit) {
+      if (popup) popup.classList.remove(HIDE_CLASS);
+      return;
+    }
+
+    if (popup) {
+      chrome.storage.local.get([TIMESTAMP_KEY], (result) => {
+        const timestamp = result[TIMESTAMP_KEY];
+        if (!timestamp) {
+          let newTimestamp = {};
+          newTimestamp[TIMESTAMP_KEY] = Date.now();
+          chrome.storage.local.set(newTimestamp);
+        } else {
+          if (Date.now() - timestamp > FIVE_MINUTES_MS) {
+            popup.classList.add(HIDE_CLASS);
+          }
+        }
+      });
+    } else {
+      chrome.storage.local.remove([TIMESTAMP_KEY]);
+    }
+  }
+  // --- End of Logic ---
 
   const isChatPage = () => location.pathname.startsWith('/c/');
 
@@ -71,10 +104,11 @@
   function applyVisibility() {
     if (shouldShow()) showBg(); else hideBg();
     applyRootFlags();
+    manageGpt5LimitPopup();
   }
 
   function startObservers() {
-    // Lightweight URL change detection - no MutationObserver
+    // URL change detection for SPA navigation
     let lastUrl = location.href;
     const checkUrl = () => {
       if (location.href !== lastUrl) {
@@ -82,22 +116,21 @@
         applyVisibility();
       }
     };
-
     window.addEventListener('popstate', checkUrl, { passive: true });
-    
-    // Override history methods for SPA navigation
     const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-    
     history.pushState = function(...args) {
       originalPushState.apply(this, args);
       setTimeout(checkUrl, 0);
     };
-    
+    const originalReplaceState = history.replaceState;
     history.replaceState = function(...args) {
       originalReplaceState.apply(this, args);
       setTimeout(checkUrl, 0);
     };
+
+    // DOM observer for the GPT-5 limit popup
+    const domObserver = new MutationObserver(manageGpt5LimitPopup);
+    domObserver.observe(document.body, { childList: true, subtree: true });
   }
 
   // Init
@@ -109,10 +142,14 @@
     });
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area !== 'sync') return;
-      if ('showInChats' in changes) settings.showInChats = changes.showInChats.newValue;
-      if ('legacyComposer' in changes) settings.legacyComposer = changes.legacyComposer.newValue;
-      if ('lightMode' in changes) settings.lightMode = changes.lightMode.newValue;
-      applyVisibility();
+      let needsUpdate = false;
+      for (let key in changes) {
+        if (key in settings) {
+          settings[key] = changes[key].newValue;
+          needsUpdate = true;
+        }
+      }
+      if (needsUpdate) applyVisibility();
     });
   } else {
     applyVisibility();
