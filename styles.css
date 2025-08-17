@@ -81,7 +81,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
   background: rgba(255,255,255,0.10) !important;
   border: 1px solid rgba(255,255,255,0.28) !important;
-  box-shadow: 0 6px 26px rgba(0,0,0,0.20) !important;
+  box-shadow: 0 6px 26px rgba(0,0,0,.20) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
 }
@@ -91,7 +91,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
     > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
     background: rgba(0,0,0,0.35) !important;
     border: 1px solid rgba(255,255,255,0.14) !important;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.40) !important;
+    box-shadow: 0 8px 30px rgba(0,0,0,.40) !important;
   }
 }
 
@@ -171,9 +171,11 @@ html.cgpt-ambient-on header#page-header.bg-token-main-surface-primary {
    Popovers & dropdown menus — glass (respects Legacy toggle)
    ========================================================= */
 
-/* main popover panel (Radix menu content) */
+/* main popover panel (Radix menu content) and Settings Dialog */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover.bg-token-main-surface-primary[data-radix-menu-content] {
+  .popover.bg-token-main-surface-primary[data-radix-menu-content],
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  .popover.bg-token-main-surface-primary[role="dialog"] {
   background: rgba(255, 255, 255, 0.10) !important;
   border: 1px solid rgba(255, 255, 255, 0.28) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
@@ -184,75 +186,34 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
 /* dark scheme tweak */
 @media (prefers-color-scheme: dark) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-    .popover.bg-token-main-surface-primary[data-radix-menu-content] {
+    .popover.bg-token-main-surface-primary[data-radix-menu-content],
+  html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+    .popover.bg-token-main-surface-primary[role="dialog"] {
     background: rgba(0, 0, 0, 0.35) !important;
     border-color: rgba(255, 255, 255, 0.14) !important;
   }
 }
 
+/* Make sure the inner container of the settings dialog is also transparent */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  .popover[role="dialog"]
+  .md\:flex-row.flex-col.h-\[100\%\].flex {
+  background-color: transparent !important;
+}
+
 /* keep section separators visible on glass (optional) */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover[data-radix-menu-content] [role="group"]::before {
+  .popover[data-radix-menu-content] [role="group"]::before,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  .popover[role="dialog"] [role="group"]::before {
   /* replaces token separator color with a subtle line */
   background: color-mix(in oklab, currentColor 24%, transparent) !important;
 }
 
 /* nicer hover inside glass menus (optional) */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover[data-radix-menu-content] .__menu-item:hover {
+  .popover[data-radix-menu-content] .__menu-item:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  .popover[role="dialog"] .__menu-item:hover {
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
-}
-
-/* =========================================================
-   Light mode overrides  (now ~10% brighter than last pass)
-   ========================================================= */
-
-/* slightly brighter image in Light mode */
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img {
-  /* previous: brightness(0.90) opacity:0.68 */
-  filter: blur(60px) brightness(0.99) contrast(1);
-  opacity: 0.72;
-}
-
-/* reduce the dark top haze a bit (~10%) */
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .haze {
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.153) 0%,
-    rgba(0,0,0,0.09) 22%,
-    rgba(0,0,0,0.045) 45%,
-    rgba(0,0,0,0.0225) 68%,
-    rgba(0,0,0,0.00) 85%
-  );
-}
-
-/* nudge the white overlay up ~10% to lift overall luminance */
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
-  background: linear-gradient(
-    to top,
-    rgba(255,255,255,0.693) 0%,
-    rgba(255,255,255,0.539) 18%,
-    rgba(255,255,255,0.346) 36%,
-    rgba(255,255,255,0.154) 60%,
-    rgba(255,255,255,0.00) 80%
-  ) !important;
-}
-
-/* composer glass in Light mode: slightly brighter fill, softer edge */
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"]
-  > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
-  /* previous bg 0.08 → 0.088 (~+10%) */
-  background: rgba(255,255,255,0.088) !important;
-  /* previous border rgba(0,0,0,0.08) → 0.072 (a touch lighter) */
-  border: 1px solid rgba(0,0,0,0.072) !important;
-  box-shadow: 0 6px 26px rgba(0,0,0,0.20) !important;
-}
-
-/* popovers in Light mode: lift bg ~10%, lighten border a touch */
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
-  .popover.bg-token-main-surface-primary[data-radix-menu-content] {
-  /* previous 0.22 → 0.242 */
-  background: rgba(255,255,255,0.242) !important;
-  border-color: rgba(0,0,0,0.072) !important;
 }
