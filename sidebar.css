@@ -21,6 +21,12 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   }
 }
 
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
+  --glass-bg: rgba(255, 255, 255, 0.28);
+  --glass-stroke: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
 /* --------- Base sidebar glass (non-legacy only) ---------------------- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   position: relative;
@@ -107,6 +113,13 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:
   }
 }
 
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
+  box-shadow:
+    0 1px 0 rgba(0,0,0,0.06) inset,
+    var(--glass-shadow);
+}
+
 /* --------- Optional polish (non-legacy only) -------------------------- */
 /* Softer hover on glass */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .hover\:bg-token-surface-hover:hover,
@@ -126,5 +139,23 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after 
     to bottom,
     rgba(255,255,255,0.015),
     rgba(0,0,0,0.015)
+  );
+}
+
+@media (prefers-color-scheme: light) {
+  html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.015),
+      rgba(255,255,255,0.015)
+    );
+  }
+}
+
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.015),
+    rgba(255,255,255,0.015)
   );
 }
