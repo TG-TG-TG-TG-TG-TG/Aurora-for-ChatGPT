@@ -8,6 +8,7 @@ Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
 ## Highlights
 
 * 🌌 **Ambient Aurora background** — a subtle gradient blur behind the ChatGPT interface
+* 🖼️ **Custom Backgrounds** — Choose from built-in presets, paste an image URL, or upload your own file.
 * 👁️ **Chat visibility toggle** — hide/show the chat panel instantly
 * 📝 **Legacy composer option** — switch back to the classic `<textarea>` input instead of the new Lexical composer
 * 🌗 **Light mode** — optional light themed variant with quick toggle

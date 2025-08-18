@@ -4,23 +4,71 @@
   const HTML_CLASS = 'cgpt-ambient-on';
   const LEGACY_CLASS = 'cgpt-legacy-composer';
   const LIGHT_CLASS = 'cgpt-light-mode';
-  const DEFAULTS = { showInChats: true, legacyComposer: false, lightMode: false };
+  const ANIMATIONS_DISABLED_CLASS = 'cgpt-animations-disabled';
+  const DEFAULTS = { showInChats: true, legacyComposer: false, lightMode: false, hideGpt5Limit: false, hideUpgradeButtons: false, disableAnimations: false, customBgUrl: '' };
   let settings = { ...DEFAULTS };
+
+  const LOCAL_BG_KEY = 'customBgData'; // Key for local storage image data
+
+  // --- Selectors and Classes ---
+  const GPT5_LIMIT_POPUP_SELECTOR = '.dark\\:bg-token-main-surface-secondary.text-token-text-primary.bg-token-main-surface-primary.border-token-border-default.md\\:items-center.shadow-xxs.dark\\:border-transparent.lg\\:mx-auto.\\[text-wrap\\:pretty\\].text-sm.pe-3.ps-5.py-4.border.rounded-3xl.gap-4.items-start.w-full.flex';
+  const HIDE_LIMIT_CLASS = 'cgpt-gpt5-limit-hidden';
+  const PANEL_UPGRADE_SELECTOR = 'div.gap-1\\.5.__menu-item.group:nth-of-type(2)';
+  const TOP_UPGRADE_SELECTOR = '.rtl\\:translate-x-1\\/2.ltr\\:-translate-x-1\\/2.start-1\\/2.absolute';
+  const HIDE_UPGRADE_CLASS = 'cgpt-upgrade-hidden';
+  const TIMESTAMP_KEY = 'gpt5LimitHitTimestamp';
+  const FIVE_MINUTES_MS = 5 * 60 * 1000;
+
+
+  function manageGpt5LimitPopup() {
+    const popup = document.querySelector(GPT5_LIMIT_POPUP_SELECTOR);
+    if (!settings.hideGpt5Limit) {
+      if (popup) popup.classList.remove(HIDE_LIMIT_CLASS);
+      return;
+    }
+    if (!chrome?.runtime?.id) return;
+    if (popup) {
+      chrome.storage.local.get([TIMESTAMP_KEY], (result) => {
+        if (chrome.runtime.lastError) return;
+        const timestamp = result[TIMESTAMP_KEY];
+        if (!timestamp) {
+          chrome.storage.local.set({ [TIMESTAMP_KEY]: Date.now() }, () => {
+            if (chrome.runtime.lastError) {}
+          });
+        } else if (Date.now() - timestamp > FIVE_MINUTES_MS) {
+          popup.classList.add(HIDE_LIMIT_CLASS);
+        }
+      });
+    } else {
+      chrome.storage.local.remove([TIMESTAMP_KEY], () => {
+        if (chrome.runtime.lastError) {}
+      });
+    }
+  }
+
+  function manageUpgradeButtons() {
+    const panelButton = document.querySelector(PANEL_UPGRADE_SELECTOR);
+    const topButtonContainer = document.querySelector(TOP_UPGRADE_SELECTOR);
+    const shouldHide = settings.hideUpgradeButtons;
+    if (panelButton && panelButton.textContent.toLowerCase().includes('upgrade')) {
+      panelButton.classList.toggle(HIDE_UPGRADE_CLASS, shouldHide);
+    }
+    if (topButtonContainer) {
+      topButtonContainer.classList.toggle(HIDE_UPGRADE_CLASS, shouldHide);
+    }
+  }
 
   const isChatPage = () => location.pathname.startsWith('/c/');
 
   function ensureAppOnTop() {
-    const app =
-      document.getElementById('__next') ||
-      document.querySelector('#root') ||
-      document.querySelector('main') ||
-      document.body.firstElementChild;
+    const app = document.getElementById('__next') || document.querySelector('#root') || document.querySelector('main') || document.body.firstElementChild;
     if (!app) return;
     const cs = getComputedStyle(app);
     if (cs.position === 'static') app.style.position = 'relative';
     if (!app.style.zIndex || parseInt(app.style.zIndex || '0', 10) < 0) app.style.zIndex = '0';
   }
 
+  // Creates the background container with an empty image structure
   function makeBgNode() {
     const wrap = document.createElement('div');
     wrap.id = ID;
@@ -28,15 +76,8 @@
     Object.assign(wrap.style, { position: 'fixed', inset: '0', zIndex: '-1', pointerEvents: 'none' });
     wrap.innerHTML = `
       <picture>
-        <source type="image/webp"
-          srcset="https://persistent.oaistatic.com/burrito-nux/640.webp 640w,
-                  https://persistent.oaistatic.com/burrito-nux/1280.webp 1280w,
-                  https://persistent.oaistatic.com/burrito-nux/1920.webp 1920w">
-        <img alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high"
-          srcset="https://persistent.oaistatic.com/burrito-nux/640.webp 640w,
-                  https://persistent.oaistatic.com/burrito-nux/1280.webp 1280w,
-                  https://persistent.oaistatic.com/burrito-nux/1920.webp 1920w"
-          src="https://persistent.oaistatic.com/burrito-nux/640.webp">
+        <source type="image/webp" srcset="">
+        <img alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high" src="" srcset="">
       </picture>
       <div class="haze"></div>
       <div class="overlay"></div>
@@ -44,10 +85,57 @@
     return wrap;
   }
 
+  // New function to handle setting the background image source
+  function updateBackgroundImage() {
+    const bgNode = document.getElementById(ID);
+    if (!bgNode) return;
+
+    const img = bgNode.querySelector('img');
+    const source = bgNode.querySelector('source');
+    if (!img || !source) return;
+
+    const defaultWebpSrcset = `https://persistent.oaistatic.com/burrito-nux/640.webp 640w,
+                             https://persistent.oaistatic.com/burrito-nux/1280.webp 1280w,
+                             https://persistent.oaistatic.com/burrito-nux/1920.webp 1920w`;
+    const defaultImgSrc = "https://persistent.oaistatic.com/burrito-nux/640.webp";
+
+    const applyImage = (url) => {
+      img.src = url;
+      img.srcset = ''; // Unset srcset for single custom images
+      source.srcset = '';
+    };
+
+    const applyDefault = () => {
+      img.src = defaultImgSrc;
+      img.srcset = defaultWebpSrcset;
+      source.srcset = defaultWebpSrcset;
+    };
+
+    if (settings.customBgUrl) {
+      if (settings.customBgUrl === '__local__') {
+        if (chrome?.storage?.local) {
+          chrome.storage.local.get(LOCAL_BG_KEY, (res) => {
+            if (chrome.runtime.lastError) { return; }
+            if (res[LOCAL_BG_KEY]) {
+              applyImage(res[LOCAL_BG_KEY]);
+            } else {
+              applyDefault(); // Fallback if local data is missing
+            }
+          });
+        }
+      } else {
+        applyImage(settings.customBgUrl); // Apply URL from sync
+      }
+    } else {
+      applyDefault(); // No custom setting, apply default
+    }
+  }
+
   function applyRootFlags() {
     document.documentElement.classList.toggle(HTML_CLASS, shouldShow());
     document.documentElement.classList.toggle(LEGACY_CLASS, !!settings.legacyComposer);
     document.documentElement.classList.toggle(LIGHT_CLASS, !!settings.lightMode);
+    document.documentElement.classList.toggle(ANIMATIONS_DISABLED_CLASS, !!settings.disableAnimations);
   }
 
   function showBg() {
@@ -68,60 +156,64 @@
     return !(isChatPage() && !settings.showInChats);
   }
 
-  function applyVisibility() {
+  function applyAllSettings() {
     if (shouldShow()) showBg(); else hideBg();
     applyRootFlags();
+    updateBackgroundImage(); // Centralized call to update the background
+    manageGpt5LimitPopup();
+    manageUpgradeButtons();
   }
 
   function startObservers() {
-    // Lightweight URL change detection - no MutationObserver
+    window.addEventListener('focus', applyAllSettings, { passive: true });
     let lastUrl = location.href;
     const checkUrl = () => {
       if (location.href !== lastUrl) {
         lastUrl = location.href;
-        applyVisibility();
+        applyAllSettings();
       }
     };
-
     window.addEventListener('popstate', checkUrl, { passive: true });
-    
-    // Override history methods for SPA navigation
     const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-    
     history.pushState = function(...args) {
       originalPushState.apply(this, args);
       setTimeout(checkUrl, 0);
     };
-    
+    const originalReplaceState = history.replaceState;
     history.replaceState = function(...args) {
       originalReplaceState.apply(this, args);
       setTimeout(checkUrl, 0);
     };
+    const domObserver = new MutationObserver(() => {
+        manageGpt5LimitPopup();
+        manageUpgradeButtons();
+    });
+    domObserver.observe(document.body, { childList: true, subtree: true });
   }
 
-  // Init
   if (chrome?.storage?.sync) {
     chrome.storage.sync.get(DEFAULTS, (res) => {
       settings = { ...DEFAULTS, ...res };
-      applyVisibility();
+      applyAllSettings();
       startObservers();
     });
     chrome.storage.onChanged.addListener((changes, area) => {
-      if (area !== 'sync') return;
-      if ('showInChats' in changes) settings.showInChats = changes.showInChats.newValue;
-      if ('legacyComposer' in changes) settings.legacyComposer = changes.legacyComposer.newValue;
-      if ('lightMode' in changes) settings.lightMode = changes.lightMode.newValue;
-      applyVisibility();
+      if (area === 'sync') {
+        let needsUpdate = false;
+        for (let key in changes) {
+          if (key in settings) {
+            settings[key] = changes[key].newValue;
+            needsUpdate = true;
+          }
+        }
+        if (needsUpdate) applyAllSettings();
+      } else if (area === 'local' && changes[LOCAL_BG_KEY]) {
+        // If only local storage changes, we still need to re-apply
+        applyAllSettings();
+      }
     });
   } else {
-    applyVisibility();
+    applyAllSettings();
     startObservers();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyVisibility, { once: true });
-  } else {
-    applyVisibility();
   }
 })();
