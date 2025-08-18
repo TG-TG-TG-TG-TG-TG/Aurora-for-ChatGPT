@@ -22,7 +22,7 @@
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       margin: 12px;
-      min-width: 280px;
+      min-width: 300px;
       color: inherit;
       background: transparent;
     }
@@ -66,73 +66,150 @@
       border-radius: 6px; cursor: pointer; white-space: nowrap;
     }
     button:hover { background: color-mix(in oklab, currentColor 25%, transparent); }
+    
+    /* Collapsible Sections */
+    details { border: 1px solid transparent; border-radius: 8px; margin-bottom: 6px; }
+    details > summary { font-weight: 500; cursor: pointer; padding: 6px 8px; }
+    details[open] > summary { margin-bottom: 6px; }
+    details .section-content { padding: 0 8px 8px 8px; }
+    input[type="range"] { width: 100%; }
   </style>
 </head>
 <body>
-  <div class="row">
-    <div class="label">Show background in chats</div>
-    <label class="switch" title="Toggle background visibility on /c/... chat pages">
-      <input type="checkbox" id="showInChats">
-      <span class="track"><span class="thumb"></span></span>
-    </label>
-  </div>
-  <hr>
-  <div class="row">
-    <div class="label" style="flex-shrink: 0;">Background preset</div>
-    <select id="bgPreset">
-      <option value="default">GPT-5 Wallpaper</option>
-      <option value="blue">Blue Wallpaper</option>
-      <option value="custom" disabled hidden>Custom</option>
-    </select>
-  </div>
-  <div class="row">
-    <input type="text" id="bgUrl" placeholder="Paste URL or select a preset">
-  </div>
-  <div class="row">
-    <input type="file" id="bgFile" accept="image/png, image/jpeg, image/webp, image/gif">
-    <button id="clearBg">Reset</button>
-  </div>
-  <hr>
-  <!-- NEW: Theme Selector -->
-  <div class="row">
-    <div class="label">Theme</div>
-    <select id="themeSelector">
-      <option value="auto">Auto</option>
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
-    </select>
-  </div>
-  <div class="hint">"Auto" matches the theme set in ChatGPT's settings.</div>
 
-  <div class="row">
-    <div class="label">Legacy composer (no glass)</div>
-    <label class="switch" title="Use the site’s standard composer styling">
-      <input type="checkbox" id="legacyComposer">
-      <span class="track"><span class="thumb"></span></span>
-    </label>
-  </div>
-  <div class="row">
-    <div class="label">Disable menu animations</div>
-    <label class="switch" title="Disable the open/close fade and scale effect on menus">
-      <input type="checkbox" id="disableAnimations">
-      <span class="track"><span class="thumb"></span></span>
-    </label>
-  </div>
-  <hr>
-  <div class="row">
-    <div class="label">Hide GPT-5 limit message</div>
-    <label class="switch" title="Hides the GPT-5 limit popup 5 minutes after it appears">
-      <input type="checkbox" id="hideGpt5Limit">
-      <span class="track"><span class="thumb"></span></span>
-    </label>
-  </div>
-  <div class="row">
-    <div class="label">Hide "Upgrade plan" buttons</div>
-    <label class="switch" title="Hide the 'Upgrade your plan' buttons">
-      <input type="checkbox" id="hideUpgradeButtons">
-      <span class="track"><span class="thumb"></span></span>
-    </label>
-  </div>
+  <details open>
+    <summary>Background</summary>
+    <div class="section-content">
+      <div class="row">
+        <div class="label" style="flex-shrink: 0;">Preset</div>
+        <select id="bgPreset">
+          <option value="default">GPT-5 Wallpaper</option>
+          <option value="blue">Blue Wallpaper</option>
+          <option value="custom" disabled hidden>Custom</option>
+        </select>
+      </div>
+      <div class="row">
+        <input type="text" id="bgUrl" placeholder="Paste URL (image or video)">
+      </div>
+      <div class="row">
+        <input type="file" id="bgFile" accept="image/*, video/mp4, video/webm, video/ogg">
+        <button id="clearBg">Reset</button>
+      </div>
+      <div class="row">
+        <label for="blurSlider" class="label">Blur Radius</label>
+        <input type="range" id="blurSlider" min="0" max="150" step="1">
+        <span id="blurValue" style="min-width: 3ch; text-align: right;">60</span>px
+      </div>
+      <div class="row">
+        <div class="label">Media Scaling</div>
+        <select id="bgScalingSelector">
+          <option value="contain">Contain (fit)</option>
+          <option value="cover">Cover (fill)</option>
+        </select>
+      </div>
+      <div class="hint" style="padding: 0 8px 8px 8px;">"Contain" fits the whole media, "Cover" fills the screen by cropping.</div>
+    </div>
+  </details>
+
+  <details>
+    <summary>Appearance</summary>
+    <div class="section-content">
+      <div class="row">
+        <div class="label">Theme</div>
+        <select id="themeSelector">
+          <option value="auto">Auto</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="label">Legacy composer (no glass)</div>
+        <label class="switch" title="Use the site’s standard composer styling">
+          <input type="checkbox" id="legacyComposer">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="row">
+        <div class="label">Disable menu animations</div>
+        <label class="switch" title="Disable the open/close fade and scale effect on menus">
+          <input type="checkbox" id="disableAnimations">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="row">
+        <div class="label">Focus Mode</div>
+        <label class="switch" title="Hides the sidebar and header for a clean view">
+            <input type="checkbox" id="focusMode">
+            <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>Voice UI</summary>
+    <div class="section-content">
+        <div class="row">
+            <div class="label">Customize voice color</div>
+            <select id="voiceColorSelector">
+                <option value="default">Default (Blue)</option>
+                <option value="orange">Sunset Orange</option>
+                <option value="yellow">Solar Yellow</option>
+                <option value="pink">Sakura Pink</option>
+                <option value="green">Aurora Green</option>
+                <option value="dark">Onyx Dark</option>
+            </select>
+        </div>
+        <div class="row">
+            <div class="label">Cute voice UI (Cat ears)</div>
+            <label class="switch" title="Adds cute ears to the voice UI">
+                <input type="checkbox" id="cuteVoiceUI">
+                <span class="track"><span class="thumb"></span></span>
+            </label>
+        </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>UI Visibility</summary>
+    <div class="section-content">
+      <div class="row">
+        <div class="label">Show background in chats</div>
+        <label class="switch" title="Toggle background visibility on /c/... chat pages">
+          <input type="checkbox" id="showInChats">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="row">
+        <div class="label">Hide GPT-5 limit message</div>
+        <label class="switch" title="Hides the GPT-5 limit popup 5 minutes after it appears">
+          <input type="checkbox" id="hideGpt5Limit">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="row">
+        <div class="label">Hide "Upgrade plan" buttons</div>
+        <label class="switch" title="Hide the 'Upgrade your plan' buttons">
+          <input type="checkbox" id="hideUpgradeButtons">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="row">
+        <div class="label">Hide 'Explore GPTs' button</div>
+        <label class="switch" title="Hide the 'Explore GPTs' button in the sidebar">
+          <input type="checkbox" id="hideGptsButton">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="row">
+        <div class="label">Hide 'Sora' button</div>
+        <label class="switch" title="Hide the 'Sora' button in the sidebar">
+          <input type="checkbox" id="hideSoraButton">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+    </div>
+  </details>
 
   <div class="credit">
     Made by <a href="https://x.com/test_tm7873" target="_blank" rel="noopener noreferrer">@test_tm7873</a> on X

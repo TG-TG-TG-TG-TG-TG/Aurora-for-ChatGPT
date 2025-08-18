@@ -1,17 +1,23 @@
+/* Aurora for ChatGPT - Main Stylesheet */
+
+/* --- Base Transparency --- */
 html.cgpt-ambient-on,
 html.cgpt-ambient-on body {
   background: transparent !important;
 }
 
+/* --- Background Container & Media --- */
 #cgpt-ambient-bg {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  background-color: #000; 
 }
 
 #cgpt-ambient-bg picture,
 #cgpt-ambient-bg img,
+#cgpt-ambient-bg video,
 #cgpt-ambient-bg .haze,
 #cgpt-ambient-bg .overlay {
   position: absolute;
@@ -20,15 +26,16 @@ html.cgpt-ambient-on body {
   height: 100%;
 }
 
-#cgpt-ambient-bg img {
-  object-fit: cover;
-  transform: scale(1.08);
-  filter: blur(60px) brightness(0.55);
+#cgpt-ambient-bg img,
+#cgpt-ambient-bg video {
+  /* object-fit is controlled dynamically by content.js */
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(0.55);
   opacity: 0.58;
   will-change: transform, filter;
   z-index: 0;
 }
 
+/* --- Background Effects --- */
 #cgpt-ambient-bg .haze {
   pointer-events: none;
   z-index: 2;
@@ -55,6 +62,7 @@ html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   ) !important;
 }
 
+/* --- Animations for Menus --- */
 @keyframes aurora-menu-open {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
@@ -65,6 +73,7 @@ html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   to { opacity: 0; transform: scale(0.95); }
 }
 
+/* --- Glass UI Elements (Composer, Popups, etc.) --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   form[data-type="unified-composer"]
   > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
@@ -74,7 +83,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
 }
-/* MODIFIED: Added :not(.cgpt-light-mode) to prevent override */
 @media (prefers-color-scheme: dark) {
   html.cgpt-ambient-on:not(.cgpt-light-mode):not(.cgpt-legacy-composer)
     form[data-type="unified-composer"]
@@ -86,15 +94,35 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"] :is(.ProseMirror, textarea) {
+  form label[class*="light:shadow-splash-chatpgpt-input"] {
+  background: rgba(0,0,0,0.35) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,.40) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+  backdrop-filter: blur(14px) saturate(140%) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  form[data-type="unified-composer"] :is(.ProseMirror, textarea),
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  form label[class*="light:shadow-splash-chatpgpt-input"] textarea {
   background: transparent !important;
 }
 
+/* User message bubble: Removed background-color to respect accent color */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+  backdrop-filter: blur(12px) saturate(160%) !important;
+}
+
+/* --- General Transparency Overrides --- */
 html.cgpt-ambient-on :is(main, #__next, .bg-token-bg-primary.sticky) {
   background-color: transparent !important;
 }
 
-html.cgpt-ambient-on #thread-bottom-container {
+html.cgpt-ambient-on #thread-bottom-container,
+html.cgpt-ambient-on #thread-bottom-container .text-token-text-secondary {
   background: transparent !important;
   box-shadow: none !important;
 }
@@ -111,10 +139,6 @@ html.cgpt-ambient-on #thread-bottom-container .content-fade::before,
 html.cgpt-ambient-on #thread-bottom-container .content-fade::after {
   content: none !important;
   background: none !important;
-}
-
-html.cgpt-ambient-on #thread-bottom-container .text-token-text-secondary {
-  background: transparent !important;
 }
 
 html.cgpt-ambient-on
@@ -143,6 +167,7 @@ html.cgpt-ambient-on
   box-shadow: none !important;
 }
 
+/* --- Menu & Popup Glass Effects --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   :is(
     .popover.bg-token-main-surface-primary[data-radix-menu-content],
@@ -155,8 +180,8 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   ) {
   background: rgba(255, 255, 255, 0.10) !important;
   border: 1px solid rgba(255, 255, 255, 0.28) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-  backdrop-filter: blur(14px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+  backdrop-filter: blur(22px) saturate(140%) !important;
   box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45) !important;
 }
 
@@ -176,7 +201,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
   animation: aurora-menu-close 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* MODIFIED: Added :not(.cgpt-light-mode) to prevent override */
 @media (prefers-color-scheme: dark) {
   html.cgpt-ambient-on:not(.cgpt-light-mode):not(.cgpt-legacy-composer)
     :is(
@@ -211,9 +235,16 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
 }
 
-.cgpt-gpt5-limit-hidden { display: none !important; }
-.cgpt-upgrade-hidden { display: none !important; }
+/* --- Helper Classes for Hiding Elements --- */
+.cgpt-hide-gpt5-limit,
+.cgpt-hide-upgrade,
+.cgpt-hide-library,
+.cgpt-hide-sora,
+.cgpt-hide-gpts {
+  display: none !important;
+}
 
+/* --- Misc Glass UI Overrides --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .dark\\:bg-\\[\\#373669\\].flex {
   background: rgba(55, 54, 105, 0.6) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -240,8 +271,11 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-5
   backdrop-filter: blur(16px) saturate(140%) !important;
 }
 
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img {
-  filter: blur(60px) brightness(0.99) contrast(1);
+/* --- Light Mode Overrides --- */
+
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img,
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg video {
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(0.99) contrast(1);
   opacity: 0.72;
 }
 
@@ -255,7 +289,9 @@ html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
 
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
   form[data-type="unified-composer"]
-  > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
+  > div:is(.bg-token-bg-primary, [class*="dark:bg"]),
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
+  form label[class*="light:shadow-splash-chatpgpt-input"] {
   background: rgba(255,255,255,0.088) !important;
   border: 1px solid rgba(0,0,0,0.072) !important;
   box-shadow: 0 6px 26px rgba(0,0,0,0.20) !important;
@@ -273,4 +309,173 @@ html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
 
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
   background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* User message bubble (Light mode): Removed background-color to respect accent color */
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg {
+  background-color: #fff;
+}
+
+/* --- ChatGPT Voice UI Color Override --- */
+html.cgpt-ambient-on[data-voice-color]:not([data-voice-color="default"]) .min-h-bloop > canvas {
+  filter: var(--voice-filter) !important;
+}
+
+html.cgpt-ambient-on[data-voice-color="orange"] { --voice-filter: hue-rotate(180deg) saturate(1.5); }
+html.cgpt-ambient-on[data-voice-color="yellow"] { --voice-filter: hue-rotate(180deg) saturate(2.5) brightness(1.1); }
+html.cgpt-ambient-on[data-voice-color="pink"] { --voice-filter: hue-rotate(80deg) saturate(1.8) brightness(1.1); }
+html.cgpt-ambient-on[data-voice-color="green"] { --voice-filter: hue-rotate(-120deg) saturate(1.2) brightness(0.9); }
+html.cgpt-ambient-on[data-voice-color="dark"] { --voice-filter: grayscale(1) brightness(0.4) contrast(1.5); }
+
+/* --- Cute Voice UI (Cat Ears) --- */
+html.cgpt-cute-voice-on .min-h-bloop { position: relative; }
+html.cgpt-cute-voice-on .min-h-bloop::before,
+html.cgpt-cute-voice-on .min-h-bloop::after {
+  content: "";
+  position: absolute;
+  width: 48px;
+  height: 65px;
+  background: #8EBBFF;
+  filter: var(--voice-filter);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  top: -15px;
+  z-index: 0;
+}
+html.cgpt-cute-voice-on .min-h-bloop::before { left: 45px; transform: rotate(-35deg); }
+html.cgpt-cute-voice-on .min-h-bloop::after { right: 45px; transform: rotate(35deg); }
+html.cgpt-cute-voice-on .min-h-bloop > canvas { position: relative; z-index: 1; }
+
+/* --- Quick Settings UI --- */
+/* Trigger Button */
+#cgpt-qs-btn {
+  position: fixed;
+  bottom: 12px;
+  right: 16px;
+  z-index: 10001;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(30, 30, 30, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+#cgpt-qs-btn:hover { transform: scale(1.08); }
+#cgpt-qs-btn svg { width: 20px; height: 20px; color: white; opacity: 0.9; }
+html.cgpt-light-mode #cgpt-qs-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(0,0,0,0.1);
+}
+html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
+
+/* MODIFIED: Settings Panel - Now matches main UI glass effect */
+#cgpt-qs-panel {
+  position: fixed;
+  bottom: 60px;
+  right: 16px;
+  z-index: 10000;
+  width: 260px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  backdrop-filter: blur(22px) saturate(140%);
+  border-radius: 14px;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.45);
+  padding: 8px;
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease;
+  color: #fff;
+}
+#cgpt-qs-panel.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+html.cgpt-light-mode #cgpt-qs-panel {
+    background: rgba(255, 255, 255, 0.242);
+    border-color: rgba(0,0,0,0.072);
+    color: #000;
+}
+
+/* Panel Content */
+.qs-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  opacity: 0.6;
+  padding: 8px 8px 4px;
+}
+.qs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+.qs-row:hover { background: rgba(255, 255, 255, 0.08); }
+html.cgpt-light-mode .qs-row:hover { background: rgba(0,0,0,0.06); }
+.qs-row > label { font-size: 14px; opacity: 0.95; }
+
+/* MODIFIED: Select Dropdown - Now matches popup.html styling */
+.qs-row select {
+  max-width: 110px;
+  padding: 4px 28px 4px 10px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
+  background-color: color-mix(in oklab, currentColor 10%, transparent);
+  color: inherit;
+  font-size: 13px;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+}
+html.cgpt-light-mode .qs-row select {
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+}
+#cgpt-qs-panel select option {
+    background: #2a2a2e;
+    color: #f0f4f8;
+}
+html.cgpt-light-mode #cgpt-qs-panel select option {
+    background: #f0f4f8;
+    color: #1d1d1f;
+}
+
+/* Switches */
+.qs-row .switch { position: relative; width: 46px; height: 26px; flex: 0 0 auto; }
+.qs-row .switch input { display: none; }
+.qs-row .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(0,0,0,0.3); transition: background .2s ease; }
+html.cgpt-light-mode .qs-row .track { background: rgba(0,0,0,0.1); }
+.qs-row input:checked + .track { background: #4f8cff; }
+.qs-row .thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
+.qs-row input:checked + .track .thumb { transform: translateX(20px); }
+
+/* Focus Mode Rules */
+html.cgpt-focus-mode-on .flex-shrink-0[class*="bg-token-sidebar-surface-primary"],
+html.cgpt-focus-mode-on header#page-header,
+html.cgpt-focus-mode-on main .gizmo-suggestions,
+html.cgpt-focus-mode-on main .text-4xl.font-semibold {
+    display: none !important;
+}
+html.cgpt-focus-mode-on #thread-bottom-container {
+    visibility: hidden !important;
+}
+html.cgpt-focus-mode-on main .flex.h-full.flex-col {
+    padding-top: 1.25rem;
 }
