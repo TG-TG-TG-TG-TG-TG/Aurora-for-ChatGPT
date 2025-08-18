@@ -11,7 +11,7 @@
       backdrop-filter: blur(16px) saturate(150%);
       -webkit-backdrop-filter: blur(16px) saturate(150%);
       overflow: hidden;
-      border-radius: 14px; /* Smoother, rounded corners */
+      border-radius: 14px;
     }
     @media (prefers-color-scheme: dark) {
       html {
@@ -22,26 +22,71 @@
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       margin: 12px;
-      min-width: 260px;
+      min-width: 280px;
       color: inherit;
       background: transparent;
     }
     .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; }
-    .label { font-size: 14px; line-height: 1.3; }
-    /* Toggle */
+    .label { font-size: 14px; line-height: 1.3; white-space: nowrap; }
     .switch { position: relative; width: 46px; height: 26px; flex: 0 0 auto; }
     .switch input { display: none; }
     .track { position: absolute; inset: 0; border-radius: 999px; background: #c8ccd1; transition: background .2s ease; }
     input:checked + .track { background: #4f8cff; }
-    @media (prefers-color-scheme: dark) {
-      .track { background: #555; }
-    }
+    @media (prefers-color-scheme: dark) { .track { background: #555; } }
     .thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
     input:checked + .track .thumb { transform: translateX(20px); }
     .hint { margin-top: 8px; font-size: 12px; opacity: .7; }
     hr { border: 0; border-top: 1px solid color-mix(in oklab, currentColor 22%, transparent); margin: 8px 0; }
     .credit { margin-top: 10px; font-size: 12px; opacity: .7; text-align: center; }
     .credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+    /* Updated Control Styles */
+    input[type="text"], select {
+      width: 100%;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
+      background-color: color-mix(in oklab, currentColor 10%, transparent);
+      color: inherit;
+      font-size: 13px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    select {
+      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 16px;
+      padding-right: 30px;
+    }
+    /* New rule to style the dropdown options' background and text color */
+    select option {
+      background: #f0f4f8;
+      color: #1d1d1f;
+    }
+    @media (prefers-color-scheme: dark) {
+      select {
+        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+      }
+      /* Dark mode styling for the dropdown options */
+      select option {
+        background: #2a2a2e;
+        color: #f0f4f8;
+      }
+    }
+    input[type="text"]:disabled { opacity: 0.6; }
+    input[type="file"] { font-size: 12px; width: 100%; }
+    button {
+      font-size: 12px;
+      padding: 4px 10px;
+      border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
+      background: color-mix(in oklab, currentColor 15%, transparent);
+      color: inherit;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button:hover { background: color-mix(in oklab, currentColor 25%, transparent); }
   </style>
 </head>
 <body>
@@ -52,7 +97,25 @@
       <span class="track"><span class="thumb"></span></span>
     </label>
   </div>
-  <div class="hint">Applies to URLs like <code>/c/&lt;id&gt;</code>. Other pages always show the background.</div>
+  <div class="hint">Applies to URLs like <code>/c/&lt;id&gt;</code>.</div>
+
+  <hr>
+
+  <div class="row">
+    <div class="label" style="flex-shrink: 0;">Background preset</div>
+    <select id="bgPreset">
+      <option value="default">GPT-5 Wallpaper</option>
+      <option value="blue">Blue Wallpaper</option>
+      <option value="custom" disabled hidden>Custom</option>
+    </select>
+  </div>
+  <div class="row">
+    <input type="text" id="bgUrl" placeholder="Paste URL or select a preset">
+  </div>
+  <div class="row">
+    <input type="file" id="bgFile" accept="image/png, image/jpeg, image/webp, image/gif">
+    <button id="clearBg">Reset</button>
+  </div>
 
   <hr>
 
@@ -63,7 +126,6 @@
       <span class="track"><span class="thumb"></span></span>
     </label>
   </div>
-
   <div class="row">
     <div class="label">Light mode</div>
     <label class="switch" title="Use a light themed background">
@@ -71,7 +133,6 @@
       <span class="track"><span class="thumb"></span></span>
     </label>
   </div>
-  
   <div class="row">
     <div class="label">Disable menu animations</div>
     <label class="switch" title="Disable the open/close fade and scale effect on menus">
@@ -79,9 +140,7 @@
       <span class="track"><span class="thumb"></span></span>
     </label>
   </div>
-
   <hr>
-
   <div class="row">
     <div class="label">Hide GPT-5 limit message</div>
     <label class="switch" title="Hides the GPT-5 limit popup 5 minutes after it appears">
@@ -89,10 +148,6 @@
       <span class="track"><span class="thumb"></span></span>
     </label>
   </div>
-  <div class="hint">When you hit the limit, the message will show for 5 minutes, then be hidden.</div>
-
-  <hr>
-
   <div class="row">
     <div class="label">Hide "Upgrade plan" buttons</div>
     <label class="switch" title="Hide the 'Upgrade your plan' buttons">
@@ -104,7 +159,6 @@
   <div class="credit">
     Made by <a href="https://x.com/test_tm7873" target="_blank" rel="noopener noreferrer">@test_tm7873</a> on X
   </div>
-
   <script src="popup.js"></script>
 </body>
 </html>
