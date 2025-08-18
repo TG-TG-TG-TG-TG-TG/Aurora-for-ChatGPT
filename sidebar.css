@@ -1,50 +1,39 @@
-/* =======================================================================
-   sidebar.css — unified glass/blur + rounded corners
-   - Now disabled when .cgpt-legacy-composer is present
-   ======================================================================= */
-
-/* --------- Tunables (only in non-legacy mode) ------------------------- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
-  --glass-radius: 14px;                 /* rounded corners */
-  --glass-blur: 18px;                   /* one blur for ALL glass layers */
+  --glass-radius: 14px;
+  --glass-blur: 18px;
   --glass-sat: 140%;
-  --glass-bg: rgba(18, 18, 18, 0.14);   /* subtle, not black */
+  --glass-bg: rgba(18, 18, 18, 0.14);
   --glass-stroke: rgba(255, 255, 255, 0.08);
   --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 @media (prefers-color-scheme: light) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
-    /* ~10% brighter than previous light pass */
-    --glass-bg: rgba(255, 255, 255, 0.22);   /* was 0.20 */
-    --glass-stroke: rgba(0, 0, 0, 0.072);    /* was 0.08 (lighter edge) */
+    --glass-bg: rgba(255, 255, 255, 0.22);
+    --glass-stroke: rgba(0, 0, 0, 0.072);
     --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   }
 }
 
-/* explicit light-mode class (mirrors the media rule) */
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   --glass-bg: rgba(255, 255, 255, 0.22);
   --glass-stroke: rgba(0, 0, 0, 0.072);
   --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
-/* --------- Base sidebar glass (non-legacy only) ---------------------- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   position: relative;
-  background: transparent !important;   /* kill opaque paints */
+  background: transparent !important;
   border-radius: var(--glass-radius);
-  overflow: hidden;                     /* clip to rounded corners */
+  overflow: hidden;
 }
 
-/* Remove opaque token backgrounds so glass can show */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .bg-token-bg-elevated-secondary,
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-bg-"],
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-surface"] {
   background-color: transparent !important;
 }
 
-/* Main frosted layer that blurs the page content behind the sidebar */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before {
   content: "";
   position: absolute;
@@ -62,23 +51,20 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before
     var(--glass-shadow);
 }
 
-/* Make sure the real content paints above the ::before layer */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar > * {
   position: relative;
   z-index: 1;
 }
 
-/* --------- Moving / sticky elements: local glass (same blur) ---------- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky,
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky {
   position: sticky;
-  isolation: isolate;                   /* local stacking context */
-  background: transparent !important;   /* unpaint token bg */
-  border-radius: var(--glass-radius);   /* rounded corners for the sticky cap */
-  contain: paint;                       /* avoid bleed on clip */
+  isolation: isolate;
+  background: transparent !important;
+  border-radius: var(--glass-radius);
+  contain: paint;
 }
 
-/* Sticky local glass (same blur/tint as main) */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
   content: "";
@@ -92,20 +78,17 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
 
-  /* subtle inner stroke + soft shadow like the main layer */
   box-shadow:
     0 1px 0 rgba(255,255,255,0.06) inset,
     var(--glass-shadow);
 }
 
-/* Sticky contents render above their local glass */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky > *,
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky > * {
   position: relative;
   z-index: 1;
 }
 
-/* Light scheme tweak for the faint inner stroke */
 @media (prefers-color-scheme: light) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
   html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
@@ -122,14 +105,11 @@ html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover
     var(--glass-shadow);
 }
 
-/* --------- Optional polish (non-legacy only) -------------------------- */
-/* Softer hover on glass */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .hover\:bg-token-surface-hover:hover,
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .focus-visible\:bg-token-surface-hover:focus-visible {
   background-color: color-mix(in oklab, currentColor 7%, transparent) !important;
 }
 
-/* Faint gradient to reduce banding in very dark schemes */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
   content: "";
   position: absolute;

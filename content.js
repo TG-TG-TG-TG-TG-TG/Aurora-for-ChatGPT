@@ -4,7 +4,8 @@
   const HTML_CLASS = 'cgpt-ambient-on';
   const LEGACY_CLASS = 'cgpt-legacy-composer';
   const LIGHT_CLASS = 'cgpt-light-mode';
-  const DEFAULTS = { showInChats: true, legacyComposer: false, lightMode: false, hideGpt5Limit: false, hideUpgradeButtons: false };
+  const ANIMATIONS_DISABLED_CLASS = 'cgpt-animations-disabled';
+  const DEFAULTS = { showInChats: true, legacyComposer: false, lightMode: false, hideGpt5Limit: false, hideUpgradeButtons: false, disableAnimations: false };
   let settings = { ...DEFAULTS };
 
   // --- Selectors and Classes ---
@@ -12,7 +13,6 @@
   const HIDE_LIMIT_CLASS = 'cgpt-gpt5-limit-hidden';
 
   const PANEL_UPGRADE_SELECTOR = 'div.gap-1\\.5.__menu-item.group:nth-of-type(2)';
-  // CORRECTED: This selector now targets the unique parent of the top button for reliable hiding.
   const TOP_UPGRADE_SELECTOR = '.rtl\\:translate-x-1\\/2.ltr\\:-translate-x-1\\/2.start-1\\/2.absolute';
   const HIDE_UPGRADE_CLASS = 'cgpt-upgrade-hidden';
 
@@ -28,13 +28,25 @@
       return;
     }
 
+    // If chrome.runtime is not available, the context is gone.
+    if (!chrome?.runtime?.id) {
+      return;
+    }
+
     if (popup) {
       chrome.storage.local.get([TIMESTAMP_KEY], (result) => {
+        // If context is invalidated before this callback runs, lastError will be set.
+        if (chrome.runtime.lastError) {
+          return; // Stop execution to prevent errors.
+        }
+
         const timestamp = result[TIMESTAMP_KEY];
         if (!timestamp) {
-          let newTimestamp = {};
-          newTimestamp[TIMESTAMP_KEY] = Date.now();
-          chrome.storage.local.set(newTimestamp);
+          let newTimestamp = { [TIMESTAMP_KEY]: Date.now() };
+          chrome.storage.local.set(newTimestamp, () => {
+            // Also check for error on set, just in case.
+            if (chrome.runtime.lastError) { /* Silently fail */ }
+          });
         } else {
           if (Date.now() - timestamp > FIVE_MINUTES_MS) {
             popup.classList.add(HIDE_LIMIT_CLASS);
@@ -42,7 +54,10 @@
         }
       });
     } else {
-      chrome.storage.local.remove([TIMESTAMP_KEY]);
+      chrome.storage.local.remove([TIMESTAMP_KEY], () => {
+        // Also check for error on remove.
+        if (chrome.runtime.lastError) { /* Silently fail */ }
+      });
     }
   }
 
@@ -53,13 +68,11 @@
     const shouldHide = settings.hideUpgradeButtons;
 
     if (panelButton) {
-      // Additional check to ensure it's the correct button
       if (panelButton.textContent.toLowerCase().includes('upgrade')) {
          panelButton.classList.toggle(HIDE_UPGRADE_CLASS, shouldHide);
       }
     }
     if (topButtonContainer) {
-        // Hides the parent container, which hides the button within it
         topButtonContainer.classList.toggle(HIDE_UPGRADE_CLASS, shouldHide);
     }
   }
@@ -105,6 +118,7 @@
     document.documentElement.classList.toggle(HTML_CLASS, shouldShow());
     document.documentElement.classList.toggle(LEGACY_CLASS, !!settings.legacyComposer);
     document.documentElement.classList.toggle(LIGHT_CLASS, !!settings.lightMode);
+    document.documentElement.classList.toggle(ANIMATIONS_DISABLED_CLASS, !!settings.disableAnimations);
   }
 
   function showBg() {
@@ -133,6 +147,9 @@
   }
 
   function startObservers() {
+    // Re-apply settings when the window regains focus (e.g., after closing popup)
+    window.addEventListener('focus', applyAllSettings, { passive: true });
+
     let lastUrl = location.href;
     const checkUrl = () => {
       if (location.href !== lastUrl) {

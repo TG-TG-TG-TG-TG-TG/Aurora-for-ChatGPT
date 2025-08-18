@@ -5,7 +5,27 @@
   <title>Ambient Blur Settings</title>
   <style>
     :root { color-scheme: light dark; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 12px; min-width: 260px; color: inherit; }
+    html {
+      background-color: #f0f4f8;
+      background-image: radial-gradient(at top center, rgba(79, 140, 255, 0.2), transparent 70%);
+      backdrop-filter: blur(16px) saturate(150%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      overflow: hidden;
+      border-radius: 14px; /* Smoother, rounded corners */
+    }
+    @media (prefers-color-scheme: dark) {
+      html {
+        background-color: #1a1a1f;
+        background-image: radial-gradient(at top center, rgba(88, 70, 160, 0.45), transparent 70%);
+      }
+    }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 12px;
+      min-width: 260px;
+      color: inherit;
+      background: transparent;
+    }
     .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; }
     .label { font-size: 14px; line-height: 1.3; }
     /* Toggle */
@@ -13,6 +33,9 @@
     .switch input { display: none; }
     .track { position: absolute; inset: 0; border-radius: 999px; background: #c8ccd1; transition: background .2s ease; }
     input:checked + .track { background: #4f8cff; }
+    @media (prefers-color-scheme: dark) {
+      .track { background: #555; }
+    }
     .thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
     input:checked + .track .thumb { transform: translateX(20px); }
     .hint { margin-top: 8px; font-size: 12px; opacity: .7; }
@@ -45,6 +68,14 @@
     <div class="label">Light mode</div>
     <label class="switch" title="Use a light themed background">
       <input type="checkbox" id="lightMode">
+      <span class="track"><span class="thumb"></span></span>
+    </label>
+  </div>
+  
+  <div class="row">
+    <div class="label">Disable menu animations</div>
+    <label class="switch" title="Disable the open/close fade and scale effect on menus">
+      <input type="checkbox" id="disableAnimations">
       <span class="track"><span class="thumb"></span></span>
     </label>
   </div>

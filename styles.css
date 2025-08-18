@@ -1,18 +1,8 @@
-/* =========================================================
-   ChatGPT Ambient Blur — FULL styles.css
-   - Ambient background with bottom gradient
-   - Top-weighted white haze over image
-   - Glass effects for composer, popovers, and sidebar
-   - Legacy composer support (disables glass effects)
-   ========================================================= */
-
-/* Page-level transparency when the background is active */
 html.cgpt-ambient-on,
 html.cgpt-ambient-on body {
   background: transparent !important;
 }
 
-/* Fixed container for the blurred background image and overlays */
 #cgpt-ambient-bg {
   position: fixed;
   inset: 0;
@@ -20,7 +10,6 @@ html.cgpt-ambient-on body {
   pointer-events: none;
 }
 
-/* Ensure inner layers stretch to fill the container */
 #cgpt-ambient-bg picture,
 #cgpt-ambient-bg img,
 #cgpt-ambient-bg .haze,
@@ -31,20 +20,18 @@ html.cgpt-ambient-on body {
   height: 100%;
 }
 
-/* Background image styling: blurred, scaled, and slightly dimmed */
 #cgpt-ambient-bg img {
   object-fit: cover;
   transform: scale(1.08);
   filter: blur(60px) brightness(0.55);
   opacity: 0.58;
   will-change: transform, filter;
-  z-index: 0; /* Base layer */
+  z-index: 0;
 }
 
-/* Top-weighted white haze for a softer look */
 #cgpt-ambient-bg .haze {
   pointer-events: none;
-  z-index: 2; /* Sits above the black overlay */
+  z-index: 2;
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,0.16) 0%,
@@ -55,10 +42,9 @@ html.cgpt-ambient-on body {
   );
 }
 
-/* Bottom gradient overlay (black to transparent) */
 html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   pointer-events: none !important;
-  z-index: 1; /* Below haze, above image */
+  z-index: 1;
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.92) 0%,
@@ -69,11 +55,28 @@ html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   ) !important;
 }
 
-/* =========================================================
-   Composer Styling
-   ========================================================= */
+@keyframes aurora-menu-open {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
-/* Glass look for the composer, only when not in legacy mode */
+@keyframes aurora-menu-close {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   form[data-type="unified-composer"]
   > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
@@ -93,22 +96,15 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   }
 }
 
-/* Ensure the text input area is also transparent in glass mode */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   form[data-type="unified-composer"] :is(.ProseMirror, textarea) {
   background: transparent !important;
 }
 
-/* =========================================================
-   Page Element Neutralization
-   ========================================================= */
-
-/* Make main content wrappers and key containers transparent */
 html.cgpt-ambient-on :is(main, #__next, .bg-token-bg-primary.sticky) {
   background-color: transparent !important;
 }
 
-/* Remove the bottom page fade/bar in all modes */
 html.cgpt-ambient-on #thread-bottom-container {
   background: transparent !important;
   box-shadow: none !important;
@@ -128,16 +124,10 @@ html.cgpt-ambient-on #thread-bottom-container .content-fade::after {
   background: none !important;
 }
 
-/* Ensure footer text has no background bar */
 html.cgpt-ambient-on #thread-bottom-container .text-token-text-secondary {
   background: transparent !important;
 }
 
-/* =========================================================
-   Headers & Sticky Bars
-   ========================================================= */
-
-/* Make all sticky top bars transparent by default */
 html.cgpt-ambient-on
   :is(header#page-header,
       .sticky.top-0.bg-token-main-surface-primary,
@@ -149,7 +139,6 @@ html.cgpt-ambient-on
   backdrop-filter: none !important;
 }
 
-/* Strip any pseudo-elements that might paint a background */
 html.cgpt-ambient-on
   :is(header#page-header,
       .sticky.top-0.bg-token-main-surface-primary,
@@ -165,18 +154,14 @@ html.cgpt-ambient-on
   box-shadow: none !important;
 }
 
-/* =========================================================
-   Glass UI Surfaces
-   ========================================================= */
-
-/* Apply glass to popovers, dialogs, menus, and specific UI components */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   :is(
     .popover.bg-token-main-surface-primary[data-radix-menu-content],
     .popover.bg-token-main-surface-primary[role="dialog"],
-    .popover.bg-token-main-surface-primary.max-w-xs, /* Keyboard shortcuts */
-    div.sticky.top-14.bg-token-main-surface-primary, /* GPTs category bar */
-    input#search[placeholder="Search GPTs"], /* GPTs search bar */
+    div[role="dialog"][class*="shadow-long"],
+    .popover.bg-token-main-surface-primary.max-w-xs,
+    div.sticky.top-14.bg-token-main-surface-primary,
+    input#search[placeholder="Search GPTs"],
     textarea.bg-token-main-surface-primary.border-token-border-default
   ) {
   background: rgba(255, 255, 255, 0.10) !important;
@@ -186,12 +171,28 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45) !important;
 }
 
-/* Dark mode adjustments for glass */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
+  :is(
+    .popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="open"],
+    .popover[role="dialog"][class*="md:max-w-"][data-state="open"]
+  ) {
+  animation: aurora-menu-open 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
+  :is(
+    .popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="closed"],
+    .popover[role="dialog"][class*="md:max-w-"][data-state="closed"]
+  ) {
+  animation: aurora-menu-close 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 @media (prefers-color-scheme: dark) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer)
     :is(
       .popover.bg-token-main-surface-primary[data-radix-menu-content],
       .popover.bg-token-main-surface-primary[role="dialog"],
+      div[role="dialog"][class*="shadow-long"],
       .popover.bg-token-main-surface-primary.max-w-xs,
       div.sticky.top-14.bg-token-main-surface-primary,
       input#search[placeholder="Search GPTs"],
@@ -202,28 +203,23 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   }
 }
 
-/* Ensure inner containers of dialogs are also transparent */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   .popover[role="dialog"]
-  .md\:flex-row.flex-col {
+  .md\:flex-row.flex-col,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  div[role="dialog"][class*="shadow-long"] .bg-token-bg-elevated-secondary {
   background-color: transparent !important;
 }
 
-/* Keep group separators visible on glass */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   :is(.popover[data-radix-menu-content], .popover[role="dialog"]) [role="group"]::before {
   background: color-mix(in oklab, currentColor 24%, transparent) !important;
 }
 
-/* Softer hover effect for items inside glass menus */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   :is(.popover[data-radix-menu-content], .popover[role="dialog"]) .__menu-item:hover {
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
 }
-
-/* =========================================================
-   Custom Additions
-   ========================================================= */
 
 .cgpt-gpt5-limit-hidden {
     display: none !important;
@@ -233,7 +229,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
     display: none !important;
 }
 
-/* Blurred glass effect for the top "Upgrade your plan" button */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .dark\\:bg-\\[\\#373669\\].flex {
   background: rgba(55, 54, 105, 0.6) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -246,17 +241,26 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) .dark\\:hover\\:bg-\\[\\#414071\
     background: rgba(65, 64, 113, 0.75) !important;
 }
 
-/* =========================================================
-   Light mode overrides (MERGED FROM DEVELOPER BRANCH)
-   ========================================================= */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[role="alert"].bg-red-500 {
+  background: rgba(239, 68, 68, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
 
-/* slightly brighter image in Light mode */
+/* Voice mode background blur */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
+  background: rgba(18, 18, 18, 0.5) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+}
+
 html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img {
   filter: blur(60px) brightness(0.99) contrast(1);
   opacity: 0.72;
 }
 
-/* reduce the dark top haze a bit */
 html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .haze {
   background: linear-gradient(
     to bottom,
@@ -268,7 +272,6 @@ html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .haze {
   );
 }
 
-/* nudge the white overlay up to lift overall luminance */
 html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
   background: linear-gradient(
     to top,
@@ -280,7 +283,6 @@ html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
   ) !important;
 }
 
-/* composer glass in Light mode: slightly brighter fill, softer edge */
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
   form[data-type="unified-composer"]
   > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
@@ -289,9 +291,12 @@ html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
   box-shadow: 0 6px 26px rgba(0,0,0,0.20) !important;
 }
 
-/* popovers in Light mode: lift bg, lighten border */
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
-  .popover.bg-token-main-surface-primary[data-radix-menu-content] {
+  :is(
+    .popover.bg-token-main-surface-primary[data-radix-menu-content],
+    .popover.bg-token-main-surface-primary[role="dialog"],
+    div[role="dialog"][class*="shadow-long"]
+  ) {
   background: rgba(255,255,255,0.242) !important;
   border-color: rgba(0,0,0,0.072) !important;
 }
