@@ -7,6 +7,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
+/* MODIFIED: This is now the definitive light mode style block */
 @media (prefers-color-scheme: light) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
     --glass-bg: rgba(255, 255, 255, 0.22);
@@ -15,6 +16,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   }
 }
 
+/* This class override ensures light mode works even with a dark OS theme */
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   --glass-bg: rgba(255, 255, 255, 0.22);
   --glass-stroke: rgba(0, 0, 0, 0.072);
@@ -40,15 +42,11 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before
   inset: 0;
   z-index: 0;
   pointer-events: none;
-
   border-radius: inherit;
   background: var(--glass-bg);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-
-  box-shadow:
-    inset -1px 0 0 var(--glass-stroke),
-    var(--glass-shadow);
+  box-shadow: inset -1px 0 0 var(--glass-stroke), var(--glass-shadow);
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar > * {
@@ -72,15 +70,11 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:
   inset: 0;
   z-index: 0;
   pointer-events: none;
-
   border-radius: inherit;
   background: var(--glass-bg);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.06) inset,
-    var(--glass-shadow);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, var(--glass-shadow);
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky > *,
@@ -92,17 +86,13 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:
 @media (prefers-color-scheme: light) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
   html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
-    box-shadow:
-      0 1px 0 rgba(0,0,0,0.06) inset,
-      var(--glass-shadow);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.06) inset, var(--glass-shadow);
   }
 }
 
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
-  box-shadow:
-    0 1px 0 rgba(0,0,0,0.06) inset,
-    var(--glass-shadow);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06) inset, var(--glass-shadow);
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .hover\:bg-token-surface-hover:hover,
@@ -117,27 +107,15 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after 
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.015),
-    rgba(0,0,0,0.015)
-  );
+  background: linear-gradient( to bottom, rgba(255,255,255,0.015), rgba(0,0,0,0.015) );
 }
 
 @media (prefers-color-scheme: light) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
-    background: linear-gradient(
-      to bottom,
-      rgba(0,0,0,0.015),
-      rgba(255,255,255,0.015)
-    );
+    background: linear-gradient( to bottom, rgba(0,0,0,0.015), rgba(255,255,255,0.015) );
   }
 }
 
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.015),
-    rgba(255,255,255,0.015)
-  );
+  background: linear-gradient( to bottom, rgba(0,0,0,0.015), rgba(255,255,255,0.015) );
 }
