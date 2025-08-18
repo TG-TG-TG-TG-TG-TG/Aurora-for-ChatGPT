@@ -56,25 +56,13 @@ html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
 }
 
 @keyframes aurora-menu-open {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes aurora-menu-close {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95);
-  }
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
@@ -86,8 +74,9 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
 }
+/* MODIFIED: Added :not(.cgpt-light-mode) to prevent override */
 @media (prefers-color-scheme: dark) {
-  html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  html.cgpt-ambient-on:not(.cgpt-light-mode):not(.cgpt-legacy-composer)
     form[data-type="unified-composer"]
     > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
     background: rgba(0,0,0,0.35) !important;
@@ -187,8 +176,9 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
   animation: aurora-menu-close 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* MODIFIED: Added :not(.cgpt-light-mode) to prevent override */
 @media (prefers-color-scheme: dark) {
-  html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  html.cgpt-ambient-on:not(.cgpt-light-mode):not(.cgpt-legacy-composer)
     :is(
       .popover.bg-token-main-surface-primary[data-radix-menu-content],
       .popover.bg-token-main-surface-primary[role="dialog"],
@@ -221,13 +211,8 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
 }
 
-.cgpt-gpt5-limit-hidden {
-    display: none !important;
-}
-
-.cgpt-upgrade-hidden {
-    display: none !important;
-}
+.cgpt-gpt5-limit-hidden { display: none !important; }
+.cgpt-upgrade-hidden { display: none !important; }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .dark\\:bg-\\[\\#373669\\].flex {
   background: rgba(55, 54, 105, 0.6) !important;
@@ -249,7 +234,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[role="alert"].bg-red-500 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Voice mode background blur */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
   background: rgba(18, 18, 18, 0.5) !important;
   -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
@@ -262,25 +246,11 @@ html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img {
 }
 
 html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .haze {
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.153) 0%,
-    rgba(0,0,0,0.09) 22%,
-    rgba(0,0,0,0.045) 45%,
-    rgba(0,0,0,0.0225) 68%,
-    rgba(0,0,0,0.00) 85%
-  );
+  background: linear-gradient( to bottom, rgba(0,0,0,0.153) 0%, rgba(0,0,0,0.09) 22%, rgba(0,0,0,0.045) 45%, rgba(0,0,0,0.0225) 68%, rgba(0,0,0,0.00) 85% );
 }
 
 html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
-  background: linear-gradient(
-    to top,
-    rgba(255,255,255,0.693) 0%,
-    rgba(255,255,255,0.539) 18%,
-    rgba(255,255,255,0.346) 36%,
-    rgba(255,255,255,0.154) 60%,
-    rgba(255,255,255,0.00) 80%
-  ) !important;
+  background: linear-gradient( to top, rgba(255,255,255,0.693) 0%, rgba(255,255,255,0.539) 18%, rgba(255,255,255,0.346) 36%, rgba(255,255,255,0.154) 60%, rgba(255,255,255,0.00) 80% ) !important;
 }
 
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
@@ -299,4 +269,8 @@ html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
   ) {
   background: rgba(255,255,255,0.242) !important;
   border-color: rgba(0,0,0,0.072) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
+  background: rgba(255, 255, 255, 0.5) !important;
 }

@@ -40,51 +40,30 @@
     .credit { margin-top: 10px; font-size: 12px; opacity: .7; text-align: center; }
     .credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 
-    /* Updated Control Styles */
+    /* Control Styles */
     input[type="text"], select {
-      width: 100%;
-      padding: 6px 10px;
-      border-radius: 6px;
+      width: 100%; padding: 6px 10px; border-radius: 6px;
       border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
       background-color: color-mix(in oklab, currentColor 10%, transparent);
-      color: inherit;
-      font-size: 13px;
-      -webkit-appearance: none;
-      appearance: none;
+      color: inherit; font-size: 13px; -webkit-appearance: none; appearance: none;
     }
     select {
       background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-      background-repeat: no-repeat;
-      background-position: right 8px center;
-      background-size: 16px;
-      padding-right: 30px;
+      background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; padding-right: 30px;
     }
-    /* New rule to style the dropdown options' background and text color */
-    select option {
-      background: #f0f4f8;
-      color: #1d1d1f;
-    }
+    select option { background: #f0f4f8; color: #1d1d1f; }
     @media (prefers-color-scheme: dark) {
       select {
         background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
       }
-      /* Dark mode styling for the dropdown options */
-      select option {
-        background: #2a2a2e;
-        color: #f0f4f8;
-      }
+      select option { background: #2a2a2e; color: #f0f4f8; }
     }
     input[type="text"]:disabled { opacity: 0.6; }
     input[type="file"] { font-size: 12px; width: 100%; }
     button {
-      font-size: 12px;
-      padding: 4px 10px;
-      border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
-      background: color-mix(in oklab, currentColor 15%, transparent);
-      color: inherit;
-      border-radius: 6px;
-      cursor: pointer;
-      white-space: nowrap;
+      font-size: 12px; padding: 4px 10px; border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
+      background: color-mix(in oklab, currentColor 15%, transparent); color: inherit;
+      border-radius: 6px; cursor: pointer; white-space: nowrap;
     }
     button:hover { background: color-mix(in oklab, currentColor 25%, transparent); }
   </style>
@@ -97,10 +76,7 @@
       <span class="track"><span class="thumb"></span></span>
     </label>
   </div>
-  <div class="hint">Applies to URLs like <code>/c/&lt;id&gt;</code>.</div>
-
   <hr>
-
   <div class="row">
     <div class="label" style="flex-shrink: 0;">Background preset</div>
     <select id="bgPreset">
@@ -116,20 +92,22 @@
     <input type="file" id="bgFile" accept="image/png, image/jpeg, image/webp, image/gif">
     <button id="clearBg">Reset</button>
   </div>
-
   <hr>
+  <!-- NEW: Theme Selector -->
+  <div class="row">
+    <div class="label">Theme</div>
+    <select id="themeSelector">
+      <option value="auto">Auto</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </div>
+  <div class="hint">"Auto" matches the theme set in ChatGPT's settings.</div>
 
   <div class="row">
     <div class="label">Legacy composer (no glass)</div>
     <label class="switch" title="Use the site’s standard composer styling">
       <input type="checkbox" id="legacyComposer">
-      <span class="track"><span class="thumb"></span></span>
-    </label>
-  </div>
-  <div class="row">
-    <div class="label">Light mode</div>
-    <label class="switch" title="Use a light themed background">
-      <input type="checkbox" id="lightMode">
       <span class="track"><span class="thumb"></span></span>
     </label>
   </div>
