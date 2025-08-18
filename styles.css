@@ -177,7 +177,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
     .popover.bg-token-main-surface-primary.max-w-xs, /* Keyboard shortcuts */
     div.sticky.top-14.bg-token-main-surface-primary, /* GPTs category bar */
     input#search[placeholder="Search GPTs"], /* GPTs search bar */
-    /* MODIFIED: Target textareas in Customize ChatGPT modal */
     textarea.bg-token-main-surface-primary.border-token-border-default
   ) {
   background: rgba(255, 255, 255, 0.10) !important;
@@ -196,7 +195,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
       .popover.bg-token-main-surface-primary.max-w-xs,
       div.sticky.top-14.bg-token-main-surface-primary,
       input#search[placeholder="Search GPTs"],
-      /* MODIFIED: Target textareas in Customize ChatGPT modal */
       textarea.bg-token-main-surface-primary.border-token-border-default
     ) {
     background: rgba(0, 0, 0, 0.35) !important;
@@ -226,6 +224,74 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
 /* =========================================================
    Custom Additions
    ========================================================= */
+
 .cgpt-gpt5-limit-hidden {
     display: none !important;
+}
+
+.cgpt-upgrade-hidden {
+    display: none !important;
+}
+
+/* Blurred glass effect for the top "Upgrade your plan" button */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .dark\\:bg-\\[\\#373669\\].flex {
+  background: rgba(55, 54, 105, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .dark\\:hover\\:bg-\\[\\#414071\\]:hover {
+    background: rgba(65, 64, 113, 0.75) !important;
+}
+
+/* =========================================================
+   Light mode overrides (MERGED FROM DEVELOPER BRANCH)
+   ========================================================= */
+
+/* slightly brighter image in Light mode */
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img {
+  filter: blur(60px) brightness(0.99) contrast(1);
+  opacity: 0.72;
+}
+
+/* reduce the dark top haze a bit */
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .haze {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.153) 0%,
+    rgba(0,0,0,0.09) 22%,
+    rgba(0,0,0,0.045) 45%,
+    rgba(0,0,0,0.0225) 68%,
+    rgba(0,0,0,0.00) 85%
+  );
+}
+
+/* nudge the white overlay up to lift overall luminance */
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
+  background: linear-gradient(
+    to top,
+    rgba(255,255,255,0.693) 0%,
+    rgba(255,255,255,0.539) 18%,
+    rgba(255,255,255,0.346) 36%,
+    rgba(255,255,255,0.154) 60%,
+    rgba(255,255,255,0.00) 80%
+  ) !important;
+}
+
+/* composer glass in Light mode: slightly brighter fill, softer edge */
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
+  form[data-type="unified-composer"]
+  > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
+  background: rgba(255,255,255,0.088) !important;
+  border: 1px solid rgba(0,0,0,0.072) !important;
+  box-shadow: 0 6px 26px rgba(0,0,0,0.20) !important;
+}
+
+/* popovers in Light mode: lift bg, lighten border */
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
+  .popover.bg-token-main-surface-primary[data-radix-menu-content] {
+  background: rgba(255,255,255,0.242) !important;
+  border-color: rgba(0,0,0,0.072) !important;
 }

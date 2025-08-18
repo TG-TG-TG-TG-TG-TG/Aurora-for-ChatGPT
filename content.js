@@ -4,20 +4,27 @@
   const HTML_CLASS = 'cgpt-ambient-on';
   const LEGACY_CLASS = 'cgpt-legacy-composer';
   const LIGHT_CLASS = 'cgpt-light-mode';
-  const DEFAULTS = { showInChats: true, legacyComposer: false, lightMode: false, hideGpt5Limit: false };
+  const DEFAULTS = { showInChats: true, legacyComposer: false, lightMode: false, hideGpt5Limit: false, hideUpgradeButtons: false };
   let settings = { ...DEFAULTS };
 
-  // --- GPT-5 Limit Popup Logic ---
-  const LIMIT_POPUP_SELECTOR = '.dark\\:bg-token-main-surface-secondary.text-token-text-primary.bg-token-main-surface-primary.border-token-border-default.md\\:items-center.shadow-xxs.dark\\:border-transparent.lg\\:mx-auto.\\[text-wrap\\:pretty\\].text-sm.pe-3.ps-5.py-4.border.rounded-3xl.gap-4.items-start.w-full.flex';
-  const HIDE_CLASS = 'cgpt-gpt5-limit-hidden';
+  // --- Selectors and Classes ---
+  const GPT5_LIMIT_POPUP_SELECTOR = '.dark\\:bg-token-main-surface-secondary.text-token-text-primary.bg-token-main-surface-primary.border-token-border-default.md\\:items-center.shadow-xxs.dark\\:border-transparent.lg\\:mx-auto.\\[text-wrap\\:pretty\\].text-sm.pe-3.ps-5.py-4.border.rounded-3xl.gap-4.items-start.w-full.flex';
+  const HIDE_LIMIT_CLASS = 'cgpt-gpt5-limit-hidden';
+
+  const PANEL_UPGRADE_SELECTOR = 'div.gap-1\\.5.__menu-item.group:nth-of-type(2)';
+  // CORRECTED: This selector now targets the unique parent of the top button for reliable hiding.
+  const TOP_UPGRADE_SELECTOR = '.rtl\\:translate-x-1\\/2.ltr\\:-translate-x-1\\/2.start-1\\/2.absolute';
+  const HIDE_UPGRADE_CLASS = 'cgpt-upgrade-hidden';
+
   const TIMESTAMP_KEY = 'gpt5LimitHitTimestamp';
   const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
+
   function manageGpt5LimitPopup() {
-    const popup = document.querySelector(LIMIT_POPUP_SELECTOR);
+    const popup = document.querySelector(GPT5_LIMIT_POPUP_SELECTOR);
 
     if (!settings.hideGpt5Limit) {
-      if (popup) popup.classList.remove(HIDE_CLASS);
+      if (popup) popup.classList.remove(HIDE_LIMIT_CLASS);
       return;
     }
 
@@ -30,7 +37,7 @@
           chrome.storage.local.set(newTimestamp);
         } else {
           if (Date.now() - timestamp > FIVE_MINUTES_MS) {
-            popup.classList.add(HIDE_CLASS);
+            popup.classList.add(HIDE_LIMIT_CLASS);
           }
         }
       });
@@ -38,7 +45,24 @@
       chrome.storage.local.remove([TIMESTAMP_KEY]);
     }
   }
-  // --- End of Logic ---
+
+  function manageUpgradeButtons() {
+    const panelButton = document.querySelector(PANEL_UPGRADE_SELECTOR);
+    const topButtonContainer = document.querySelector(TOP_UPGRADE_SELECTOR);
+
+    const shouldHide = settings.hideUpgradeButtons;
+
+    if (panelButton) {
+      // Additional check to ensure it's the correct button
+      if (panelButton.textContent.toLowerCase().includes('upgrade')) {
+         panelButton.classList.toggle(HIDE_UPGRADE_CLASS, shouldHide);
+      }
+    }
+    if (topButtonContainer) {
+        // Hides the parent container, which hides the button within it
+        topButtonContainer.classList.toggle(HIDE_UPGRADE_CLASS, shouldHide);
+    }
+  }
 
   const isChatPage = () => location.pathname.startsWith('/c/');
 
@@ -101,19 +125,19 @@
     return !(isChatPage() && !settings.showInChats);
   }
 
-  function applyVisibility() {
+  function applyAllSettings() {
     if (shouldShow()) showBg(); else hideBg();
     applyRootFlags();
     manageGpt5LimitPopup();
+    manageUpgradeButtons();
   }
 
   function startObservers() {
-    // URL change detection for SPA navigation
     let lastUrl = location.href;
     const checkUrl = () => {
       if (location.href !== lastUrl) {
         lastUrl = location.href;
-        applyVisibility();
+        applyAllSettings();
       }
     };
     window.addEventListener('popstate', checkUrl, { passive: true });
@@ -128,8 +152,11 @@
       setTimeout(checkUrl, 0);
     };
 
-    // DOM observer for the GPT-5 limit popup
-    const domObserver = new MutationObserver(manageGpt5LimitPopup);
+    // DOM observer for dynamically added elements
+    const domObserver = new MutationObserver(() => {
+        manageGpt5LimitPopup();
+        manageUpgradeButtons();
+    });
     domObserver.observe(document.body, { childList: true, subtree: true });
   }
 
@@ -137,7 +164,7 @@
   if (chrome?.storage?.sync) {
     chrome.storage.sync.get(DEFAULTS, (res) => {
       settings = { ...DEFAULTS, ...res };
-      applyVisibility();
+      applyAllSettings();
       startObservers();
     });
     chrome.storage.onChanged.addListener((changes, area) => {
@@ -149,16 +176,16 @@
           needsUpdate = true;
         }
       }
-      if (needsUpdate) applyVisibility();
+      if (needsUpdate) applyAllSettings();
     });
   } else {
-    applyVisibility();
+    applyAllSettings();
     startObservers();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyVisibility, { once: true });
+    document.addEventListener('DOMContentLoaded', applyAllSettings, { once: true });
   } else {
-    applyVisibility();
+    applyAllSettings();
   }
 })();

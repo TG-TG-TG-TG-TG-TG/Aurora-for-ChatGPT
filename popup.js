@@ -1,17 +1,25 @@
 // popup.js — controls settings
-const DEFAULTS = { showInChats: true, legacyComposer: false, lightMode: false, hideGpt5Limit: false };
+const DEFAULTS = {
+  showInChats: true,
+  legacyComposer: false,
+  lightMode: false,
+  hideGpt5Limit: false,
+  hideUpgradeButtons: false
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   const cbChats = document.getElementById('showInChats');
   const cbLegacy = document.getElementById('legacyComposer');
   const cbLight = document.getElementById('lightMode');
   const cbGpt5Limit = document.getElementById('hideGpt5Limit');
+  const cbUpgradeButtons = document.getElementById('hideUpgradeButtons');
 
   chrome.storage.sync.get(DEFAULTS, (res) => {
     cbChats.checked  = !!res.showInChats;
     cbLegacy.checked = !!res.legacyComposer;
     cbLight.checked  = !!res.lightMode;
     cbGpt5Limit.checked = !!res.hideGpt5Limit;
+    cbUpgradeButtons.checked = !!res.hideUpgradeButtons;
   });
 
   cbChats.addEventListener('change', () => {
@@ -28,5 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   cbGpt5Limit.addEventListener('change', () => {
     chrome.storage.sync.set({ hideGpt5Limit: cbGpt5Limit.checked });
+  });
+
+  cbUpgradeButtons.addEventListener('change', () => {
+    chrome.storage.sync.set({ hideUpgradeButtons: cbUpgradeButtons.checked });
   });
 });
