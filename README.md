@@ -91,5 +91,6 @@ Branding & icons © 2025 **test\_tm7873**. All rights reserved.
 
 Made by **@test\_tm7873** on X.
 Thanks to everyone who likes their AI chats… just a bit more magical. ✨
+And many thanks to **@tnemoroccan** on X. for adding more blur elements and custom backgrounds!
 
 ---
