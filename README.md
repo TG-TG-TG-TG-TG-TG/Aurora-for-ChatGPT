@@ -8,8 +8,10 @@ Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
 ## Highlights
 
 * 🌌 **Ambient Aurora background** — a subtle gradient blur behind the ChatGPT interface
+* 🖼️ **Custom Backgrounds** — Choose from built-in presets, paste an image URL, or upload your own file.
 * 👁️ **Chat visibility toggle** — hide/show the chat panel instantly
 * 📝 **Legacy composer option** — switch back to the classic `<textarea>` input instead of the new Lexical composer
+* 🌗 **Light mode** — optional light themed variant with quick toggle
 * 🪄 **Seamless integration** — blends into the UI without breaking layouts or controls
 * 🔒 **Private** — no network calls, no analytics; settings sync via Chrome’s `storage.sync`
 
@@ -40,6 +42,7 @@ This section will be updated once the extension is published on the Chrome Web S
 
 * **Toggle Aurora background**: via the toolbar popup or the in-page controls.
 * **Switch composers**: enable **Legacy composer** from the popup or settings.
+* **Light mode**: flip the "Light mode" toggle in the popup for a brighter vibe.
 * **Settings sync**: changes persist between sessions automatically.
 
 ---

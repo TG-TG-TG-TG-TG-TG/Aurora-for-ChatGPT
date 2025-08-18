@@ -1,20 +1,8 @@
-/* =========================================================
-   ChatGPT Ambient Blur — FULL styles.css
-   - Ambient background with bottom gradient
-   - Top-weighted white haze over image (Option A)
-   - Glass composer only when NOT in legacy
-   - Legacy composer = stock gray, untouched
-   - Upload chips/previews stay visible
-   - Bottom bar/fade removed in BOTH modes
-   ========================================================= */
-
-/* only make the page transparent when our bg is active */
 html.cgpt-ambient-on,
 html.cgpt-ambient-on body {
   background: transparent !important;
 }
 
-/* fixed, behind everything, non-interactive */
 #cgpt-ambient-bg {
   position: fixed;
   inset: 0;
@@ -22,7 +10,6 @@ html.cgpt-ambient-on body {
   pointer-events: none;
 }
 
-/* stretch inner elements */
 #cgpt-ambient-bg picture,
 #cgpt-ambient-bg img,
 #cgpt-ambient-bg .haze,
@@ -33,20 +20,18 @@ html.cgpt-ambient-on body {
   height: 100%;
 }
 
-/* blur + slightly darker image */
 #cgpt-ambient-bg img {
   object-fit: cover;
   transform: scale(1.08);
   filter: blur(60px) brightness(0.55);
   opacity: 0.58;
   will-change: transform, filter;
-  z-index: 0; /* base layer */
+  z-index: 0;
 }
 
-/* ===== Option A: top-weighted white haze ABOVE the black overlay ===== */
 #cgpt-ambient-bg .haze {
   pointer-events: none;
-  z-index: 2; /* sits above .overlay */
+  z-index: 2;
   background: linear-gradient(
     to bottom,
     rgba(255,255,255,0.16) 0%,
@@ -57,10 +42,9 @@ html.cgpt-ambient-on body {
   );
 }
 
-/* bottom gradient (black → transparent), kept UNDER the haze */
 html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   pointer-events: none !important;
-  z-index: 1; /* below .haze, above the image */
+  z-index: 1;
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.92) 0%,
@@ -71,11 +55,28 @@ html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   ) !important;
 }
 
-/* =========================================================
-   Composer styling
-   ========================================================= */
+@keyframes aurora-menu-open {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
-/* Glass look — ONLY when NOT in legacy mode */
+@keyframes aurora-menu-close {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   form[data-type="unified-composer"]
   > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
@@ -95,40 +96,26 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   }
 }
 
-/* keep the editor area transparent only in glass mode */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"] .ProseMirror,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"] textarea {
+  form[data-type="unified-composer"] :is(.ProseMirror, textarea) {
   background: transparent !important;
 }
 
-/* Legacy mode: DO NOT override the composer;
-   let the site’s stock gray render naturally */
-
-/* =========================================================
-   Safer page neutralization
-   ========================================================= */
-
-/* only neutralize the big page wrappers */
-html.cgpt-ambient-on :is(main, #__next) {
+html.cgpt-ambient-on :is(main, #__next, .bg-token-bg-primary.sticky) {
   background-color: transparent !important;
 }
 
-/* ===== remove the bottom page bar/fade in BOTH modes ===== */
 html.cgpt-ambient-on #thread-bottom-container {
-  background: transparent !important;   /* kills the gray bar surface */
+  background: transparent !important;
   box-shadow: none !important;
 }
 
-/* remove any gradient mask it applies */
 html.cgpt-ambient-on #thread-bottom-container.content-fade,
 html.cgpt-ambient-on #thread-bottom-container .content-fade {
   -webkit-mask-image: none !important;
   mask-image: none !important;
 }
 
-/* some builds paint the fade via pseudos — strip those */
 html.cgpt-ambient-on #thread-bottom-container::before,
 html.cgpt-ambient-on #thread-bottom-container::after,
 html.cgpt-ambient-on #thread-bottom-container .content-fade::before,
@@ -137,68 +124,179 @@ html.cgpt-ambient-on #thread-bottom-container .content-fade::after {
   background: none !important;
 }
 
-/* footer line (“ChatGPT can make mistakes…”) — ensure no bar */
 html.cgpt-ambient-on #thread-bottom-container .text-token-text-secondary {
   background: transparent !important;
 }
 
-/* =========================================================
-   Transparent top header (keep content, remove gray bar)
-   ========================================================= */
-
-html.cgpt-ambient-on header#page-header {
-  /* nuke the gray box */
+html.cgpt-ambient-on
+  :is(header#page-header,
+      .sticky.top-0.bg-token-main-surface-primary,
+      div.sticky.top-14[class*="bg-token-bg-primary"]
+  ) {
   background: transparent !important;
-  box-shadow: none !important;          /* kills [box-shadow:var(--sharp-edge-top-shadow)] */
+  box-shadow: none !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
 
-/* just in case any pseudo paints it */
-html.cgpt-ambient-on header#page-header::before,
-html.cgpt-ambient-on header#page-header::after {
+html.cgpt-ambient-on
+  :is(header#page-header,
+      .sticky.top-0.bg-token-main-surface-primary,
+      div.sticky.top-14[class*="bg-token-bg-primary"]
+  )::before,
+html.cgpt-ambient-on
+  :is(header#page-header,
+      .sticky.top-0.bg-token-main-surface-primary,
+      div.sticky.top-14[class*="bg-token-bg-primary"]
+  )::after {
   content: none !important;
   background: none !important;
   box-shadow: none !important;
 }
 
-/* if the site sets the gray via this token class on the header element */
-html.cgpt-ambient-on header#page-header.bg-token-main-surface-primary {
-  background-color: transparent !important;
-}
-
-/* =========================================================
-   Popovers & dropdown menus — glass (respects Legacy toggle)
-   ========================================================= */
-
-/* main popover panel (Radix menu content) */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover.bg-token-main-surface-primary[data-radix-menu-content] {
+  :is(
+    .popover.bg-token-main-surface-primary[data-radix-menu-content],
+    .popover.bg-token-main-surface-primary[role="dialog"],
+    div[role="dialog"][class*="shadow-long"],
+    .popover.bg-token-main-surface-primary.max-w-xs,
+    div.sticky.top-14.bg-token-main-surface-primary,
+    input#search[placeholder="Search GPTs"],
+    textarea.bg-token-main-surface-primary.border-token-border-default
+  ) {
   background: rgba(255, 255, 255, 0.10) !important;
   border: 1px solid rgba(255, 255, 255, 0.28) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
-  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45) !important; /* a touch deeper than composer */
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45) !important;
 }
 
-/* dark scheme tweak */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
+  :is(
+    .popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="open"],
+    .popover[role="dialog"][class*="md:max-w-"][data-state="open"]
+  ) {
+  animation: aurora-menu-open 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
+  :is(
+    .popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="closed"],
+    .popover[role="dialog"][class*="md:max-w-"][data-state="closed"]
+  ) {
+  animation: aurora-menu-close 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 @media (prefers-color-scheme: dark) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-    .popover.bg-token-main-surface-primary[data-radix-menu-content] {
+    :is(
+      .popover.bg-token-main-surface-primary[data-radix-menu-content],
+      .popover.bg-token-main-surface-primary[role="dialog"],
+      div[role="dialog"][class*="shadow-long"],
+      .popover.bg-token-main-surface-primary.max-w-xs,
+      div.sticky.top-14.bg-token-main-surface-primary,
+      input#search[placeholder="Search GPTs"],
+      textarea.bg-token-main-surface-primary.border-token-border-default
+    ) {
     background: rgba(0, 0, 0, 0.35) !important;
     border-color: rgba(255, 255, 255, 0.14) !important;
   }
 }
 
-/* keep section separators visible on glass (optional) */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover[data-radix-menu-content] [role="group"]::before {
-  /* replaces token separator color with a subtle line */
+  .popover[role="dialog"]
+  .md\:flex-row.flex-col,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  div[role="dialog"][class*="shadow-long"] .bg-token-bg-elevated-secondary {
+  background-color: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  :is(.popover[data-radix-menu-content], .popover[role="dialog"]) [role="group"]::before {
   background: color-mix(in oklab, currentColor 24%, transparent) !important;
 }
 
-/* nicer hover inside glass menus (optional) */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  .popover[data-radix-menu-content] .__menu-item:hover {
+  :is(.popover[data-radix-menu-content], .popover[role="dialog"]) .__menu-item:hover {
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
+}
+
+.cgpt-gpt5-limit-hidden {
+    display: none !important;
+}
+
+.cgpt-upgrade-hidden {
+    display: none !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .dark\\:bg-\\[\\#373669\\].flex {
+  background: rgba(55, 54, 105, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .dark\\:hover\\:bg-\\[\\#414071\\]:hover {
+    background: rgba(65, 64, 113, 0.75) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[role="alert"].bg-red-500 {
+  background: rgba(239, 68, 68, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Voice mode background blur */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
+  background: rgba(18, 18, 18, 0.5) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img {
+  filter: blur(60px) brightness(0.99) contrast(1);
+  opacity: 0.72;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .haze {
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.153) 0%,
+    rgba(0,0,0,0.09) 22%,
+    rgba(0,0,0,0.045) 45%,
+    rgba(0,0,0,0.0225) 68%,
+    rgba(0,0,0,0.00) 85%
+  );
+}
+
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
+  background: linear-gradient(
+    to top,
+    rgba(255,255,255,0.693) 0%,
+    rgba(255,255,255,0.539) 18%,
+    rgba(255,255,255,0.346) 36%,
+    rgba(255,255,255,0.154) 60%,
+    rgba(255,255,255,0.00) 80%
+  ) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
+  form[data-type="unified-composer"]
+  > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
+  background: rgba(255,255,255,0.088) !important;
+  border: 1px solid rgba(0,0,0,0.072) !important;
+  box-shadow: 0 6px 26px rgba(0,0,0,0.20) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
+  :is(
+    .popover.bg-token-main-surface-primary[data-radix-menu-content],
+    .popover.bg-token-main-surface-primary[role="dialog"],
+    div[role="dialog"][class*="shadow-long"]
+  ) {
+  background: rgba(255,255,255,0.242) !important;
+  border-color: rgba(0,0,0,0.072) !important;
 }
