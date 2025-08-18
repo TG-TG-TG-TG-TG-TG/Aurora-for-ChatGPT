@@ -2,11 +2,11 @@
 const DEFAULTS = {
   showInChats: true,
   legacyComposer: false,
-  lightMode: false,
+  theme: 'auto', // Replaces lightMode
   hideGpt5Limit: false,
   hideUpgradeButtons: false,
   disableAnimations: false,
-  customBgUrl: '' // Empty string signifies the default "GPT-5" wallpaper
+  customBgUrl: ''
 };
 
 const LOCAL_BG_KEY = 'customBgData';
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Get all UI elements ---
   const cbChats = document.getElementById('showInChats');
   const cbLegacy = document.getElementById('legacyComposer');
-  const cbLight = document.getElementById('lightMode');
+  const themeSelector = document.getElementById('themeSelector');
   const cbGpt5Limit = document.getElementById('hideGpt5Limit');
   const cbUpgradeButtons = document.getElementById('hideUpgradeButtons');
   const cbDisableAnimations = document.getElementById('disableAnimations');
@@ -30,25 +30,25 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateUi(settings) {
     cbChats.checked = !!settings.showInChats;
     cbLegacy.checked = !!settings.legacyComposer;
-    cbLight.checked = !!settings.lightMode;
+    themeSelector.value = settings.theme;
     cbGpt5Limit.checked = !!settings.hideGpt5Limit;
     cbUpgradeButtons.checked = !!settings.hideUpgradeButtons;
     cbDisableAnimations.checked = !!settings.disableAnimations;
 
     const url = settings.customBgUrl;
-    tbBgUrl.disabled = false; // Enable by default
+    tbBgUrl.disabled = false;
 
-    if (!url) { // Default GPT-5 Wallpaper
+    if (!url) {
       bgPreset.value = 'default';
       tbBgUrl.value = '';
-    } else if (url === BLUE_WALLPAPER_URL) { // Blue Wallpaper
+    } else if (url === BLUE_WALLPAPER_URL) {
       bgPreset.value = 'blue';
-      tbBgUrl.value = ''; // Hide the URL, but keep input enabled
-    } else if (url === '__local__') { // Local file
+      tbBgUrl.value = '';
+    } else if (url === '__local__') {
       bgPreset.value = 'custom';
       tbBgUrl.value = 'Local image is in use';
-      tbBgUrl.disabled = true; // Disable only for local files
-    } else { // Custom URL
+      tbBgUrl.disabled = true;
+    } else {
       bgPreset.value = 'custom';
       tbBgUrl.value = url;
     }
@@ -60,33 +60,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Event Listeners for Toggles ---
   cbChats.addEventListener('change', () => chrome.storage.sync.set({ showInChats: cbChats.checked }));
   cbLegacy.addEventListener('change', () => chrome.storage.sync.set({ legacyComposer: cbLegacy.checked }));
-  cbLight.addEventListener('change', () => chrome.storage.sync.set({ lightMode: cbLight.checked }));
+  themeSelector.addEventListener('change', () => chrome.storage.sync.set({ theme: themeSelector.value }));
   cbGpt5Limit.addEventListener('change', () => chrome.storage.sync.set({ hideGpt5Limit: cbGpt5Limit.checked }));
   cbUpgradeButtons.addEventListener('change', () => chrome.storage.sync.set({ hideUpgradeButtons: cbUpgradeButtons.checked }));
   cbDisableAnimations.addEventListener('change', () => chrome.storage.sync.set({ disableAnimations: cbDisableAnimations.checked }));
 
   // --- Event Listeners for Custom Background ---
-
-  // Handle preset selection
   bgPreset.addEventListener('change', () => {
-    const selection = bgPreset.value;
-    let newUrl = '';
-    if (selection === 'blue') {
-      newUrl = BLUE_WALLPAPER_URL;
-    }
-    // For 'default', newUrl remains '', which is correct.
+    let newUrl = bgPreset.value === 'blue' ? BLUE_WALLPAPER_URL : '';
     chrome.storage.sync.set({ customBgUrl: newUrl });
     chrome.storage.local.remove(LOCAL_BG_KEY);
   });
-
-  // Handle URL input
   tbBgUrl.addEventListener('change', () => {
-    const url = tbBgUrl.value.trim();
-    chrome.storage.sync.set({ customBgUrl: url });
+    chrome.storage.sync.set({ customBgUrl: tbBgUrl.value.trim() });
     chrome.storage.local.remove(LOCAL_BG_KEY);
   });
-
-  // Handle file upload
   fileBg.addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -95,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const dataUrl = e.target.result;
       if (dataUrl.length > 4.5 * 1024 * 1024) {
         alert('Image is too large! Please choose a file under 4MB.');
-        fileBg.value = ''; return;
+        return;
       }
       chrome.storage.local.set({ [LOCAL_BG_KEY]: dataUrl }, () => {
         chrome.storage.sync.set({ customBgUrl: '__local__' });
@@ -104,17 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsDataURL(file);
     fileBg.value = '';
   });
-
-  // Handle the reset button (resets to default GPT-5 wallpaper)
   btnClearBg.addEventListener('click', () => {
     chrome.storage.sync.set({ customBgUrl: '' });
     chrome.storage.local.remove(LOCAL_BG_KEY);
   });
-
-  // Listen for changes from other parts of the extension and update UI
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'sync') {
-      chrome.storage.sync.get(DEFAULTS, updateUi);
-    }
-  });
+  chrome.storage.onChanged.addListener(() => chrome.storage.sync.get(DEFAULTS, updateUi));
 });
