@@ -5,6 +5,14 @@ Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
 
 ---
 
+> ⚠️ **DEVELOPMENT / TESTING FORK**
+>
+> This is **not** the official version of this project.  
+> it may be buggy, and not all changes will be implemented.  
+> 👉 [Go to the official repo](https://github.com/TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT)
+
+---
+
 ## Highlights
 
 * 🌌 **Ambient Aurora background** — a subtle gradient blur behind the ChatGPT interface
