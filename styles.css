@@ -235,7 +235,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
 }
 
-/* --- Helper Classes for Hiding Elements --- */
 .cgpt-hide-gpt5-limit,
 .cgpt-hide-upgrade,
 .cgpt-hide-sora,
@@ -243,7 +242,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   display: none !important;
 }
 
-/* --- Misc Glass UI Overrides --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .dark\\:bg-\\[\\#373669\\].flex {
   background: rgba(55, 54, 105, 0.6) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -269,8 +267,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-5
   -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
   backdrop-filter: blur(16px) saturate(140%) !important;
 }
-
-/* --- Light Mode Overrides --- */
 
 html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img,
 html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg video {
@@ -310,7 +306,6 @@ html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .flex-col.w-full
   background: rgba(255, 255, 255, 0.5) !important;
 }
 
-/* User message bubble (Light mode): Removed background-color to respect accent color */
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
   border: 1px solid rgba(0, 0, 0, 0.12) !important;
 }
@@ -319,7 +314,6 @@ html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg {
   background-color: #fff;
 }
 
-/* --- ChatGPT Voice UI Color Override --- */
 html.cgpt-ambient-on[data-voice-color]:not([data-voice-color="default"]) .min-h-bloop > canvas {
   filter: var(--voice-filter) !important;
 }
@@ -499,7 +493,7 @@ html:not(.cgpt-light-mode) .qs-color-dot {
   bottom: calc(100% + 6px);
   right: 0;
   left: 0;
-  z-index: 99999; /* MODIFIED: Set to highest value */
+  z-index: 99999;
   list-style: none;
   padding: 6px;
   margin: 0;

@@ -8,13 +8,11 @@
   position: relative;
 }
 
-/* FIX: Elevate the open select menu to prevent it from clipping behind other cards */
-/* Make cards a positioning context so z-index can be applied */
+
 details.settings-card {
   position: relative;
 }
 
-/* When a dropdown is open, elevate its parent card and allow content to overflow */
 details.settings-card:has(.custom-select.is-open) {
   z-index: 10;
   overflow: visible;
@@ -63,7 +61,7 @@ details.settings-card:has(.custom-select.is-open) {
 
 .select-trigger svg {
   flex-shrink: 0;
-  margin-left: auto; /* Changed from margin-left: 8px */
+  margin-left: auto;
   opacity: 0.6;
   transition: transform 0.2s ease;
 }
@@ -89,7 +87,7 @@ details.settings-card:has(.custom-select.is-open) {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   max-height: 200px;
   overflow-y: auto;
-  display: none; /* Hidden by default */
+  display: none; 
 }
 
 @media (prefers-color-scheme: dark) {
@@ -136,14 +134,13 @@ details.settings-card:has(.custom-select.is-open) {
     }
 }
 
-/* NEW: Styles for the color dots */
 .color-dot {
   width: 14px;
   height: 14px;
   border-radius: 50%;
   flex-shrink: 0;
   border: 1px solid rgba(0,0,0,0.1);
-  display: none; /* Hide by default unless it has a color */
+  display: none; 
 }
 @media (prefers-color-scheme: dark) {
   .color-dot {

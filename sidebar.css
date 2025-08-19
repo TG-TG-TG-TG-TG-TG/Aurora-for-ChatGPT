@@ -1,6 +1,6 @@
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   --glass-radius: 14px;
-  --glass-blur: 22px; /* MODIFIED: Increased from 18px to 22px */
+  --glass-blur: 22px; 
   --glass-sat: 140%;
   --glass-bg: rgba(18, 18, 18, 0.14);
   --glass-stroke: rgba(255, 255, 255, 0.08);
