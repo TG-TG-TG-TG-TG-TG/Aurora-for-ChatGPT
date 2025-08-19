@@ -1,0 +1,152 @@
+/* --- Custom Select Dropdown --- */
+.custom-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select {
+  position: relative;
+}
+
+/* FIX: Elevate the open select menu to prevent it from clipping behind other cards */
+/* Make cards a positioning context so z-index can be applied */
+details.settings-card {
+  position: relative;
+}
+
+/* When a dropdown is open, elevate its parent card and allow content to overflow */
+details.settings-card:has(.custom-select.is-open) {
+  z-index: 10;
+  overflow: visible;
+}
+
+.select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Add gap for color dot */
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-light);
+  background-color: var(--input-background-light);
+  color: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .2s ease, background-color .2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .select-trigger {
+    border: 1px solid var(--border-dark);
+    background-color: var(--input-background-dark);
+  }
+}
+
+.select-trigger:hover {
+  background: var(--hover-background-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .select-trigger:hover {
+    background: var(--hover-background-dark);
+  }
+}
+
+.select-trigger > .select-label {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select-trigger svg {
+  flex-shrink: 0;
+  margin-left: auto; /* Changed from margin-left: 8px */
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+.select-trigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.select-options {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  z-index: 100;
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.242);
+  border: 1px solid var(--border-light);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  display: none; /* Hidden by default */
+}
+
+@media (prefers-color-scheme: dark) {
+  .select-options {
+    background: rgba(0, 0, 0, 0.35);
+    border-color: var(--border-dark);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+}
+
+.select-options[style*="block"] {
+  display: block !important;
+}
+
+.select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Add gap for color dot */
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color .2s ease;
+}
+
+.select-option:hover {
+  background-color: var(--hover-background-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .select-option:hover {
+    background-color: var(--hover-background-dark);
+  }
+}
+
+.select-option[aria-selected="true"] {
+  font-weight: 500;
+  background-color: var(--primary-accent) !important;
+  color: white;
+}
+@media (prefers-color-scheme: dark) {
+    .select-option[aria-selected="true"] {
+        color: var(--text-dark);
+    }
+}
+
+/* NEW: Styles for the color dots */
+.color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.1);
+  display: none; /* Hide by default unless it has a color */
+}
+@media (prefers-color-scheme: dark) {
+  .color-dot {
+    border-color: rgba(255,255,255,0.1);
+  }
+}

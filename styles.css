@@ -238,7 +238,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
 /* --- Helper Classes for Hiding Elements --- */
 .cgpt-hide-gpt5-limit,
 .cgpt-hide-upgrade,
-.cgpt-hide-library,
 .cgpt-hide-sora,
 .cgpt-hide-gpts {
   display: none !important;
@@ -350,12 +349,12 @@ html.cgpt-cute-voice-on .min-h-bloop::after { right: 45px; transform: rotate(35d
 html.cgpt-cute-voice-on .min-h-bloop > canvas { position: relative; z-index: 1; }
 
 /* --- Quick Settings UI --- */
-/* Trigger Button */
+/* MODIFIED: Increased z-index values significantly */
 #cgpt-qs-btn {
   position: fixed;
   bottom: 12px;
   right: 16px;
-  z-index: 10001;
+  z-index: 99998;
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -378,12 +377,11 @@ html.cgpt-light-mode #cgpt-qs-btn {
 }
 html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
 
-/* MODIFIED: Settings Panel - Now matches main UI glass effect */
 #cgpt-qs-panel {
   position: fixed;
   bottom: 60px;
   right: 16px;
-  z-index: 10000;
+  z-index: 99997;
   width: 260px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -409,7 +407,6 @@ html.cgpt-light-mode #cgpt-qs-panel {
     color: #000;
 }
 
-/* Panel Content */
 .qs-section-title {
   font-size: 11px;
   font-weight: 600;
@@ -429,35 +426,6 @@ html.cgpt-light-mode #cgpt-qs-panel {
 html.cgpt-light-mode .qs-row:hover { background: rgba(0,0,0,0.06); }
 .qs-row > label { font-size: 14px; opacity: 0.95; }
 
-/* MODIFIED: Select Dropdown - Now matches popup.html styling */
-.qs-row select {
-  max-width: 110px;
-  padding: 4px 28px 4px 10px;
-  border-radius: 6px;
-  border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
-  background-color: color-mix(in oklab, currentColor 10%, transparent);
-  color: inherit;
-  font-size: 13px;
-  -webkit-appearance: none;
-  appearance: none;
-  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 16px;
-}
-html.cgpt-light-mode .qs-row select {
-  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-}
-#cgpt-qs-panel select option {
-    background: #2a2a2e;
-    color: #f0f4f8;
-}
-html.cgpt-light-mode #cgpt-qs-panel select option {
-    background: #f0f4f8;
-    color: #1d1d1f;
-}
-
-/* Switches */
 .qs-row .switch { position: relative; width: 46px; height: 26px; flex: 0 0 auto; }
 .qs-row .switch input { display: none; }
 .qs-row .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(0,0,0,0.3); transition: background .2s ease; }
@@ -465,6 +433,121 @@ html.cgpt-light-mode .qs-row .track { background: rgba(0,0,0,0.1); }
 .qs-row input:checked + .track { background: #4f8cff; }
 .qs-row .thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
 .qs-row input:checked + .track .thumb { transform: translateX(20px); }
+
+.qs-custom-select {
+  position: relative;
+  max-width: 110px;
+  width: 100%;
+}
+.qs-select-trigger {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+html.cgpt-light-mode .qs-select-trigger {
+  border-color: rgba(0, 0, 0, 0.08);
+  background-color: rgba(0, 0, 0, 0.03);
+}
+.qs-select-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+html.cgpt-light-mode .qs-select-trigger:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+.qs-select-trigger > .qs-select-label {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qs-select-trigger svg {
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+.qs-select-trigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.qs-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+html:not(.cgpt-light-mode) .qs-color-dot {
+  border-color: rgba(255,255,255,0.1);
+}
+.qs-select-options {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 99999; /* MODIFIED: Set to highest value */
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  backdrop-filter: blur(22px) saturate(140%);
+  border-radius: 10px;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.45);
+  max-height: 200px;
+  overflow-y: auto;
+}
+.qs-select-options::-webkit-scrollbar {
+  display: none;
+}
+html.cgpt-light-mode .qs-select-options {
+  background: rgba(255, 255, 255, 0.242);
+  border-color: rgba(0,0,0,0.072);
+}
+.qs-select-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+.qs-select-option:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+html.cgpt-light-mode .qs-select-option:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.qs-select-option[aria-selected="true"] {
+  font-weight: 500;
+}
+.qs-select-option .qs-checkmark {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  opacity: 0;
+}
+.qs-select-option[aria-selected="true"] .qs-checkmark {
+  opacity: 1;
+}
 
 /* Focus Mode Rules */
 html.cgpt-focus-mode-on .flex-shrink-0[class*="bg-token-sidebar-surface-primary"],
@@ -478,4 +561,13 @@ html.cgpt-focus-mode-on #thread-bottom-container {
 }
 html.cgpt-focus-mode-on main .flex.h-full.flex-col {
     padding-top: 1.25rem;
+}
+
+/* Composer Animation */
+form[data-type="unified-composer"] > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
+  transition: background 0.3s ease-in-out, 
+              border-color 0.3s ease-in-out, 
+              box-shadow 0.3s ease-in-out, 
+              backdrop-filter 0.3s ease-in-out, 
+              -webkit-backdrop-filter 0.3s ease-in-out;
 }

@@ -2,25 +2,23 @@
 (() => {
   const ID = 'cgpt-ambient-bg';
   const STYLE_ID = 'cgpt-ambient-styles';
-  const QS_BUTTON_ID = 'cgpt-qs-btn'; // Quick Settings Button
-  const QS_PANEL_ID = 'cgpt-qs-panel'; // Quick Settings Panel
+  const QS_BUTTON_ID = 'cgpt-qs-btn';
+  const QS_PANEL_ID = 'cgpt-qs-panel';
   const HTML_CLASS = 'cgpt-ambient-on';
   const LEGACY_CLASS = 'cgpt-legacy-composer';
   const LIGHT_CLASS = 'cgpt-light-mode';
   const ANIMATIONS_DISABLED_CLASS = 'cgpt-animations-disabled';
-  const DEFAULTS = { showInChats: true, legacyComposer: false, theme: 'auto', hideGpt5Limit: false, hideUpgradeButtons: false, disableAnimations: false, focusMode: false, customBgUrl: '', hideLibraryButton: false, hideSoraButton: false, hideGptsButton: false, backgroundBlur: '60', backgroundScaling: 'contain', voiceColor: 'default', cuteVoiceUI: false };
+  const DEFAULTS = { legacyComposer: false, theme: 'auto', hideGpt5Limit: false, hideUpgradeButtons: false, disableAnimations: false, focusMode: false, hideQuickSettings: false, customBgUrl: '', hideSoraButton: false, hideGptsButton: false, backgroundBlur: '60', backgroundScaling: 'contain', voiceColor: 'default', cuteVoiceUI: false, showInNewChatsOnly: false };
   let settings = { ...DEFAULTS };
 
   const LOCAL_BG_KEY = 'customBgData';
   const HIDE_LIMIT_CLASS = 'cgpt-hide-gpt5-limit';
   const HIDE_UPGRADE_CLASS = 'cgpt-hide-upgrade';
-  const HIDE_LIBRARY_CLASS = 'cgpt-hide-library';
   const HIDE_SORA_CLASS = 'cgpt-hide-sora';
   const HIDE_GPTS_CLASS = 'cgpt-hide-gpts';
   const TIMESTAMP_KEY = 'gpt5LimitHitTimestamp';
   const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
-  // --- No changes to the functions below this line ---
   function manageGpt5LimitPopup() {
     const popup = document.querySelector('div[class*="text-token-text-primary"]');
     if (popup && !popup.textContent.toLowerCase().includes('you\'ve reached the gpt-5 limit')) return;
@@ -44,14 +42,26 @@
   function manageUpgradeButtons() {
     const panelButton = Array.from(document.querySelectorAll('.__menu-item')).find(el => el.textContent.toLowerCase().includes('upgrade'));
     const topButtonContainer = document.querySelector('.start-1\\/2.absolute');
+
+    // The previous class-based selector was brittle. This search is more robust.
+    let accountUpgradeSection = null;
+    const allSettingRows = document.querySelectorAll('div.py-2.border-b');
+    for (const row of allSettingRows) {
+        const hasTitle = Array.from(row.querySelectorAll('div')).some(d => d.textContent.trim() === 'Get ChatGPT Plus');
+        const hasButton = row.querySelector('button')?.textContent.trim() === 'Upgrade';
+        if (hasTitle && hasButton) {
+            accountUpgradeSection = row;
+            break;
+        }
+    }
+
     if (panelButton) panelButton.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
     if (topButtonContainer) topButtonContainer.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
+    if (accountUpgradeSection) accountUpgradeSection.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
   }
   function manageSidebarButtons() {
-    const libraryButton = document.querySelector('a[href="/gpts/library"]');
     const soraButton = document.getElementById('sora');
     const gptsButton = document.querySelector('a[href="/gpts"]');
-    if (libraryButton) libraryButton.classList.toggle(HIDE_LIBRARY_CLASS, settings.hideLibraryButton);
     if (soraButton) soraButton.classList.toggle(HIDE_SORA_CLASS, settings.hideSoraButton);
     if (gptsButton) gptsButton.classList.toggle(HIDE_GPTS_CLASS, settings.hideGptsButton);
   }
@@ -134,7 +144,6 @@
     `;
   }
 
-  // --- REWRITTEN: Function to create and manage the Quick Settings UI ---
   function manageQuickSettingsUI() {
     let btn = document.getElementById(QS_BUTTON_ID);
     let panel = document.getElementById(QS_PANEL_ID);
@@ -159,10 +168,18 @@
         if (!panel.contains(e.target) && panel.classList.contains('active')) {
           panel.classList.remove('active');
         }
+        const selectContainer = document.getElementById('qs-voice-color-select');
+        if (selectContainer && !selectContainer.contains(e.target)) {
+            const selectTrigger = selectContainer.querySelector('.qs-select-trigger');
+            if (selectTrigger && selectTrigger.getAttribute('aria-expanded') === 'true') {
+                const selectOptions = selectContainer.querySelector('.qs-select-options');
+                selectTrigger.setAttribute('aria-expanded', 'false');
+                if (selectOptions) selectOptions.style.display = 'none';
+            }
+        }
       });
     }
 
-    // Populate panel content
     panel.innerHTML = `
       <div class="qs-section-title">Visibility</div>
       <div class="qs-row" data-setting="focusMode">
@@ -180,14 +197,14 @@
       <div class="qs-section-title">Voice UI</div>
       <div class="qs-row" data-setting="voiceColor">
           <label>Voice Color</label>
-          <select id="qs-voiceColorSelector">
-              <option value="default">Default</option>
-              <option value="orange">Orange</option>
-              <option value="yellow">Yellow</option>
-              <option value="pink">Pink</option>
-              <option value="green">Green</option>
-              <option value="dark">Onyx</option>
-          </select>
+          <div class="qs-custom-select" id="qs-voice-color-select">
+              <button type="button" class="qs-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="qs-color-dot"></span>
+                  <span class="qs-select-label"></span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="qs-select-options" role="listbox" style="display: none;"></div>
+          </div>
       </div>
       <div class="qs-row" data-setting="cuteVoiceUI">
           <label>Cute UI (Ears)</label>
@@ -195,26 +212,70 @@
       </div>
     `;
 
-    // Sync UI with current settings
     document.getElementById('qs-focusMode').checked = !!settings.focusMode;
     document.getElementById('qs-hideUpgradeButtons').checked = !!settings.hideUpgradeButtons;
     document.getElementById('qs-hideGptsButton').checked = !!settings.hideGptsButton;
-    document.getElementById('qs-voiceColorSelector').value = settings.voiceColor;
     document.getElementById('qs-cuteVoiceUI').checked = !!settings.cuteVoiceUI;
 
-    // Add event listeners
-    const addListener = (id, settingName, isCheckbox = true) => {
-        const el = document.getElementById(id);
-        el.addEventListener('change', () => {
-            const value = isCheckbox ? el.checked : el.value;
-            chrome.storage.sync.set({ [settingName]: value });
+    const addCheckboxListener = (id, settingName) => {
+      const el = document.getElementById(id);
+      if(el) el.addEventListener('change', () => {
+        chrome.storage.sync.set({ [settingName]: el.checked });
+      });
+    };
+    addCheckboxListener('qs-focusMode', 'focusMode');
+    addCheckboxListener('qs-hideUpgradeButtons', 'hideUpgradeButtons');
+    addCheckboxListener('qs-hideGptsButton', 'hideGptsButton');
+    addCheckboxListener('qs-cuteVoiceUI', 'cuteVoiceUI');
+
+    const voiceColorOptions = [
+        { value: 'default', label: 'Default', color: '#8EBBFF' },
+        { value: 'orange', label: 'Orange', color: '#FF9900' },
+        { value: 'yellow', label: 'Yellow', color: '#FFD700' },
+        { value: 'pink', label: 'Pink', color: '#FF69B4' },
+        { value: 'green', label: 'Green', color: '#32CD32' },
+        { value: 'dark', label: 'Onyx', color: '#555555' }
+    ];
+    const selectContainer = document.getElementById('qs-voice-color-select');
+    const trigger = selectContainer.querySelector('.qs-select-trigger');
+    const optionsContainer = selectContainer.querySelector('.qs-select-options');
+    const triggerDot = trigger.querySelector('.qs-color-dot');
+    const triggerLabel = trigger.querySelector('.qs-select-label');
+
+    const updateSelectorState = (value) => {
+        const selectedOption = voiceColorOptions.find(opt => opt.value === value) || voiceColorOptions[0];
+        triggerDot.style.backgroundColor = selectedOption.color;
+        triggerLabel.textContent = selectedOption.label;
+        optionsContainer.querySelectorAll('.qs-select-option').forEach(opt => {
+            opt.setAttribute('aria-selected', opt.dataset.value === value);
         });
     };
-    addListener('qs-focusMode', 'focusMode');
-    addListener('qs-hideUpgradeButtons', 'hideUpgradeButtons');
-    addListener('qs-hideGptsButton', 'hideGptsButton');
-    addListener('qs-cuteVoiceUI', 'cuteVoiceUI');
-    addListener('qs-voiceColorSelector', 'voiceColor', false);
+
+    optionsContainer.innerHTML = voiceColorOptions.map(option => `
+        <div class="qs-select-option" role="option" data-value="${option.value}">
+            <span class="qs-color-dot" style="background-color: ${option.color};"></span>
+            <span class="qs-select-label">${option.label}</span>
+            <svg class="qs-checkmark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+    `).join('');
+    
+    updateSelectorState(settings.voiceColor);
+
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+        trigger.setAttribute('aria-expanded', !isExpanded);
+        optionsContainer.style.display = isExpanded ? 'none' : 'block';
+    });
+
+    optionsContainer.querySelectorAll('.qs-select-option').forEach(optionEl => {
+        optionEl.addEventListener('click', () => {
+            const newValue = optionEl.dataset.value;
+            chrome.storage.sync.set({ voiceColor: newValue });
+            trigger.setAttribute('aria-expanded', 'false');
+            optionsContainer.style.display = 'none';
+        });
+    });
   }
 
   function applyRootFlags() {
@@ -240,20 +301,29 @@
     if (node) node.remove();
   }
   function shouldShow() {
-    return !(isChatPage() && !settings.showInChats);
+    if (settings.showInNewChatsOnly) {
+      return !isChatPage();
+    }
+    return true;
   }
 
   function applyAllSettings() {
     if (shouldShow()) {
       showBg();
-      manageQuickSettingsUI(); // Use the new function
     } else {
       hideBg();
+    }
+
+    // Manage Quick Settings UI visibility
+    if (shouldShow() && !settings.hideQuickSettings) {
+      manageQuickSettingsUI();
+    } else {
       const btn = document.getElementById(QS_BUTTON_ID);
       const panel = document.getElementById(QS_PANEL_ID);
-      if(btn) btn.remove();
-      if(panel) panel.remove();
+      if (btn) btn.remove();
+      if (panel) panel.remove();
     }
+
     applyRootFlags();
     applyCustomStyles();
     updateBackgroundImage();
@@ -262,7 +332,6 @@
     manageSidebarButtons();
   }
 
-  // --- No changes to the code below this line ---
   function startObservers() {
     window.addEventListener('focus', applyAllSettings, { passive: true });
     let lastUrl = location.href;

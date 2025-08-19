@@ -3,10 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <title>Ambient Blur Settings</title>
+  <link rel="stylesheet" href="popup.css">
   <style>
-    :root { color-scheme: light dark; }
+    :root {
+      color-scheme: light dark;
+      --background-light: #f0f4f8;
+      --background-dark: #1a1a1f;
+      --text-light: #1d1d1f;
+      --text-dark: #f0f4f8;
+      --card-background-light: rgba(255, 255, 255, 0.7);
+      --card-background-dark: rgba(42, 42, 46, 0.7);
+      --border-light: rgba(0, 0, 0, 0.1);
+      --border-dark: rgba(255, 255, 255, 0.2);
+      --input-background-light: rgba(0, 0, 0, 0.05);
+      --input-background-dark: rgba(255, 255, 255, 0.1);
+      --primary-accent: #4f8cff;
+      --hover-background-light: rgba(0, 0, 0, 0.1);
+      --hover-background-dark: rgba(255, 255, 255, 0.15);
+    }
     html {
-      background-color: #f0f4f8;
+      background-color: var(--background-light);
       background-image: radial-gradient(at top center, rgba(79, 140, 255, 0.2), transparent 70%);
       backdrop-filter: blur(16px) saturate(150%);
       -webkit-backdrop-filter: blur(16px) saturate(150%);
@@ -15,194 +31,333 @@
     }
     @media (prefers-color-scheme: dark) {
       html {
-        background-color: #1a1a1f;
+        background-color: var(--background-dark);
         background-image: radial-gradient(at top center, rgba(88, 70, 160, 0.45), transparent 70%);
       }
     }
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      margin: 12px;
-      min-width: 300px;
-      color: inherit;
+      margin: 10px;
+      min-width: 310px;
+      color: var(--text-light);
       background: transparent;
     }
-    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; }
-    .label { font-size: 14px; line-height: 1.3; white-space: nowrap; }
-    .switch { position: relative; width: 46px; height: 26px; flex: 0 0 auto; }
-    .switch input { display: none; }
-    .track { position: absolute; inset: 0; border-radius: 999px; background: #c8ccd1; transition: background .2s ease; }
-    input:checked + .track { background: #4f8cff; }
-    @media (prefers-color-scheme: dark) { .track { background: #555; } }
-    .thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
-    input:checked + .track .thumb { transform: translateX(20px); }
-    .hint { margin-top: 8px; font-size: 12px; opacity: .7; }
-    hr { border: 0; border-top: 1px solid color-mix(in oklab, currentColor 22%, transparent); margin: 8px 0; }
-    .credit { margin-top: 10px; font-size: 12px; opacity: .7; text-align: center; }
-    .credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
-
-    /* Control Styles */
-    input[type="text"], select {
-      width: 100%; padding: 6px 10px; border-radius: 6px;
-      border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
-      background-color: color-mix(in oklab, currentColor 10%, transparent);
-      color: inherit; font-size: 13px; -webkit-appearance: none; appearance: none;
-    }
-    select {
-      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-      background-repeat: no-repeat; background-position: right 8px center; background-size: 16px; padding-right: 30px;
-    }
-    select option { background: #f0f4f8; color: #1d1d1f; }
     @media (prefers-color-scheme: dark) {
-      select {
-        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+      body {
+        color: var(--text-dark);
       }
-      select option { background: #2a2a2e; color: #f0f4f8; }
     }
-    input[type="text"]:disabled { opacity: 0.6; }
-    input[type="file"] { font-size: 12px; width: 100%; }
+    .settings-card {
+      background: var(--card-background-light);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      backdrop-filter: blur(10px) saturate(150%);
+      -webkit-backdrop-filter: blur(10px) saturate(150%);
+      overflow: hidden; /* This is necessary for the border-radius to clip content */
+    }
+    @media (prefers-color-scheme: dark) {
+      .settings-card {
+        background: var(--card-background-dark);
+        border: 1px solid var(--border-dark);
+      }
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 500;
+      padding: 10px 12px;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: margin 0.2s ease;
+    }
+    .card-title::-webkit-details-marker { display: none; }
+    .card-title::after {
+      content: '';
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 16px;
+      transform: rotate(0deg);
+      transition: transform 0.2s ease;
+      opacity: 0.6;
+    }
+    @media (prefers-color-scheme: dark) {
+      .card-title::after {
+        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+      }
+    }
+    .settings-card[open] > .card-title::after { transform: rotate(180deg); }
+    .settings-card[open] > .card-title {
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      .settings-card[open] > .card-title { border-bottom-color: var(--border-dark); }
+    }
+    .card-content {
+      padding: 4px 12px 12px 12px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0;
+    }
+    .label {
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+    .switch input { display: none; }
+    .track {
+      position: absolute;
+      inset: 0;
+      border-radius: 11px;
+      background: #c8ccd1;
+      transition: background .2s ease;
+    }
+    input:checked + .track { background: var(--primary-accent); }
+    @media (prefers-color-scheme: dark) { .track { background: #555; } }
+    .thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,.25);
+      transition: transform .2s ease;
+    }
+    input:checked + .track .thumb { transform: translateX(18px); }
+    .credit {
+      padding-top: 4px;
+      font-size: 12px;
+      opacity: .7;
+      text-align: center;
+    }
+    .credit a { color: inherit; }
+    input[type="text"] {
+      width: 100%;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+      background-color: var(--input-background-light);
+      color: inherit;
+      font-size: 12px;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color .2s ease, background-color .2s ease;
+    }
+    @media (prefers-color-scheme: dark) {
+      input[type="text"] {
+        border: 1px solid var(--border-dark);
+        background-color: var(--input-background-dark);
+      }
+    }
+    input[type="file"] {
+      font-size: 12px;
+      width: 100%;
+    }
     button {
-      font-size: 12px; padding: 4px 10px; border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
-      background: color-mix(in oklab, currentColor 15%, transparent); color: inherit;
-      border-radius: 6px; cursor: pointer; white-space: nowrap;
+      font-size: 12px;
+      padding: 6px 10px;
+      border: 1px solid var(--border-light);
+      background: var(--input-background-light);
+      color: inherit;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color .2s ease;
     }
-    button:hover { background: color-mix(in oklab, currentColor 25%, transparent); }
-    
-    /* Collapsible Sections */
-    details { border: 1px solid transparent; border-radius: 8px; margin-bottom: 6px; }
-    details > summary { font-weight: 500; cursor: pointer; padding: 6px 8px; }
-    details[open] > summary { margin-bottom: 6px; }
-    details .section-content { padding: 0 8px 8px 8px; }
-    input[type="range"] { width: 100%; }
+    button:hover { background: var(--hover-background-light); }
+    @media (prefers-color-scheme: dark) {
+      button {
+        border: 1px solid var(--border-dark);
+        background: var(--input-background-dark);
+      }
+      button:hover { background: var(--hover-background-dark); }
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary-accent);
+    }
+    .file-input-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
 
-  <details open>
-    <summary>Background</summary>
-    <div class="section-content">
+  <details class="settings-card" open>
+    <summary class="card-title">Background</summary>
+    <div class="card-content">
       <div class="row">
-        <div class="label" style="flex-shrink: 0;">Preset</div>
-        <select id="bgPreset">
-          <option value="default">GPT-5 Wallpaper</option>
-          <option value="blue">Blue Wallpaper</option>
-          <option value="custom" disabled hidden>Custom</option>
-        </select>
+        <div class="label">Preset</div>
+        <div class="custom-select-wrapper">
+          <div class="custom-select" id="bgPreset">
+            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="select-label"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="select-options" role="listbox"></div>
+          </div>
+        </div>
       </div>
       <div class="row">
-        <input type="text" id="bgUrl" placeholder="Paste URL (image or video)">
+        <input type="text" id="bgUrl" placeholder="Paste image or video URL">
       </div>
       <div class="row">
-        <input type="file" id="bgFile" accept="image/*, video/mp4, video/webm, video/ogg">
-        <button id="clearBg">Reset</button>
+          <div class="file-input-wrapper">
+              <input type="file" id="bgFile" accept="image/*, video/mp4, video/webm, video/ogg">
+              <button id="clearBg">Reset</button>
+          </div>
       </div>
       <div class="row">
-        <label for="blurSlider" class="label">Blur Radius</label>
+        <div class="label">Blur</div>
         <input type="range" id="blurSlider" min="0" max="150" step="1">
         <span id="blurValue" style="min-width: 3ch; text-align: right;">60</span>px
       </div>
       <div class="row">
-        <div class="label">Media Scaling</div>
-        <select id="bgScalingSelector">
-          <option value="contain">Contain (fit)</option>
-          <option value="cover">Cover (fill)</option>
-        </select>
+        <div class="label">Scaling</div>
+        <div class="custom-select-wrapper">
+          <div class="custom-select" id="bgScalingSelector">
+            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="select-label"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="select-options" role="listbox"></div>
+          </div>
+        </div>
       </div>
-      <div class="hint" style="padding: 0 8px 8px 8px;">"Contain" fits the whole media, "Cover" fills the screen by cropping.</div>
     </div>
   </details>
 
-  <details>
-    <summary>Appearance</summary>
-    <div class="section-content">
+  <details class="settings-card">
+    <summary class="card-title">Appearance</summary>
+    <div class="card-content">
       <div class="row">
         <div class="label">Theme</div>
-        <select id="themeSelector">
-          <option value="auto">Auto</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
+        <div class="custom-select-wrapper">
+          <div class="custom-select" id="themeSelector">
+            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="select-label"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="select-options" role="listbox"></div>
+          </div>
+        </div>
       </div>
       <div class="row">
-        <div class="label">Legacy composer (no glass)</div>
+        <div class="label">Legacy composer</div>
         <label class="switch" title="Use the site’s standard composer styling">
           <input type="checkbox" id="legacyComposer">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">Disable menu animations</div>
-        <label class="switch" title="Disable the open/close fade and scale effect on menus">
+        <div class="label">Disable animations</div>
+        <label class="switch" title="Disable menu open/close animations">
           <input type="checkbox" id="disableAnimations">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
+    </div>
+  </details>
+
+  <details class="settings-card">
+    <summary class="card-title">Interface</summary>
+    <div class="card-content">
       <div class="row">
         <div class="label">Focus Mode</div>
-        <label class="switch" title="Hides the sidebar and header for a clean view">
+        <label class="switch" title="Hides the sidebar and header">
             <input type="checkbox" id="focusMode">
             <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
-    </div>
-  </details>
-
-  <details>
-    <summary>Voice UI</summary>
-    <div class="section-content">
-        <div class="row">
-            <div class="label">Customize voice color</div>
-            <select id="voiceColorSelector">
-                <option value="default">Default (Blue)</option>
-                <option value="orange">Sunset Orange</option>
-                <option value="yellow">Solar Yellow</option>
-                <option value="pink">Sakura Pink</option>
-                <option value="green">Aurora Green</option>
-                <option value="dark">Onyx Dark</option>
-            </select>
-        </div>
-        <div class="row">
-            <div class="label">Cute voice UI (Cat ears)</div>
-            <label class="switch" title="Adds cute ears to the voice UI">
-                <input type="checkbox" id="cuteVoiceUI">
-                <span class="track"><span class="thumb"></span></span>
-            </label>
-        </div>
-    </div>
-  </details>
-
-  <details>
-    <summary>UI Visibility</summary>
-    <div class="section-content">
       <div class="row">
-        <div class="label">Show background in chats</div>
-        <label class="switch" title="Toggle background visibility on /c/... chat pages">
-          <input type="checkbox" id="showInChats">
-          <span class="track"><span class="thumb"></span></span>
+        <div class="label">Hide Quick Settings</div>
+        <label class="switch" title="Hides the in-page settings icon">
+            <input type="checkbox" id="hideQuickSettings">
+            <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">Hide GPT-5 limit message</div>
+        <div class="label">Show in new chats only</div>
+        <label class="switch" title="Background is hidden in existing chats">
+          <input type="checkbox" id="showInNewChatsOnly">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+    </div>
+  </details>
+
+  <details class="settings-card">
+    <summary class="card-title">Voice UI</summary>
+    <div class="card-content">
+      <div class="row">
+          <div class="label">Color</div>
+          <div class="custom-select-wrapper">
+            <div class="custom-select" id="voiceColorSelector">
+              <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="color-dot"></span>
+                <span class="select-label"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="select-options" role="listbox"></div>
+            </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="label">Cute UI (Cat ears)</div>
+          <label class="switch" title="Adds cute ears to the voice UI">
+              <input type="checkbox" id="cuteVoiceUI">
+              <span class="track"><span class="thumb"></span></span>
+          </label>
+      </div>
+    </div>
+  </details>
+
+  <details class="settings-card">
+    <summary class="card-title">Hide Elements</summary>
+    <div class="card-content">
+      <div class="row">
+        <div class="label">GPT-5 limit message</div>
         <label class="switch" title="Hides the GPT-5 limit popup 5 minutes after it appears">
           <input type="checkbox" id="hideGpt5Limit">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">Hide "Upgrade plan" buttons</div>
+        <div class="label">"Upgrade plan" buttons</div>
         <label class="switch" title="Hide the 'Upgrade your plan' buttons">
           <input type="checkbox" id="hideUpgradeButtons">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">Hide 'Explore GPTs' button</div>
+        <div class="label">'Explore GPTs' button</div>
         <label class="switch" title="Hide the 'Explore GPTs' button in the sidebar">
           <input type="checkbox" id="hideGptsButton">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">Hide 'Sora' button</div>
+        <div class="label">'Sora' button</div>
         <label class="switch" title="Hide the 'Sora' button in the sidebar">
           <input type="checkbox" id="hideSoraButton">
           <span class="track"><span class="thumb"></span></span>
