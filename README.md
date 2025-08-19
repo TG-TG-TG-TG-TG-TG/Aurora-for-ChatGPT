@@ -5,14 +5,6 @@ Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
 
 ---
 
-> ⚠️ **DEVELOPMENT / TESTING FORK**
->
-> This is **not** the official version of this project.  
-> it may be buggy, and not all changes will be implemented.  
-> 👉 [Go to the official repo](https://github.com/TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT)
-
----
-
 ## Highlights
 
 * 🌌 **Ambient Aurora background** — a subtle gradient blur behind the ChatGPT interface
@@ -69,7 +61,6 @@ This section will be updated once the extension is published on the Chrome Web S
 "host_permissions": [
   "https://chatgpt.com/*",
   "https://chat.openai.com/*"
-  "https://openai.com/*"
 ]
 ```
 
@@ -98,9 +89,7 @@ Branding & icons © 2025 **test\_tm7873**. All rights reserved.
 
 ## Credits
 
-Made by <a href="@test\_tm7873" target="_blank">[@test\_tm7873](https://twitter.com/test_tm7873)</a> on X.
+Made by **@test\_tm7873** on X.
 Thanks to everyone who likes their AI chats… just a bit more magical. ✨
-And many thanks to <a href="@tnemoroccan" target="_blank">[@tnemoroccan](https://x.com/tnemoroccan)</a>
- on X. for adding more blur elements and custom backgrounds!
 
 ---
