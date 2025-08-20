@@ -1,13 +1,12 @@
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   --glass-radius: 14px;
-  --glass-blur: 18px;
+  --glass-blur: 22px; 
   --glass-sat: 140%;
   --glass-bg: rgba(18, 18, 18, 0.14);
   --glass-stroke: rgba(255, 255, 255, 0.08);
   --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-/* MODIFIED: This is now the definitive light mode style block */
 @media (prefers-color-scheme: light) {
   html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
     --glass-bg: rgba(255, 255, 255, 0.22);
@@ -16,7 +15,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   }
 }
 
-/* This class override ensures light mode works even with a dark OS theme */
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   --glass-bg: rgba(255, 255, 255, 0.22);
   --glass-stroke: rgba(0, 0, 0, 0.072);
