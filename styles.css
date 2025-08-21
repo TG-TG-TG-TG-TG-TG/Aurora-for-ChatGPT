@@ -235,6 +235,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
 }
 
+
 .cgpt-hide-gpt5-limit,
 .cgpt-hide-upgrade,
 .cgpt-hide-sora,
@@ -564,4 +565,19 @@ form[data-type="unified-composer"] > div:is(.bg-token-bg-primary, [class*="dark:
               box-shadow 0.3s ease-in-out, 
               backdrop-filter 0.3s ease-in-out, 
               -webkit-backdrop-filter 0.3s ease-in-out;
+}
+
+html.cgpt-light-mode body,
+html.cgpt-light-mode [class*="text-token-text-"],
+html.cgpt-light-mode [class*="text-gray-"] {
+  color: #000000 !important;
+}
+
+html.cgpt-light-mode svg {
+  color: #000000 !important;
+}
+
+html.cgpt-light-mode ::placeholder {
+  color: #000000 !important;
+  opacity: 0.7;
 }
