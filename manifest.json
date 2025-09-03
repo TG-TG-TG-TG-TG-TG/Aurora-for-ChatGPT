@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Aurora for ChatGPT",
-  "version": "1.5",
+  "version": "1.5.1",
   "description": "Ambient blurred background under the ChatGPT UI with a chat visibility toggle and legacy composer option. Not affiliated with OpenAI.",
   "icons": {
     "16":  "icons/logo-16.png",

@@ -128,23 +128,40 @@
     }
   }
   function applyCustomStyles() {
-    let styleNode = document.getElementById(STYLE_ID);
-    if (!styleNode) {
-      styleNode = document.createElement('style');
-      styleNode.id = STYLE_ID;
-      document.head.appendChild(styleNode);
-    }
-    const blurPx = `${settings.backgroundBlur || '60'}px`;
-    const scaling = settings.backgroundScaling || 'contain';
-    styleNode.textContent = `
-      #${ID} img, #${ID} video {
-        --cgpt-bg-blur-radius: ${blurPx};
-        object-fit: ${scaling};
+    // Ensure <head> exists before injecting styles when running at document_start
+    const ensureAndApply = () => {
+      let styleNode = document.getElementById(STYLE_ID);
+      if (!styleNode) {
+        styleNode = document.createElement('style');
+        styleNode.id = STYLE_ID;
+        (document.head || document.documentElement || document.body)?.appendChild(styleNode);
       }
-    `;
+      const blurPx = `${settings.backgroundBlur || '60'}px`;
+      const scaling = settings.backgroundScaling || 'contain';
+      styleNode.textContent = `
+        #${ID} img, #${ID} video {
+          --cgpt-bg-blur-radius: ${blurPx};
+          object-fit: ${scaling};
+        }
+      `;
+    };
+    if (!document.head && !document.body) {
+      document.addEventListener('DOMContentLoaded', ensureAndApply, { once: true });
+      return;
+    }
+    ensureAndApply();
   }
 
+  let qsInitScheduled = false;
   function manageQuickSettingsUI() {
+    // If body is not yet available (run_at: document_start), wait for DOMContentLoaded once
+    if (!document.body) {
+      if (!qsInitScheduled) {
+        qsInitScheduled = true;
+        document.addEventListener('DOMContentLoaded', () => { qsInitScheduled = false; manageQuickSettingsUI(); }, { once: true });
+      }
+      return;
+    }
     let btn = document.getElementById(QS_BUTTON_ID);
     let panel = document.getElementById(QS_PANEL_ID);
 
@@ -292,7 +309,13 @@
   function showBg() {
     if (!document.getElementById(ID)) {
       const node = makeBgNode();
-      const add = () => { document.body.prepend(node); ensureAppOnTop(); };
+      const add = () => {
+        document.body.prepend(node);
+        ensureAppOnTop();
+        // After the node exists, ensure styles and media sources are applied
+        try { applyCustomStyles(); } catch {}
+        try { updateBackgroundImage(); } catch {}
+      };
       if (document.body) add(); else document.addEventListener('DOMContentLoaded', add, { once: true });
     }
   }
@@ -332,7 +355,18 @@
     manageSidebarButtons();
   }
 
+  let observersStarted = false;
+  let observersInitScheduled = false;
   function startObservers() {
+    if (observersStarted) return; // prevent double init
+    if (!document.body) {
+      if (!observersInitScheduled) {
+        observersInitScheduled = true;
+        document.addEventListener('DOMContentLoaded', () => { observersInitScheduled = false; startObservers(); }, { once: true });
+      }
+      return;
+    }
+    observersStarted = true;
     window.addEventListener('focus', applyAllSettings, { passive: true });
     let lastUrl = location.href;
     const checkUrl = () => { if (location.href === lastUrl) return; lastUrl = location.href; applyAllSettings(); };
@@ -346,9 +380,11 @@
       manageUpgradeButtons();
       manageSidebarButtons();
     });
+    // document.body is guaranteed here due to guard above
     domObserver.observe(document.body, { childList: true, subtree: true });
     const themeObserver = new MutationObserver(() => { if (settings.theme === 'auto') applyRootFlags(); });
-    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    const rootNode = document.documentElement || document.body;
+    if (rootNode) themeObserver.observe(rootNode, { attributes: true, attributeFilter: ['class'] });
   }
   if (chrome?.storage?.sync) {
     chrome.storage.sync.get(DEFAULTS, (res) => {
