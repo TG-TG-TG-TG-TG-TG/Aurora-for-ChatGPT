@@ -142,6 +142,15 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45) !important;
 }
 
+/* Glass effect for thread title/header elements */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .bg-token-main-surface-primary.sticky.top-\[-1px\].z-1.px-\(--thread-content-margin\).text-center.text-lg.text-pretty.md\:static {
+  background: rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+  backdrop-filter: blur(22px) saturate(140%) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.40) !important;
+}
+
 html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
   :is(
     .popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="open"],
@@ -263,6 +272,12 @@ html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
   border-color: rgba(0,0,0,0.072) !important;
 }
 
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .bg-token-main-surface-primary.sticky.top-\[-1px\].z-1.px-\(--thread-content-margin\).text-center.text-lg.text-pretty.md\:static {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(0, 0, 0, 0.09) !important;
+  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.20) !important;
+}
+
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
   background: rgba(255, 255, 255, 0.5) !important;
 }
@@ -284,6 +299,26 @@ html.cgpt-ambient-on.cgpt-light-mode svg {
 html.cgpt-ambient-on.cgpt-light-mode ::placeholder {
   color: #000000 !important;
   opacity: 0.7;
+}
+
+/* --- Fix for round UI elements in light mode --- */
+html.cgpt-ambient-on.cgpt-light-mode button {
+  background: transparent !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #000000 !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode .bg-token-main-surface-primary {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode .bg-black {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode .composer-submit-btn {
+  background: rgba(255, 255, 255, 0.3) !important;
 }
 
 /* --- Voice UI & Cat Ears --- */
