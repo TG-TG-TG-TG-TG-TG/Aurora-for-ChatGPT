@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Aurora for ChatGPT",
+  "name": "__MSG_extensionName__",
   "version": "1.5.3",
-  "description": "Ambient blurred background under the ChatGPT UI with a chat visibility toggle and legacy composer option. Not affiliated with OpenAI.",
+  "default_locale": "en",
+  "description": "__MSG_extensionDescription__",
   "icons": {
     "16":  "icons/logo-16.png",
     "32":  "icons/logo-32.png",
@@ -11,7 +12,7 @@
   },
   "permissions": ["storage"],
   "action": {
-    "default_title": "Aurora for ChatGPT — Settings",
+    "default_title": "__MSG_actionTitle__",
     "default_popup": "popup.html",
     "default_icon": {
       "16":  "icons/logo-16.png",
