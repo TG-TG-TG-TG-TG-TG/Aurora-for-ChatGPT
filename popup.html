@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Ambient Blur Settings</title>
+  <title>__MSG_popupTitle__</title>
   <link rel="stylesheet" href="popup.css">
   <style>
     :root {
@@ -204,10 +204,10 @@
 <body>
 
   <details class="settings-card" open>
-    <summary class="card-title">Background</summary>
+    <summary class="card-title" data-i18n="sectionBackground">__MSG_sectionBackground__</summary>
     <div class="card-content">
       <div class="row">
-        <div class="label">Preset</div>
+        <div class="label" data-i18n="labelPreset">__MSG_labelPreset__</div>
         <div class="custom-select-wrapper">
           <div class="custom-select" id="bgPreset">
             <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
@@ -219,21 +219,21 @@
         </div>
       </div>
       <div class="row">
-        <input type="text" id="bgUrl" placeholder="Paste image or video URL">
+        <input type="text" id="bgUrl" placeholder="__MSG_placeholderBgUrl__" data-i18n-placeholder="placeholderBgUrl">
       </div>
       <div class="row">
           <div class="file-input-wrapper">
               <input type="file" id="bgFile" accept="image/*, video/mp4, video/webm, video/ogg">
-              <button id="clearBg">Reset</button>
+              <button id="clearBg" data-i18n="buttonReset">__MSG_buttonReset__</button>
           </div>
       </div>
       <div class="row">
-        <div class="label">Blur</div>
+        <div class="label" data-i18n="labelBlur">__MSG_labelBlur__</div>
         <input type="range" id="blurSlider" min="0" max="150" step="1">
         <span id="blurValue" style="min-width: 3ch; text-align: right;">60</span>px
       </div>
       <div class="row">
-        <div class="label">Scaling</div>
+        <div class="label" data-i18n="labelScaling">__MSG_labelScaling__</div>
         <div class="custom-select-wrapper">
           <div class="custom-select" id="bgScalingSelector">
             <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
@@ -248,10 +248,10 @@
   </details>
 
   <details class="settings-card">
-    <summary class="card-title">Appearance</summary>
+    <summary class="card-title" data-i18n="sectionAppearance">__MSG_sectionAppearance__</summary>
     <div class="card-content">
       <div class="row">
-        <div class="label">Theme</div>
+        <div class="label" data-i18n="labelTheme">__MSG_labelTheme__</div>
         <div class="custom-select-wrapper">
           <div class="custom-select" id="themeSelector">
             <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
@@ -263,15 +263,15 @@
         </div>
       </div>
       <div class="row">
-        <div class="label">Legacy composer</div>
-        <label class="switch" title="Use the site’s standard composer styling">
+        <div class="label" data-i18n="labelLegacyComposer">__MSG_labelLegacyComposer__</div>
+        <label class="switch" title="__MSG_tooltipLegacyComposer__" data-i18n-title="tooltipLegacyComposer">
           <input type="checkbox" id="legacyComposer">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">Disable animations</div>
-        <label class="switch" title="Disable menu open/close animations">
+        <div class="label" data-i18n="labelDisableAnimations">__MSG_labelDisableAnimations__</div>
+        <label class="switch" title="__MSG_tooltipDisableAnimations__" data-i18n-title="tooltipDisableAnimations">
           <input type="checkbox" id="disableAnimations">
           <span class="track"><span class="thumb"></span></span>
         </label>
@@ -280,25 +280,25 @@
   </details>
 
   <details class="settings-card">
-    <summary class="card-title">Interface</summary>
+    <summary class="card-title" data-i18n="sectionInterface">__MSG_sectionInterface__</summary>
     <div class="card-content">
       <div class="row">
-        <div class="label">Focus Mode</div>
-        <label class="switch" title="Hides the sidebar and header">
+        <div class="label" data-i18n="labelFocusMode">__MSG_labelFocusMode__</div>
+        <label class="switch" title="__MSG_tooltipFocusMode__" data-i18n-title="tooltipFocusMode">
             <input type="checkbox" id="focusMode">
             <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">Hide Quick Settings</div>
-        <label class="switch" title="Hides the in-page settings icon">
+        <div class="label" data-i18n="labelHideQuickSettings">__MSG_labelHideQuickSettings__</div>
+        <label class="switch" title="__MSG_tooltipHideQuickSettings__" data-i18n-title="tooltipHideQuickSettings">
             <input type="checkbox" id="hideQuickSettings">
             <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">Show in new chats only</div>
-        <label class="switch" title="Background is hidden in existing chats">
+        <div class="label" data-i18n="labelShowInNewChatsOnly">__MSG_labelShowInNewChatsOnly__</div>
+        <label class="switch" title="__MSG_tooltipShowInNewChatsOnly__" data-i18n-title="tooltipShowInNewChatsOnly">
           <input type="checkbox" id="showInNewChatsOnly">
           <span class="track"><span class="thumb"></span></span>
         </label>
@@ -307,10 +307,10 @@
   </details>
 
   <details class="settings-card">
-    <summary class="card-title">Voice UI</summary>
+    <summary class="card-title" data-i18n="sectionVoiceUi">__MSG_sectionVoiceUi__</summary>
     <div class="card-content">
       <div class="row">
-          <div class="label">Color</div>
+          <div class="label" data-i18n="labelVoiceColor">__MSG_labelVoiceColor__</div>
           <div class="custom-select-wrapper">
             <div class="custom-select" id="voiceColorSelector">
               <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
@@ -323,8 +323,8 @@
           </div>
       </div>
       <div class="row">
-          <div class="label">Cute UI (Cat ears)</div>
-          <label class="switch" title="Adds cute ears to the voice UI">
+          <div class="label" data-i18n="labelCuteVoice">__MSG_labelCuteVoice__</div>
+          <label class="switch" title="__MSG_tooltipCuteVoice__" data-i18n-title="tooltipCuteVoice">
               <input type="checkbox" id="cuteVoiceUI">
               <span class="track"><span class="thumb"></span></span>
           </label>
@@ -333,32 +333,32 @@
   </details>
 
   <details class="settings-card">
-    <summary class="card-title">Hide Elements</summary>
+    <summary class="card-title" data-i18n="sectionHideElements">__MSG_sectionHideElements__</summary>
     <div class="card-content">
       <div class="row">
-        <div class="label">GPT-5 limit message</div>
-        <label class="switch" title="Hides the GPT-5 limit popup 5 minutes after it appears">
+        <div class="label" data-i18n="labelHideGpt5Limit">__MSG_labelHideGpt5Limit__</div>
+        <label class="switch" title="__MSG_tooltipHideGpt5Limit__" data-i18n-title="tooltipHideGpt5Limit">
           <input type="checkbox" id="hideGpt5Limit">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">"Upgrade plan" buttons</div>
-        <label class="switch" title="Hide the 'Upgrade your plan' buttons">
+        <div class="label" data-i18n="labelHideUpgradeButtons">__MSG_labelHideUpgradeButtons__</div>
+        <label class="switch" title="__MSG_tooltipHideUpgradeButtons__" data-i18n-title="tooltipHideUpgradeButtons">
           <input type="checkbox" id="hideUpgradeButtons">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">'Explore GPTs' button</div>
-        <label class="switch" title="Hide the 'Explore GPTs' button in the sidebar">
+        <div class="label" data-i18n="labelHideGptsButton">__MSG_labelHideGptsButton__</div>
+        <label class="switch" title="__MSG_tooltipHideGptsButton__" data-i18n-title="tooltipHideGptsButton">
           <input type="checkbox" id="hideGptsButton">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label">'Sora' button</div>
-        <label class="switch" title="Hide the 'Sora' button in the sidebar">
+        <div class="label" data-i18n="labelHideSoraButton">__MSG_labelHideSoraButton__</div>
+        <label class="switch" title="__MSG_tooltipHideSoraButton__" data-i18n-title="tooltipHideSoraButton">
           <input type="checkbox" id="hideSoraButton">
           <span class="track"><span class="thumb"></span></span>
         </label>
@@ -367,8 +367,14 @@
   </details>
 
   <div class="credit">
-    Made by <a href="https://x.com/test_tm7873" target="_blank" rel="noopener noreferrer">@test_tm7873</a> on X
+    <span data-i18n="creditPrefix">__MSG_creditPrefix__</span>
+    <a href="https://x.com/test_tm7873" target="_blank" rel="noopener noreferrer">@test_tm7873</a>
+    <span data-i18n="creditSuffix">__MSG_creditSuffix__</span>
   </div>
   <script src="popup.js"></script>
 </body>
 </html>
+
+
+
+

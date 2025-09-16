@@ -1,4 +1,4 @@
-// popup.js — controls settings
+// popup.js - controls settings
 const DEFAULTS = {
   legacyComposer: false,
   theme: 'auto',
@@ -22,7 +22,37 @@ const BLUE_WALLPAPER_URL = 'https://img.freepik.com/free-photo/abstract-luxury-g
 const MAX_FILE_SIZE_MB = 15;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
+const getMessage = (key, substitutions) => {
+  if (chrome?.i18n?.getMessage) {
+    const text = chrome.i18n.getMessage(key, substitutions);
+    if (text) return text;
+  }
+  return key;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+  document.title = getMessage('popupTitle');
+
+  const applyStaticLocalization = () => {
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+      const key = el.getAttribute('data-i18n');
+      const message = getMessage(key);
+      if (message) el.textContent = message;
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      const message = getMessage(key);
+      if (message) el.setAttribute('placeholder', message);
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-title');
+      const message = getMessage(key);
+      if (message) el.setAttribute('title', message);
+    });
+  };
+
+  applyStaticLocalization();
+
   // --- Get all UI elements ---
   const cbLegacy = document.getElementById('legacyComposer');
   const cbGpt5Limit = document.getElementById('hideGpt5Limit');
@@ -34,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cbSoraButton = document.getElementById('hideSoraButton');
   const cbCuteVoice = document.getElementById('cuteVoiceUI');
   const cbShowInNewChatsOnly = document.getElementById('showInNewChatsOnly');
-  
+
   const tbBgUrl = document.getElementById('bgUrl');
   const fileBg = document.getElementById('bgFile');
   const btnClearBg = document.getElementById('clearBg');
@@ -47,27 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const trigger = container.querySelector('.select-trigger');
     const label = container.querySelector('.select-label');
     const optionsContainer = container.querySelector('.select-options');
+    const dotInTrigger = trigger.querySelector('.color-dot');
 
-    function updateSelectorState(value) {
-      const selectedOption = options.find(opt => opt.value === value) || options[0];
-      
-      const dotInTrigger = trigger.querySelector('.color-dot');
-      if (dotInTrigger && selectedOption.color) {
-        dotInTrigger.style.backgroundColor = selectedOption.color;
-        dotInTrigger.style.display = 'block';
-      } else if (dotInTrigger) {
-        dotInTrigger.style.display = 'none';
-      }
-      
-      label.textContent = selectedOption.label;
+    const resolveLabel = (option) => option.labelKey ? getMessage(option.labelKey) : (option.label || option.value);
+
+    function renderOptions(selectedValue) {
       optionsContainer.innerHTML = options
-        .filter(option => !option.hidden) // Filter out hidden options
+        .filter(option => !option.hidden)
         .map(option => {
             const colorDotHtml = option.color ? `<span class="color-dot" style="background-color: ${option.color}; display: block;"></span>` : '';
+            const optionLabel = resolveLabel(option);
+            const isSelected = option.value === selectedValue ? 'true' : 'false';
             return `
-            <div class="select-option" role="option" data-value="${option.value}" aria-selected="${option.value === value}">
+            <div class="select-option" role="option" data-value="${option.value}" aria-selected="${isSelected}">
               ${colorDotHtml}
-              <span class="option-label">${option.label}</span>
+              <span class="option-label">${optionLabel}</span>
             </div>
             `;
         }).join('');
@@ -84,6 +108,23 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    function updateSelectorState(value) {
+      const selectedOption = options.find(opt => opt.value === value) || options[0];
+      const selectedLabel = resolveLabel(selectedOption);
+
+      if (dotInTrigger) {
+        if (selectedOption.color) {
+          dotInTrigger.style.backgroundColor = selectedOption.color;
+          dotInTrigger.style.display = 'block';
+        } else {
+          dotInTrigger.style.display = 'none';
+        }
+      }
+
+      label.textContent = selectedLabel;
+      renderOptions(value);
+    }
+
     trigger.addEventListener('click', (e) => {
       e.stopPropagation();
       const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
@@ -97,22 +138,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return { update: updateSelectorState };
   }
-  
+
   function closeAllSelects() {
     document.querySelectorAll('.custom-select').forEach(sel => {
         sel.classList.remove('is-open');
-        sel.querySelector('.select-trigger').setAttribute('aria-expanded', 'false');
-        sel.querySelector('.select-options').style.display = 'none';
+        const trigger = sel.querySelector('.select-trigger');
+        const optionsContainer = sel.querySelector('.select-options');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        if (optionsContainer) optionsContainer.style.display = 'none';
     });
   }
   document.addEventListener('click', closeAllSelects);
 
-
   // --- Initialize Custom Selects ---
   const bgPresetOptions = [
-    { value: 'default', label: 'GPT-5 Wallpaper' },
-    { value: 'blue', label: 'Blue Wallpaper' },
-    { value: 'custom', label: 'Custom', hidden: true } // Hidden option for state
+    { value: 'default', labelKey: 'bgPresetOptionDefault' },
+    { value: 'blue', labelKey: 'bgPresetOptionBlue' },
+    { value: 'custom', labelKey: 'bgPresetOptionCustom', hidden: true }
   ];
   const bgPresetSelect = createCustomSelect('bgPreset', bgPresetOptions, 'customBgUrl', (value) => {
     let newUrl = value === 'blue' ? BLUE_WALLPAPER_URL : '';
@@ -123,28 +165,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const bgScalingOptions = [
-    { value: 'contain', label: 'Contain (fit)' },
-    { value: 'cover', label: 'Cover (fill)' }
+    { value: 'contain', labelKey: 'bgScalingOptionContain' },
+    { value: 'cover', labelKey: 'bgScalingOptionCover' }
   ];
   const bgScalingSelect = createCustomSelect('bgScalingSelector', bgScalingOptions, 'backgroundScaling');
 
   const themeOptions = [
-    { value: 'auto', label: 'Auto' },
-    { value: 'light', label: 'Light' },
-    { value: 'dark', label: 'Dark' }
+    { value: 'auto', labelKey: 'themeOptionAuto' },
+    { value: 'light', labelKey: 'themeOptionLight' },
+    { value: 'dark', labelKey: 'themeOptionDark' }
   ];
   const themeSelect = createCustomSelect('themeSelector', themeOptions, 'theme');
 
   const voiceColorOptions = [
-    { value: 'default', label: 'Default (Blue)', color: '#8EBBFF' },
-    { value: 'orange', label: 'Sunset Orange', color: '#FF9900' },
-    { value: 'yellow', label: 'Solar Yellow', color: '#FFD700' },
-    { value: 'pink', label: 'Sakura Pink', color: '#FF69B4' },
-    { value: 'green', label: 'Aurora Green', color: '#32CD32' },
-    { value: 'dark', label: 'Onyx Dark', color: '#555555' }
+    { value: 'default', labelKey: 'voiceColorOptionDefault', color: '#8EBBFF' },
+    { value: 'orange', labelKey: 'voiceColorOptionOrange', color: '#FF9900' },
+    { value: 'yellow', labelKey: 'voiceColorOptionYellow', color: '#FFD700' },
+    { value: 'pink', labelKey: 'voiceColorOptionPink', color: '#FF69B4' },
+    { value: 'green', labelKey: 'voiceColorOptionGreen', color: '#32CD32' },
+    { value: 'dark', labelKey: 'voiceColorOptionDark', color: '#555555' }
   ];
   const voiceColorSelect = createCustomSelect('voiceColorSelector', voiceColorOptions, 'voiceColor');
-
 
   // --- Function to update the UI based on current settings ---
   function updateUi(settings) {
@@ -177,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
       bgPresetSelect.update('blue');
     } else if (url === '__local__') {
       bgPresetSelect.update('custom');
-      tbBgUrl.value = 'Local file is in use';
+      tbBgUrl.value = getMessage('statusLocalFileInUse');
       tbBgUrl.disabled = true;
     } else {
       bgPresetSelect.update('custom');
@@ -200,7 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
   cbCuteVoice.addEventListener('change', () => chrome.storage.sync.set({ cuteVoiceUI: cbCuteVoice.checked }));
   cbShowInNewChatsOnly.addEventListener('change', () => chrome.storage.sync.set({ showInNewChatsOnly: cbShowInNewChatsOnly.checked }));
 
-
   // --- Event Listeners for Custom Background ---
   blurSlider.addEventListener('input', () => {
     blurValue.textContent = blurSlider.value;
@@ -217,13 +257,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     chrome.storage.sync.set(newSettings);
   });
-  
+
   fileBg.addEventListener('change', (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      alert(`File is too large! Please choose a file under ${MAX_FILE_SIZE_MB}MB.`);
+      alert(getMessage('alertFileTooLarge', MAX_FILE_SIZE_MB.toString()));
       fileBg.value = '';
       return;
     }
@@ -240,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnClearBg.addEventListener('click', () => {
-    chrome.storage.sync.set({ 
+    chrome.storage.sync.set({
       customBgUrl: '',
       backgroundBlur: DEFAULTS.backgroundBlur,
       backgroundScaling: DEFAULTS.backgroundScaling
