@@ -61,6 +61,7 @@ This section will be updated once the extension is published on the Chrome Web S
 "host_permissions": [
   "https://chatgpt.com/*",
   "https://chat.openai.com/*"
+  "https://openai.com/*"
 ]
 ```
 

@@ -12,7 +12,7 @@ html.cgpt-ambient-on body {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-color: #000; 
+  background-color: #000;
 }
 
 #cgpt-ambient-bg picture,
@@ -39,27 +39,13 @@ html.cgpt-ambient-on body {
 #cgpt-ambient-bg .haze {
   pointer-events: none;
   z-index: 2;
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.16) 0%,
-    rgba(255,255,255,0.10) 22%,
-    rgba(255,255,255,0.06) 45%,
-    rgba(255,255,255,0.02) 68%,
-    rgba(255,255,255,0.00) 85%
-  );
+  background: linear-gradient( to bottom, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.10) 22%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 68%, rgba(255,255,255,0.00) 85% );
 }
 
 html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   pointer-events: none !important;
   z-index: 1;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.92) 0%,
-    rgba(0, 0, 0, 0.75) 18%,
-    rgba(0, 0, 0, 0.50) 36%,
-    rgba(0, 0, 0, 0.24) 60%,
-    rgba(0, 0, 0, 0.00) 80%
-  ) !important;
+  background: linear-gradient( to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.75) 18%, rgba(0, 0, 0, 0.50) 36%, rgba(0, 0, 0, 0.24) 60%, rgba(0, 0, 0, 0.00) 80% ) !important;
 }
 
 /* --- Animations for Menus --- */
@@ -73,43 +59,32 @@ html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   to { opacity: 0; transform: scale(0.95); }
 }
 
-/* --- Glass UI Elements (Composer, Popups, etc.) --- */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"]
-  > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
-  background: rgba(255,255,255,0.10) !important;
-  border: 1px solid rgba(255,255,255,0.28) !important;
-  box-shadow: 0 6px 26px rgba(0,0,0,.20) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-  backdrop-filter: blur(14px) saturate(140%) !important;
-}
-@media (prefers-color-scheme: dark) {
-  html.cgpt-ambient-on:not(.cgpt-light-mode):not(.cgpt-legacy-composer)
-    form[data-type="unified-composer"]
-    > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
-    background: rgba(0,0,0,0.35) !important;
-    border: 1px solid rgba(255,255,255,0.14) !important;
-    box-shadow: 0 8px 30px rgba(0,0,0,.40) !important;
-  }
-}
-
-html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  form label[class*="light:shadow-splash-chatpgpt-input"] {
+/* 
+  --- REFACTORED: Unified Composer Glass Effect --- 
+  This single, more accurate selector replaces the two older, redundant ones.
+  It targets the main container of the ChatGPT textbox.
+*/
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div {
   background: rgba(0,0,0,0.35) !important;
   border: 1px solid rgba(255,255,255,0.14) !important;
   box-shadow: 0 8px 30px rgba(0,0,0,.40) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
+/* 
+  --- REFACTORED: Simplified Composer Text Area ---
+  Removed the old, obsolete selector for the legacy composer's label.
+  This now correctly targets the modern ProseMirror editor and its textarea fallback.
+*/
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"] :is(.ProseMirror, textarea),
-html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  form label[class*="light:shadow-splash-chatpgpt-input"] textarea {
+  form[data-type="unified-composer"] :is(.ProseMirror, textarea) {
   background: transparent !important;
 }
 
-/* User message bubble: Removed background-color to respect accent color */
+
+/* User message bubble: Glass effect */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
   -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
@@ -117,8 +92,16 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="us
 }
 
 /* --- General Transparency Overrides --- */
-html.cgpt-ambient-on :is(main, #__next, .bg-token-bg-primary.sticky) {
+html.cgpt-ambient-on :is(main, #__next, .bg-token-bg-primary.sticky, header#page-header, .sticky.top-0.bg-token-main-surface-primary, div.sticky.top-14[class*="bg-token-bg-primary"]) {
   background-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+html.cgpt-ambient-on :is(header#page-header, .sticky.top-0.bg-token-main-surface-primary, div.sticky.top-14[class*="bg-token-bg-primary"])::before,
+html.cgpt-ambient-on :is(header#page-header, .sticky.top-0.bg-token-main-surface-primary, div.sticky.top-14[class*="bg-token-bg-primary"])::after {
+  content: none !important;
 }
 
 html.cgpt-ambient-on #thread-bottom-container,
@@ -138,34 +121,8 @@ html.cgpt-ambient-on #thread-bottom-container::after,
 html.cgpt-ambient-on #thread-bottom-container .content-fade::before,
 html.cgpt-ambient-on #thread-bottom-container .content-fade::after {
   content: none !important;
-  background: none !important;
 }
 
-html.cgpt-ambient-on
-  :is(header#page-header,
-      .sticky.top-0.bg-token-main-surface-primary,
-      div.sticky.top-14[class*="bg-token-bg-primary"]
-  ) {
-  background: transparent !important;
-  box-shadow: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-
-html.cgpt-ambient-on
-  :is(header#page-header,
-      .sticky.top-0.bg-token-main-surface-primary,
-      div.sticky.top-14[class*="bg-token-bg-primary"]
-  )::before,
-html.cgpt-ambient-on
-  :is(header#page-header,
-      .sticky.top-0.bg-token-main-surface-primary,
-      div.sticky.top-14[class*="bg-token-bg-primary"]
-  )::after {
-  content: none !important;
-  background: none !important;
-  box-shadow: none !important;
-}
 
 /* --- Menu & Popup Glass Effects --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
@@ -183,6 +140,15 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
   backdrop-filter: blur(22px) saturate(140%) !important;
   box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Glass effect for thread title/header elements */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .bg-token-main-surface-primary.sticky.top-\[-1px\].z-1.px-\(--thread-content-margin\).text-center.text-lg.text-pretty.md\:static {
+  background: rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+  backdrop-filter: blur(22px) saturate(140%) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.40) !important;
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
@@ -235,6 +201,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   background: color-mix(in oklab, currentColor 12%, transparent) !important;
 }
 
+
 .cgpt-hide-gpt5-limit,
 .cgpt-hide-upgrade,
 .cgpt-hide-sora,
@@ -242,6 +209,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   display: none !important;
 }
 
+/* --- Misc Glass UI elements --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .dark\\:bg-\\[\\#373669\\].flex {
   background: rgba(55, 54, 105, 0.6) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -268,6 +236,12 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-5
   backdrop-filter: blur(16px) saturate(140%) !important;
 }
 
+
+/* --- Light Mode Overrides --- */
+html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg {
+  background-color: #fff;
+}
+
 html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img,
 html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg video {
   filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(0.99) contrast(1);
@@ -282,13 +256,9 @@ html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
   background: linear-gradient( to top, rgba(255,255,255,0.693) 0%, rgba(255,255,255,0.539) 18%, rgba(255,255,255,0.346) 36%, rgba(255,255,255,0.154) 60%, rgba(255,255,255,0.00) 80% ) !important;
 }
 
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"]
-  > div:is(.bg-token-bg-primary, [class*="dark:bg"]),
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
-  form label[class*="light:shadow-splash-chatpgpt-input"] {
-  background: rgba(255,255,255,0.088) !important;
-  border: 1px solid rgba(0,0,0,0.072) !important;
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div {
+  background: rgba(255,255,255,0.2) !important;
+  border: 1px solid rgba(0,0,0,0.09) !important;
   box-shadow: 0 6px 26px rgba(0,0,0,0.20) !important;
 }
 
@@ -302,6 +272,12 @@ html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
   border-color: rgba(0,0,0,0.072) !important;
 }
 
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .bg-token-main-surface-primary.sticky.top-\[-1px\].z-1.px-\(--thread-content-margin\).text-center.text-lg.text-pretty.md\:static {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(0, 0, 0, 0.09) !important;
+  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.20) !important;
+}
+
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
   background: rgba(255, 255, 255, 0.5) !important;
 }
@@ -310,10 +286,42 @@ html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message
   border: 1px solid rgba(0, 0, 0, 0.12) !important;
 }
 
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg {
-  background-color: #fff;
+html.cgpt-ambient-on.cgpt-light-mode body,
+html.cgpt-ambient-on.cgpt-light-mode [class*="text-token-text-"],
+html.cgpt-ambient-on.cgpt-light-mode [class*="text-gray-"] {
+  color: #000000 !important;
 }
 
+html.cgpt-ambient-on.cgpt-light-mode svg {
+  color: #000000 !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode ::placeholder {
+  color: #000000 !important;
+  opacity: 0.7;
+}
+
+/* --- Fix for round UI elements in light mode --- */
+html.cgpt-ambient-on.cgpt-light-mode button {
+  background: transparent !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #000000 !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode .bg-token-main-surface-primary {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode .bg-black {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode .composer-submit-btn {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* --- Voice UI & Cat Ears --- */
 html.cgpt-ambient-on[data-voice-color]:not([data-voice-color="default"]) .min-h-bloop > canvas {
   filter: var(--voice-filter) !important;
 }
@@ -324,7 +332,6 @@ html.cgpt-ambient-on[data-voice-color="pink"] { --voice-filter: hue-rotate(80deg
 html.cgpt-ambient-on[data-voice-color="green"] { --voice-filter: hue-rotate(-120deg) saturate(1.2) brightness(0.9); }
 html.cgpt-ambient-on[data-voice-color="dark"] { --voice-filter: grayscale(1) brightness(0.4) contrast(1.5); }
 
-/* --- Cute Voice UI (Cat Ears) --- */
 html.cgpt-cute-voice-on .min-h-bloop { position: relative; }
 html.cgpt-cute-voice-on .min-h-bloop::before,
 html.cgpt-cute-voice-on .min-h-bloop::after {
@@ -343,7 +350,7 @@ html.cgpt-cute-voice-on .min-h-bloop::after { right: 45px; transform: rotate(35d
 html.cgpt-cute-voice-on .min-h-bloop > canvas { position: relative; z-index: 1; }
 
 /* --- Quick Settings UI --- */
-/* MODIFIED: Increased z-index values significantly */
+/* (This section was already well-structured, so it remains unchanged) */
 #cgpt-qs-btn {
   position: fixed;
   bottom: 12px;
