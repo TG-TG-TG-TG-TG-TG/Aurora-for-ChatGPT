@@ -20,9 +20,14 @@
   const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
   const getMessage = (key) => {
-    if (chrome?.i18n?.getMessage) {
-      const text = chrome.i18n.getMessage(key);
-      if (text) return text;
+    if (chrome?.i18n?.getMessage && chrome.runtime?.id) {
+      try {
+        const text = chrome.i18n.getMessage(key);
+        if (text) return text;
+      } catch (e) {
+        // Catches "Extension context invalidated" and prevents script from crashing
+        return key;
+      }
     }
     return key;
   };
@@ -47,10 +52,20 @@
     }
   }
   function manageUpgradeButtons() {
-    const panelButton = Array.from(document.querySelectorAll('.__menu-item')).find(el => el.textContent.toLowerCase().includes('upgrade'));
+    // This selector finds the "Upgrade plan" menu item inside the settings popup
+    const panelButton = Array.from(document.querySelectorAll('a.__menu-item')).find(el => el.textContent.toLowerCase().includes('upgrade'));
+    
+    // This selector finds the button at the very top of the page (e.g., "Upgrade to Plus")
     const topButtonContainer = document.querySelector('.start-1\\/2.absolute');
 
-    // The previous class-based selector was brittle. This search is more robust.
+    // This handles the "Upgrade" button WITHIN the profile item at the bottom of the sidebar
+    const profileButtonUpgrade = document.querySelector('[data-testid="accounts-profile-button"] .__menu-item-trailing-btn');
+
+    // REVISED: This now specifically finds the sidebar item containing the text "Upgrade", which is much more robust
+    // and avoids accidentally hiding other menu items.
+    const newSidebarUpgradeButton = Array.from(document.querySelectorAll('div.gap-1\\.5.__menu-item.group')).find(el => el.textContent.toLowerCase().includes('upgrade'));
+
+    // This finds the upgrade section in the main settings page
     let accountUpgradeSection = null;
     const allSettingRows = document.querySelectorAll('div.py-2.border-b');
     for (const row of allSettingRows) {
@@ -62,8 +77,11 @@
         }
     }
 
+    // --- Apply the hiding class to all targets ---
     if (panelButton) panelButton.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
     if (topButtonContainer) topButtonContainer.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
+    if (profileButtonUpgrade) profileButtonUpgrade.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
+    if (newSidebarUpgradeButton) newSidebarUpgradeButton.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
     if (accountUpgradeSection) accountUpgradeSection.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
   }
   function manageSidebarButtons() {
@@ -119,14 +137,21 @@
     };
     if (settings.customBgUrl) {
       if (settings.customBgUrl === '__local__') {
-        if (!chrome?.storage?.local) return;
-        chrome.storage.local.get(LOCAL_BG_KEY, (res) => {
-          if (!chrome.runtime.lastError && res[LOCAL_BG_KEY]) {
-            applyMedia(res[LOCAL_BG_KEY]);
-          } else {
-            applyDefault();
-          }
-        });
+        // Check if the extension context (chrome.runtime.id) is still valid before making an API call.
+        if (chrome?.runtime?.id && chrome?.storage?.local) {
+          chrome.storage.local.get(LOCAL_BG_KEY, (res) => {
+            // A final check inside the callback is best practice.
+            if (chrome.runtime.lastError) { return; }
+            if (res && res[LOCAL_BG_KEY]) {
+              applyMedia(res[LOCAL_BG_KEY]);
+            } else {
+              applyDefault();
+            }
+          });
+        } else {
+          // If the context is gone, don't even try. Fall back to default.
+          applyDefault();
+        }
       } else {
         applyMedia(settings.customBgUrl);
       }
@@ -414,9 +439,3 @@
     startObservers();
   }
 })();
-
-
-
-
-
-
