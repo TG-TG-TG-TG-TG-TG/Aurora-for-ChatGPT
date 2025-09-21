@@ -1,4 +1,4 @@
-# Aurora-for-ChatGPT
+# Aurora-for-ChatGPT V1.5.4
 
 Bring a **soft, ambient, blurred glow** behind the ChatGPT UI — plus a **chat visibility toggle** and a **legacy composer** option.
 Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
