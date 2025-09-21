@@ -5,6 +5,7 @@ const DEFAULTS = {
   hideGpt5Limit: false,
   hideUpgradeButtons: false,
   disableAnimations: false,
+  disableBgAnimation: false,
   focusMode: false,
   hideQuickSettings: false,
   customBgUrl: '',
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cbGpt5Limit = document.getElementById('hideGpt5Limit');
   const cbUpgradeButtons = document.getElementById('hideUpgradeButtons');
   const cbDisableAnimations = document.getElementById('disableAnimations');
+  const cbDisableBgAnimation = document.getElementById('disableBgAnimation');
   const cbFocusMode = document.getElementById('focusMode');
   const cbHideQuickSettings = document.getElementById('hideQuickSettings');
   const cbGptsButton = document.getElementById('hideGptsButton');
@@ -188,11 +190,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const voiceColorSelect = createCustomSelect('voiceColorSelector', voiceColorOptions, 'voiceColor');
 
   // --- Function to update the UI based on current settings ---
-  function updateUi(settings) {
+  async function updateUi(settings) {
+    if (settings.theme === 'auto') {
+      const { detectedTheme } = await new Promise(resolve => chrome.storage.local.get('detectedTheme', resolve));
+      document.documentElement.classList.toggle('theme-light', detectedTheme === 'light');
+    } else {
+      document.documentElement.classList.toggle('theme-light', settings.theme === 'light');
+    }
     cbLegacy.checked = !!settings.legacyComposer;
     cbGpt5Limit.checked = !!settings.hideGpt5Limit;
     cbUpgradeButtons.checked = !!settings.hideUpgradeButtons;
     cbDisableAnimations.checked = !!settings.disableAnimations;
+    cbDisableBgAnimation.checked = !!settings.disableBgAnimation;
     cbFocusMode.checked = !!settings.focusMode;
     cbHideQuickSettings.checked = !!settings.hideQuickSettings;
     cbGptsButton.checked = !!settings.hideGptsButton;
@@ -202,12 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
     blurSlider.value = settings.backgroundBlur;
     blurValue.textContent = settings.backgroundBlur;
 
-    // Update custom selects
     bgScalingSelect.update(settings.backgroundScaling);
     themeSelect.update(settings.theme);
     voiceColorSelect.update(settings.voiceColor);
 
-    // Special handling for background preset
     const url = settings.customBgUrl;
     tbBgUrl.disabled = false;
     tbBgUrl.value = '';
@@ -234,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
   cbGpt5Limit.addEventListener('change', () => chrome.storage.sync.set({ hideGpt5Limit: cbGpt5Limit.checked }));
   cbUpgradeButtons.addEventListener('change', () => chrome.storage.sync.set({ hideUpgradeButtons: cbUpgradeButtons.checked }));
   cbDisableAnimations.addEventListener('change', () => chrome.storage.sync.set({ disableAnimations: cbDisableAnimations.checked }));
+  cbDisableBgAnimation.addEventListener('change', () => chrome.storage.sync.set({ disableBgAnimation: cbDisableBgAnimation.checked }));
   cbFocusMode.addEventListener('change', () => chrome.storage.sync.set({ focusMode: cbFocusMode.checked }));
   cbHideQuickSettings.addEventListener('change', () => chrome.storage.sync.set({ hideQuickSettings: cbHideQuickSettings.checked }));
   cbGptsButton.addEventListener('change', () => chrome.storage.sync.set({ hideGptsButton: cbGptsButton.checked }));

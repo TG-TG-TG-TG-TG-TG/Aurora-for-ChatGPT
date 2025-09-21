@@ -7,198 +7,109 @@
   <style>
     :root {
       color-scheme: light dark;
-      --background-light: #f0f4f8;
+      /* --- Base Colors (Dark Theme) --- */
       --background-dark: #1a1a1f;
-      --text-light: #1d1d1f;
       --text-dark: #f0f4f8;
-      --card-background-light: rgba(255, 255, 255, 0.7);
-      --card-background-dark: rgba(42, 42, 46, 0.7);
-      --border-light: rgba(0, 0, 0, 0.1);
-      --border-dark: rgba(255, 255, 255, 0.2);
-      --input-background-light: rgba(0, 0, 0, 0.05);
-      --input-background-dark: rgba(255, 255, 255, 0.1);
-      --primary-accent: #4f8cff;
-      --hover-background-light: rgba(0, 0, 0, 0.1);
+      --card-background-dark: rgba(40, 40, 40, 0.55);
+      --border-dark: rgba(255, 255, 255, 0.18);
+      --input-background-dark: rgba(255, 255, 255, 0.08);
       --hover-background-dark: rgba(255, 255, 255, 0.15);
+      --primary-accent: #4f8cff;
+      /* --- Base Colors (Light Theme) --- */
+      --background-light: #f0f4f8;
+      --text-light: #1d1d1f;
+      --card-background-light: rgba(245, 245, 245, 0.7);
+      --border-light: rgba(0, 0, 0, 0.1);
+      --input-background-light: rgba(0, 0, 0, 0.05);
+      --hover-background-light: rgba(0, 0, 0, 0.1);
     }
     html {
-      background-color: var(--background-light);
-      background-image: radial-gradient(at top center, rgba(79, 140, 255, 0.2), transparent 70%);
-      backdrop-filter: blur(16px) saturate(150%);
-      -webkit-backdrop-filter: blur(16px) saturate(150%);
+      background-color: var(--background-dark);
+      background-image: radial-gradient(at top center, rgba(88, 70, 160, 0.45), transparent 70%);
       overflow: hidden;
       border-radius: 14px;
     }
-    @media (prefers-color-scheme: dark) {
-      html {
-        background-color: var(--background-dark);
-        background-image: radial-gradient(at top center, rgba(88, 70, 160, 0.45), transparent 70%);
-      }
+    html.theme-light {
+      background-color: var(--background-light);
+      background-image: radial-gradient(at top center, rgba(79, 140, 255, 0.2), transparent 70%);
     }
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       margin: 10px;
       min-width: 310px;
-      color: var(--text-light);
+      color: var(--text-dark);
       background: transparent;
     }
-    @media (prefers-color-scheme: dark) {
-      body {
-        color: var(--text-dark);
-      }
-    }
+    html.theme-light body { color: var(--text-light); }
     .settings-card {
-      background: var(--card-background-light);
-      border: 1px solid var(--border-light);
-      border-radius: 10px;
+      background: var(--card-background-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 18px;
       margin-bottom: 8px;
-      backdrop-filter: blur(10px) saturate(150%);
-      -webkit-backdrop-filter: blur(10px) saturate(150%);
-      overflow: hidden; /* This is necessary for the border-radius to clip content */
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      backdrop-filter: blur(24px) saturate(180%);
+      overflow: hidden; /* Important: remains hidden by default */
     }
-    @media (prefers-color-scheme: dark) {
-      .settings-card {
-        background: var(--card-background-dark);
-        border: 1px solid var(--border-dark);
-      }
+    html.theme-light .settings-card {
+      background: var(--card-background-light);
+      border-color: var(--border-light);
     }
+    details.settings-card { position: relative; }
+    details.settings-card:has(.custom-select.is-open) { z-index: 10; overflow: visible; }
     .card-title {
-      font-size: 15px;
-      font-weight: 500;
-      padding: 10px 12px;
-      cursor: pointer;
-      list-style: none;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: margin 0.2s ease;
+      font-size: 15px; font-weight: 500; padding: 10px 12px;
+      cursor: pointer; list-style: none; display: flex;
+      justify-content: space-between; align-items: center;
     }
     .card-title::-webkit-details-marker { display: none; }
     .card-title::after {
-      content: '';
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 16px;
-      transform: rotate(0deg);
-      transition: transform 0.2s ease;
-      opacity: 0.6;
+      content: ''; display: inline-block; width: 16px; height: 16px;
+      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+      background-repeat: no-repeat; background-position: center; background-size: 16px;
+      transform: rotate(0deg); transition: transform 0.2s ease; opacity: 0.6;
     }
-    @media (prefers-color-scheme: dark) {
-      .card-title::after {
-        background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-      }
+    html.theme-light .card-title::after {
+      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24" 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
     }
-    .settings-card[open] > .card-title::after { transform: rotate(180deg); }
     .settings-card[open] > .card-title {
-      border-bottom: 1px solid var(--border-light);
-      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-dark); padding-bottom: 10px;
     }
-    @media (prefers-color-scheme: dark) {
-      .settings-card[open] > .card-title { border-bottom-color: var(--border-dark); }
-    }
-    .card-content {
-      padding: 4px 12px 12px 12px;
-    }
-    .row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 6px 0;
-    }
-    .label {
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .switch {
-      position: relative;
-      width: 40px;
-      height: 22px;
-      flex-shrink: 0;
-    }
+    html.theme-light .settings-card[open] > .card-title { border-bottom-color: var(--border-light); }
+    .settings-card[open] > .card-title::after { transform: rotate(180deg); }
+    .card-content { padding: 4px 12px 12px 12px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; }
+    .label { font-size: 13px; white-space: nowrap; }
+    .switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
     .switch input { display: none; }
     .track {
-      position: absolute;
-      inset: 0;
-      border-radius: 11px;
-      background: #c8ccd1;
-      transition: background .2s ease;
+      position: absolute; inset: 0; border-radius: 11px;
+      background: rgba(255, 255, 255, 0.15); transition: background .2s ease;
     }
+    html.theme-light .track { background: rgba(0, 0, 0, 0.15); }
     input:checked + .track { background: var(--primary-accent); }
-    @media (prefers-color-scheme: dark) { .track { background: #555; } }
     .thumb {
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: white;
-      box-shadow: 0 1px 3px rgba(0,0,0,.25);
-      transition: transform .2s ease;
+      position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
+      background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease;
     }
     input:checked + .track .thumb { transform: translateX(18px); }
-    .credit {
-      padding-top: 4px;
-      font-size: 12px;
-      opacity: .7;
-      text-align: center;
-    }
+    .credit { padding-top: 4px; font-size: 12px; opacity: .7; text-align: center; }
     .credit a { color: inherit; }
-    input[type="text"] {
-      width: 100%;
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--border-light);
-      background-color: var(--input-background-light);
-      color: inherit;
-      font-size: 12px;
-      -webkit-appearance: none;
-      appearance: none;
+    input[type="text"], button, .file-input-label {
+      font-size: 12px; padding: 6px 10px; border-radius: 6px; color: inherit;
+      border: 1px solid var(--border-dark); background-color: var(--input-background-dark);
       transition: border-color .2s ease, background-color .2s ease;
     }
-    @media (prefers-color-scheme: dark) {
-      input[type="text"] {
-        border: 1px solid var(--border-dark);
-        background-color: var(--input-background-dark);
-      }
+    html.theme-light input[type="text"], html.theme-light button, html.theme-light .file-input-label {
+      border-color: var(--border-light); background-color: var(--input-background-light);
     }
-    input[type="file"] {
-      font-size: 12px;
-      width: 100%;
-    }
-    button {
-      font-size: 12px;
-      padding: 6px 10px;
-      border: 1px solid var(--border-light);
-      background: var(--input-background-light);
-      color: inherit;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color .2s ease;
-    }
-    button:hover { background: var(--hover-background-light); }
-    @media (prefers-color-scheme: dark) {
-      button {
-        border: 1px solid var(--border-dark);
-        background: var(--input-background-dark);
-      }
-      button:hover { background: var(--hover-background-dark); }
-    }
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--primary-accent);
-    }
-    .file-input-wrapper {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      width: 100%;
-    }
+    button, .file-input-label { cursor: pointer; }
+    button:hover, .file-input-label:hover { background: var(--hover-background-dark); }
+    html.theme-light button:hover, html.theme-light .file-input-label:hover { background: var(--hover-background-light); }
+    input[type="text"] { width: 100%; -webkit-appearance: none; appearance: none; }
+    input[type="range"] { width: 100%; accent-color: var(--primary-accent); }
+    .file-input-wrapper { display: flex; gap: 10px; align-items: center; width: 100%; }
+    input[type="file"] { width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1; }
+    .file-input-label { flex-shrink: 0; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -223,7 +134,9 @@
       </div>
       <div class="row">
           <div class="file-input-wrapper">
+              <label for="bgFile" class="file-input-label" data-i18n="buttonChooseFile">__MSG_buttonChooseFile__</label>
               <input type="file" id="bgFile" accept="image/*, video/mp4, video/webm, video/ogg">
+              <div style="flex-grow: 1;"></div>
               <button id="clearBg" data-i18n="buttonReset">__MSG_buttonReset__</button>
           </div>
       </div>
@@ -251,7 +164,7 @@
     <summary class="card-title" data-i18n="sectionAppearance">__MSG_sectionAppearance__</summary>
     <div class="card-content">
       <div class="row">
-        <div class="label" data-i18n="labelTheme">__MSG_labelTheme__</div>
+        <div class="label" data-i18n="labelTheme"></div>
         <div class="custom-select-wrapper">
           <div class="custom-select" id="themeSelector">
             <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
@@ -263,14 +176,21 @@
         </div>
       </div>
       <div class="row">
-        <div class="label" data-i18n="labelLegacyComposer">__MSG_labelLegacyComposer__</div>
+        <div class="label" data-i18n="labelLegacyComposer"></div>
         <label class="switch" title="__MSG_tooltipLegacyComposer__" data-i18n-title="tooltipLegacyComposer">
           <input type="checkbox" id="legacyComposer">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label" data-i18n="labelDisableAnimations">__MSG_labelDisableAnimations__</div>
+        <div class="label" data-i18n="labelDisableBgAnimation"></div>
+        <label class="switch" title="__MSG_tooltipDisableBgAnimation__" data-i18n-title="tooltipDisableBgAnimation">
+          <input type="checkbox" id="disableBgAnimation">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="row">
+        <div class="label" data-i18n="labelDisableAnimations"></div>
         <label class="switch" title="__MSG_tooltipDisableAnimations__" data-i18n-title="tooltipDisableAnimations">
           <input type="checkbox" id="disableAnimations">
           <span class="track"><span class="thumb"></span></span>
@@ -374,7 +294,3 @@
   <script src="popup.js"></script>
 </body>
 </html>
-
-
-
-
