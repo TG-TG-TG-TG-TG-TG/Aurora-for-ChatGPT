@@ -2,6 +2,7 @@
   "extensionName": { "message": "Aurora for ChatGPT" },
   "extensionDescription": { "message": "Ambient blurred background under the ChatGPT UI with a chat visibility toggle and legacy composer option. Not affiliated with OpenAI." },
   "actionTitle": { "message": "Aurora for ChatGPT — Settings" },
+  "buttonChooseFile": { "message": "Use Local File" },
   "popupTitle": { "message": "Ambient Blur Settings" },
   "sectionBackground": { "message": "Background" },
   "labelPreset": { "message": "Preset" },
@@ -13,7 +14,9 @@
   "labelTheme": { "message": "Theme" },
   "labelLegacyComposer": { "message": "Legacy composer" },
   "tooltipLegacyComposer": { "message": "Use the site's standard composer styling" },
-  "labelDisableAnimations": { "message": "Disable animations" },
+  "labelDisableBgAnimation": { "message": "Disable background animation" },
+  "tooltipDisableBgAnimation": { "message": "Makes the background appear instantly without a fade-in effect." },
+  "labelDisableAnimations": { "message": "Disable menu animations" },
   "tooltipDisableAnimations": { "message": "Disable menu open/close animations" },
   "sectionInterface": { "message": "Interface" },
   "labelFocusMode": { "message": "Focus Mode" },
@@ -58,6 +61,7 @@
   "quickSettingsSectionVoice": { "message": "Voice UI" },
   "quickSettingsLabelHideUpgradeButtons": { "message": "Hide Upgrade Buttons" },
   "quickSettingsLabelHideGptsButton": { "message": "Hide 'Explore GPTs'" },
+  "quickSettingsLabelDisableBgAnimation": { "message": "Disable BG Animation" },
   "quickSettingsLabelCuteVoice": { "message": "Cute UI (Ears)" },
   "quickSettingsLabelVoiceColor": { "message": "Voice Color" }
 }

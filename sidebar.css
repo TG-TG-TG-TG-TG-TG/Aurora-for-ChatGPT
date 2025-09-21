@@ -29,7 +29,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .bg-token-bg-elevated-secondary,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-bg-"],
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-bg-"]:not([class*="bg-token-bg-elevated-secondary"]),
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-surface"] {
   background-color: transparent !important;
 }

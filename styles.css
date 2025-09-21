@@ -13,6 +13,17 @@ html.cgpt-ambient-on body {
   z-index: -1;
   pointer-events: none;
   background-color: #000;
+  /* --- NEW: Smooth Transition Logic --- */
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.5s ease-in-out;
+}
+
+html.cgpt-bg-anim-disabled #cgpt-ambient-bg {
+  transition: none;
+}
+
+#cgpt-ambient-bg.bg-visible {
+  opacity: 1; /* Made visible via this class */
 }
 
 #cgpt-ambient-bg picture,
@@ -59,8 +70,8 @@ html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   to { opacity: 0; transform: scale(0.95); }
 }
 
-/* 
-  --- REFACTORED: Unified Composer Glass Effect --- 
+/*
+  --- REFACTORED: Unified Composer Glass Effect ---
   This single, more accurate selector replaces the two older, redundant ones.
   It targets the main container of the ChatGPT textbox.
 */
@@ -73,7 +84,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-/* 
+/*
   --- REFACTORED: Simplified Composer Text Area ---
   Removed the old, obsolete selector for the legacy composer's label.
   This now correctly targets the modern ProseMirror editor and its textarea fallback.
@@ -350,7 +361,6 @@ html.cgpt-cute-voice-on .min-h-bloop::after { right: 45px; transform: rotate(35d
 html.cgpt-cute-voice-on .min-h-bloop > canvas { position: relative; z-index: 1; }
 
 /* --- Quick Settings UI --- */
-/* (This section was already well-structured, so it remains unchanged) */
 #cgpt-qs-btn {
   position: fixed;
   bottom: 12px;
@@ -373,7 +383,7 @@ html.cgpt-cute-voice-on .min-h-bloop > canvas { position: relative; z-index: 1; 
 #cgpt-qs-btn:hover { transform: scale(1.08); }
 #cgpt-qs-btn svg { width: 20px; height: 20px; color: white; opacity: 0.9; }
 html.cgpt-light-mode #cgpt-qs-btn {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   border-color: rgba(0,0,0,0.1);
 }
 html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
@@ -388,7 +398,7 @@ html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
   border: 1px solid rgba(255, 255, 255, 0.14);
   -webkit-backdrop-filter: blur(22px) saturate(140%);
   backdrop-filter: blur(22px) saturate(140%);
-  border-radius: 14px;
+  border-radius: 18px;
   box-shadow: 0 16px 50px rgba(0,0,0,0.45);
   padding: 8px;
   opacity: 0;
@@ -425,19 +435,19 @@ html.cgpt-light-mode #cgpt-qs-panel {
 }
 .qs-row:hover { background: rgba(255, 255, 255, 0.08); }
 html.cgpt-light-mode .qs-row:hover { background: rgba(0,0,0,0.06); }
-.qs-row > label { font-size: 14px; opacity: 0.95; }
+.qs-row > label { font-size: 13px; opacity: 0.95; }
 
-.qs-row .switch { position: relative; width: 46px; height: 26px; flex: 0 0 auto; }
+.qs-row .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
 .qs-row .switch input { display: none; }
 .qs-row .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(0,0,0,0.3); transition: background .2s ease; }
 html.cgpt-light-mode .qs-row .track { background: rgba(0,0,0,0.1); }
 .qs-row input:checked + .track { background: #4f8cff; }
-.qs-row .thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
-.qs-row input:checked + .track .thumb { transform: translateX(20px); }
+.qs-row .thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
+.qs-row input:checked + .track .thumb { transform: translateX(18px); }
 
 .qs-custom-select {
   position: relative;
-  max-width: 110px;
+  max-width: 150px;
   width: 100%;
 }
 .qs-select-trigger {
@@ -499,8 +509,8 @@ html:not(.cgpt-light-mode) .qs-color-dot {
   position: absolute;
   bottom: calc(100% + 6px);
   right: 0;
-  left: 0;
   z-index: 99999;
+  min-width: 170px;
   list-style: none;
   padding: 6px;
   margin: 0;
@@ -524,7 +534,7 @@ html.cgpt-light-mode .qs-select-options {
   display: flex;
   align-items: center;
   padding: 8px 10px;
-  font-size: 14px;
+  font-size: 13px;
   border-radius: 6px;
   cursor: pointer;
   gap: 8px;
@@ -550,6 +560,7 @@ html.cgpt-light-mode .qs-select-option:hover {
   opacity: 1;
 }
 
+
 /* Focus Mode Rules */
 html.cgpt-focus-mode-on .flex-shrink-0[class*="bg-token-sidebar-surface-primary"],
 html.cgpt-focus-mode-on header#page-header,
@@ -566,9 +577,14 @@ html.cgpt-focus-mode-on main .flex.h-full.flex-col {
 
 /* Composer Animation */
 form[data-type="unified-composer"] > div:is(.bg-token-bg-primary, [class*="dark:bg"]) {
-  transition: background 0.3s ease-in-out, 
-              border-color 0.3s ease-in-out, 
-              box-shadow 0.3s ease-in-out, 
-              backdrop-filter 0.3s ease-in-out, 
+  transition: background 0.3s ease-in-out,
+              border-color 0.3s ease-in-out,
+              box-shadow 0.3s ease-in-out,
+              backdrop-filter 0.3s ease-in-out,
               -webkit-backdrop-filter 0.3s ease-in-out;
+}
+
+/* Fix for composer's inner container background covering the blur effect */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div > div {
+    background: transparent !important;
 }
