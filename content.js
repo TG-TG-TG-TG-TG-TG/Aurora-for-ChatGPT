@@ -34,6 +34,7 @@
     }
     return key;
   };
+
   function manageGpt5LimitPopup() {
     const popup = document.querySelector('div[class*="text-token-text-primary"]');
     if (popup && !popup.textContent.toLowerCase().includes('you\'ve reached the gpt-5 limit')) return;
@@ -54,13 +55,23 @@
       chrome.storage.local.remove([TIMESTAMP_KEY], () => { if (chrome.runtime.lastError) {} });
     }
   }
+
   function manageUpgradeButtons() {
+    // This selector finds the "Upgrade plan" menu item inside the settings popup
     const panelButton = Array.from(document.querySelectorAll('a.__menu-item')).find(el => el.textContent.toLowerCase().includes('upgrade'));
+    
+    // This selector finds the button at the very top of the page (e.g., "Upgrade to Plus")
     const topButtonContainer = document.querySelector('.start-1\\/2.absolute');
+    
+    // This handles the "Upgrade" button WITHIN the profile item at the bottom of the sidebar
     const profileButtonUpgrade = document.querySelector('[data-testid="accounts-profile-button"] .__menu-item-trailing-btn');
+    
+    // REVISED: This now specifically finds the sidebar item containing the text "Upgrade", which is much more robust
     const newSidebarUpgradeButton = Array.from(document.querySelectorAll('div.gap-1\\.5.__menu-item.group')).find(el => el.textContent.toLowerCase().includes('upgrade'));
+    
     const tinySidebarUpgradeIcon = document.querySelector('#stage-sidebar-tiny-bar > div:nth-of-type(4)');
 
+    // This finds the upgrade section in the main settings page
     let accountUpgradeSection = null;
     const allSettingRows = document.querySelectorAll('div.py-2.border-b');
     for (const row of allSettingRows) {
@@ -72,6 +83,7 @@
         }
     }
 
+    // --- Apply the hiding class to all targets ---
     if (panelButton) panelButton.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
     if (topButtonContainer) topButtonContainer.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
     if (profileButtonUpgrade) profileButtonUpgrade.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
@@ -79,13 +91,16 @@
     if (tinySidebarUpgradeIcon) tinySidebarUpgradeIcon.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
     if (accountUpgradeSection) accountUpgradeSection.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
   }
+
   function manageSidebarButtons() {
     const soraButton = document.getElementById('sora');
     const gptsButton = document.querySelector('a[href="/gpts"]');
     if (soraButton) soraButton.classList.toggle(HIDE_SORA_CLASS, settings.hideSoraButton);
     if (gptsButton) gptsButton.classList.toggle(HIDE_GPTS_CLASS, settings.hideGptsButton);
   }
+
   const isChatPage = () => location.pathname.startsWith('/c/');
+
   function ensureAppOnTop() {
     const app = document.getElementById('__next') || document.querySelector('#root') || document.querySelector('main') || document.body.firstElementChild;
     if (!app) return;
@@ -93,6 +108,7 @@
     if (cs.position === 'static') app.style.position = 'relative';
     if (!app.style.zIndex || parseInt(app.style.zIndex || '0', 10) < 0) app.style.zIndex = '0';
   }
+
   function makeBgNode() {
     const wrap = document.createElement('div');
     wrap.id = ID;
@@ -101,6 +117,7 @@
     wrap.innerHTML = `<video playsinline autoplay muted loop></video><picture><source type="image/webp" srcset=""><img alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high" src="" srcset=""></picture><div class="haze"></div><div class="overlay"></div>`;
     return wrap;
   }
+
   function updateBackgroundImage() {
     const bgNode = document.getElementById(ID);
     if (!bgNode) return;
@@ -132,8 +149,10 @@
     };
     if (settings.customBgUrl) {
       if (settings.customBgUrl === '__local__') {
+        // Check if the extension context (chrome.runtime.id) is still valid before making an API call.
         if (chrome?.runtime?.id && chrome?.storage?.local) {
           chrome.storage.local.get(LOCAL_BG_KEY, (res) => {
+            // A final check inside the callback is best practice.
             if (chrome.runtime.lastError) { return; }
             if (res && res[LOCAL_BG_KEY]) {
               applyMedia(res[LOCAL_BG_KEY]);
@@ -142,6 +161,7 @@
             }
           });
         } else {
+          // If the context is gone, don't even try. Fall back to default.
           applyDefault();
         }
       } else {
@@ -151,6 +171,7 @@
       applyDefault();
     }
   }
+
   function applyCustomStyles() {
     const ensureAndApply = () => {
       let styleNode = document.getElementById(STYLE_ID);
