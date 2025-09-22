@@ -59,6 +59,30 @@ html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
   background: linear-gradient( to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.75) 18%, rgba(0, 0, 0, 0.50) 36%, rgba(0, 0, 0, 0.24) 60%, rgba(0, 0, 0, 0.00) 80% ) !important;
 }
 
+html.cgpt-appearance-clear #cgpt-ambient-bg .overlay {
+  background: transparent !important;
+}
+
+html.cgpt-appearance-clear #cgpt-ambient-bg .haze {
+  display: none !important;
+}
+
+html.cgpt-appearance-clear #cgpt-ambient-bg img,
+html.cgpt-appearance-clear #cgpt-ambient-bg video {
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.04);
+  opacity: 1;
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg img,
+html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg video {
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.02);
+  opacity: 1;
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg .overlay {
+  background: transparent !important;
+}
+
 /* --- Animations for Menus --- */
 @keyframes aurora-menu-open {
   from { opacity: 0; transform: scale(0.95); }
@@ -84,6 +108,18 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
+html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  box-shadow: 0 14px 32px rgba(12, 20, 38, 0.22) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border: 1px solid rgba(15, 24, 44, 0.14) !important;
+  box-shadow: 0 12px 28px rgba(30, 42, 68, 0.18) !important;
+}
+
 /*
   --- REFACTORED: Simplified Composer Text Area ---
   Removed the old, obsolete selector for the legacy composer's label.
@@ -100,6 +136,16 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="us
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
   -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
   backdrop-filter: blur(12px) saturate(160%) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(15, 20, 32, 0.18) !important;
 }
 
 /* --- General Transparency Overrides --- */
@@ -178,6 +224,28 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
   animation: aurora-menu-close 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer)
+  :is(
+    .popover.bg-token-main-surface-primary[data-radix-menu-content],
+    .popover.bg-token-main-surface-primary[role="dialog"],
+    div[role="dialog"][class*="shadow-long"]
+  ) {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+  box-shadow: 0 18px 44px rgba(12, 20, 32, 0.2) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
+  :is(
+    .popover.bg-token-main-surface-primary[data-radix-menu-content],
+    .popover.bg-token-main-surface-primary[role="dialog"],
+    div[role="dialog"][class*="shadow-long"]
+  ) {
+  background: rgba(255, 255, 255, 0.32) !important;
+  border-color: rgba(15, 24, 44, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(30, 42, 64, 0.18) !important;
+}
+
 @media (prefers-color-scheme: dark) {
   html.cgpt-ambient-on:not(.cgpt-light-mode):not(.cgpt-legacy-composer)
     :is(
@@ -245,6 +313,11 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-5
   background: rgba(18, 18, 18, 0.5) !important;
   -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
   backdrop-filter: blur(16px) saturate(140%) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: inherit;
 }
 
 
@@ -388,6 +461,14 @@ html.cgpt-light-mode #cgpt-qs-btn {
 }
 html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
 
+html.cgpt-appearance-clear #cgpt-qs-btn {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 26px rgba(20, 30, 48, 0.24);
+}
+html.cgpt-appearance-clear #cgpt-qs-btn svg {
+  color: rgba(16, 28, 48, 0.9);
+}
 #cgpt-qs-panel {
   position: fixed;
   bottom: 60px;
@@ -418,6 +499,18 @@ html.cgpt-light-mode #cgpt-qs-panel {
     color: #000;
 }
 
+html.cgpt-appearance-clear #cgpt-qs-panel {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: rgba(18, 26, 42, 0.92);
+  box-shadow: 0 18px 44px rgba(12, 20, 32, 0.26);
+}
+html.cgpt-appearance-clear.cgpt-light-mode #cgpt-qs-panel {
+  background: rgba(255, 255, 255, 0.38);
+  border-color: rgba(15, 24, 40, 0.12);
+  color: rgba(15, 24, 40, 0.92);
+  box-shadow: 0 14px 32px rgba(30, 42, 64, 0.18);
+}
 .qs-section-title {
   font-size: 11px;
   font-weight: 600;
@@ -444,6 +537,50 @@ html.cgpt-light-mode .qs-row .track { background: rgba(0,0,0,0.1); }
 .qs-row input:checked + .track { background: #4f8cff; }
 .qs-row .thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
 .qs-row input:checked + .track .thumb { transform: translateX(18px); }
+
+
+.qs-pill-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+}
+.qs-pill {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.qs-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.qs-pill:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px currentColor;
+}
+.qs-pill.active {
+  background: rgba(255, 255, 255, 0.2);
+}
+html.cgpt-light-mode .qs-pill-group {
+  border-color: rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.05);
+}
+html.cgpt-light-mode .qs-pill {
+  color: inherit;
+}
+html.cgpt-light-mode .qs-pill:hover {
+  background: rgba(0,0,0,0.08);
+}
+html.cgpt-light-mode .qs-pill.active {
+  background: rgba(0,0,0,0.12);
+}
 
 .qs-custom-select {
   position: relative;

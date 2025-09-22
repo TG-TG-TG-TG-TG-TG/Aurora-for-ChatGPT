@@ -9,7 +9,8 @@
   const LIGHT_CLASS = 'cgpt-light-mode';
   const ANIMATIONS_DISABLED_CLASS = 'cgpt-animations-disabled';
   const BG_ANIM_DISABLED_CLASS = 'cgpt-bg-anim-disabled';
-  const DEFAULTS = { legacyComposer: false, theme: 'auto', hideGpt5Limit: false, hideUpgradeButtons: false, disableAnimations: false, disableBgAnimation: false, focusMode: false, hideQuickSettings: false, customBgUrl: '', hideSoraButton: false, hideGptsButton: false, backgroundBlur: '60', backgroundScaling: 'contain', voiceColor: 'default', cuteVoiceUI: false, showInNewChatsOnly: false };
+  const CLEAR_APPEARANCE_CLASS = 'cgpt-appearance-clear';
+  const DEFAULTS = { legacyComposer: false, theme: 'auto', appearance: 'dimmed', hideGpt5Limit: false, hideUpgradeButtons: false, disableAnimations: false, disableBgAnimation: false, focusMode: false, hideQuickSettings: false, customBgUrl: '', hideSoraButton: false, hideGptsButton: false, backgroundBlur: '60', backgroundScaling: 'contain', voiceColor: 'default', cuteVoiceUI: false, showInNewChatsOnly: false };
   let settings = { ...DEFAULTS };
 
   const LOCAL_BG_KEY = 'customBgData';
@@ -268,6 +269,13 @@
           <label>${getMessage('quickSettingsLabelDisableBgAnimation')}</label>
           <label class="switch"><input type="checkbox" id="qs-disableBgAnimation"><span class="track"><span class="thumb"></span></span></label>
       </div>
+      <div class="qs-row" data-setting="appearance">
+          <label>${getMessage('quickSettingsLabelGlassStyle')}</label>
+          <div class="qs-pill-group" role="group" aria-label="${getMessage('quickSettingsLabelGlassStyle')}">
+            <button type="button" class="qs-pill" data-appearance="dimmed">${getMessage('glassAppearanceOptionDimmed')}</button>
+            <button type="button" class="qs-pill" data-appearance="clear">${getMessage('glassAppearanceOptionClear')}</button>
+          </div>
+      </div>
       <div class="qs-section-title">${getMessage('quickSettingsSectionVoice')}</div>
       <div class="qs-row" data-setting="voiceColor">
           <label>${getMessage('quickSettingsLabelVoiceColor')}</label>
@@ -291,6 +299,26 @@
     document.getElementById('qs-hideGptsButton').checked = !!settings.hideGptsButton;
     document.getElementById('qs-disableBgAnimation').checked = !!settings.disableBgAnimation;
     document.getElementById('qs-cuteVoiceUI').checked = !!settings.cuteVoiceUI;
+
+    const appearanceButtons = Array.from(panel.querySelectorAll('[data-appearance]'));
+    const syncAppearanceButtons = () => {
+      appearanceButtons.forEach((btn) => {
+        const isActive = settings.appearance === btn.dataset.appearance;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+    };
+    syncAppearanceButtons();
+    appearanceButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const value = btn.dataset.appearance;
+        if (!value || value === settings.appearance) return;
+        settings.appearance = value;
+        syncAppearanceButtons();
+        applyRootFlags();
+        chrome.storage.sync.set({ appearance: value });
+      });
+    });
 
     const addCheckboxListener = (id, settingName) => {
       const el = document.getElementById(id);
@@ -361,6 +389,7 @@
     document.documentElement.classList.toggle(LEGACY_CLASS, !!settings.legacyComposer);
     document.documentElement.classList.toggle(ANIMATIONS_DISABLED_CLASS, !!settings.disableAnimations);
     document.documentElement.classList.toggle(BG_ANIM_DISABLED_CLASS, !!settings.disableBgAnimation);
+    document.documentElement.classList.toggle(CLEAR_APPEARANCE_CLASS, settings.appearance === 'clear');
     document.documentElement.classList.toggle('cgpt-cute-voice-on', !!settings.cuteVoiceUI);
     document.documentElement.classList.toggle('cgpt-focus-mode-on', !!settings.focusMode);
 

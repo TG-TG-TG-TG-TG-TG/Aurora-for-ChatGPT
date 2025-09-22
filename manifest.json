@@ -32,5 +32,15 @@
       "css": ["styles.css", "sidebar.css"],
       "run_at": "document_start"
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["Aurora/grok-4.webp"],
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://chatgpt.com/*",
+        "https://openai.com/*"
+      ]
+    }
   ]
 }

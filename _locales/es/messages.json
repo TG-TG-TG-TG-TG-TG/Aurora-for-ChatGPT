@@ -14,6 +14,7 @@
   "tooltipDisableBgAnimation": { "message": "Hace que el fondo aparezca instantáneamente sin un efecto de desvanecimiento." },
   "sectionAppearance": { "message": "Apariencia" },
   "labelTheme": { "message": "Tema" },
+  "labelGlassStyle": { "message": "Estilo de vidrio" },
   "labelLegacyComposer": { "message": "Editor clásico" },
   "tooltipLegacyComposer": { "message": "Usa el estilo estándar del editor del sitio" },
   "labelDisableAnimations": { "message": "Desactivar animaciones de menú" },
@@ -52,6 +53,8 @@
   "themeOptionAuto": { "message": "Automático" },
   "themeOptionLight": { "message": "Claro" },
   "themeOptionDark": { "message": "Oscuro" },
+  "glassAppearanceOptionDimmed": { "message": "Vidrio atenuado" },
+  "glassAppearanceOptionClear": { "message": "Vidrio claro" },
   "alertFileTooLarge": { "message": "¡El archivo es demasiado grande! Elige un archivo menor a $1MB." },
   "statusLocalFileInUse": { "message": "Se usa un archivo local" },
   "creditPrefix": { "message": "Creado por" },
@@ -62,6 +65,7 @@
   "quickSettingsLabelHideUpgradeButtons": { "message": "Ocultar botones de mejora" },
   "quickSettingsLabelHideGptsButton": { "message": "Ocultar \"Explorar GPTs\"" },
   "quickSettingsLabelDisableBgAnimation": { "message": "Desactivar Anim. Fondo" },
+  "quickSettingsLabelGlassStyle": { "message": "Estilo de vidrio" },
   "quickSettingsLabelCuteVoice": { "message": "Interfaz adorable (orejas)" },
   "quickSettingsLabelVoiceColor": { "message": "Color de voz" }
 }

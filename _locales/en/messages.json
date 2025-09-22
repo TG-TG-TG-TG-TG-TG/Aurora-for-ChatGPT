@@ -12,6 +12,7 @@
   "labelScaling": { "message": "Scaling" },
   "sectionAppearance": { "message": "Appearance" },
   "labelTheme": { "message": "Theme" },
+  "labelGlassStyle": { "message": "Glass style" },
   "labelLegacyComposer": { "message": "Legacy composer" },
   "tooltipLegacyComposer": { "message": "Use the site's standard composer styling" },
   "labelDisableBgAnimation": { "message": "Disable background animation" },
@@ -45,6 +46,7 @@
   "voiceColorOptionGreen": { "message": "Aurora Green" },
   "voiceColorOptionDark": { "message": "Onyx Dark" },
   "bgPresetOptionDefault": { "message": "GPT-5 Wallpaper" },
+  "bgPresetOptionGrokHorizon": { "message": "Grok Horizon" },
   "bgPresetOptionBlue": { "message": "Blue Wallpaper" },
   "bgPresetOptionCustom": { "message": "Custom" },
   "bgScalingOptionContain": { "message": "Contain (fit)" },
@@ -52,6 +54,8 @@
   "themeOptionAuto": { "message": "Auto" },
   "themeOptionLight": { "message": "Light" },
   "themeOptionDark": { "message": "Dark" },
+  "glassAppearanceOptionDimmed": { "message": "Dimmed glass" },
+  "glassAppearanceOptionClear": { "message": "Clear glass" },
   "alertFileTooLarge": { "message": "File is too large! Please choose a file under $1MB." },
   "statusLocalFileInUse": { "message": "Local file is in use" },
   "creditPrefix": { "message": "Made by" },
@@ -62,6 +66,7 @@
   "quickSettingsLabelHideUpgradeButtons": { "message": "Hide Upgrade Buttons" },
   "quickSettingsLabelHideGptsButton": { "message": "Hide 'Explore GPTs'" },
   "quickSettingsLabelDisableBgAnimation": { "message": "Disable BG Animation" },
+  "quickSettingsLabelGlassStyle": { "message": "Glass Style" },
   "quickSettingsLabelCuteVoice": { "message": "Cute UI (Ears)" },
   "quickSettingsLabelVoiceColor": { "message": "Voice Color" }
 }

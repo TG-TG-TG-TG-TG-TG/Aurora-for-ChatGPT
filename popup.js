@@ -2,6 +2,7 @@
 const DEFAULTS = {
   legacyComposer: false,
   theme: 'auto',
+  appearance: 'dimmed',
   hideGpt5Limit: false,
   hideUpgradeButtons: false,
   disableAnimations: false,
@@ -20,6 +21,9 @@ const DEFAULTS = {
 
 const LOCAL_BG_KEY = 'customBgData';
 const BLUE_WALLPAPER_URL = 'https://img.freepik.com/free-photo/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner_1258-54581.jpg?semt=ais_hybrid&w=740&q=80';
+const GROK_HORIZON_URL = chrome?.runtime?.getURL
+  ? chrome.runtime.getURL('Aurora/grok-4.webp')
+  : 'Aurora/grok-4.webp';
 const MAX_FILE_SIZE_MB = 15;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
@@ -155,15 +159,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Initialize Custom Selects ---
   const bgPresetOptions = [
     { value: 'default', labelKey: 'bgPresetOptionDefault' },
+    { value: 'grokHorizon', labelKey: 'bgPresetOptionGrokHorizon' },
     { value: 'blue', labelKey: 'bgPresetOptionBlue' },
     { value: 'custom', labelKey: 'bgPresetOptionCustom', hidden: true }
   ];
   const bgPresetSelect = createCustomSelect('bgPreset', bgPresetOptions, 'customBgUrl', (value) => {
-    let newUrl = value === 'blue' ? BLUE_WALLPAPER_URL : '';
-    if (value !== 'custom') {
-        chrome.storage.local.remove(LOCAL_BG_KEY);
+    let newUrl = '';
+    if (value === 'blue') {
+      newUrl = BLUE_WALLPAPER_URL;
+    } else if (value === 'grokHorizon') {
+      newUrl = GROK_HORIZON_URL;
     }
-    chrome.storage.sync.set({ customBgUrl: newUrl });
+
+    if (value !== 'custom') {
+      chrome.storage.local.remove(LOCAL_BG_KEY);
+      chrome.storage.sync.set({ customBgUrl: newUrl });
+    }
   });
 
   const bgScalingOptions = [
@@ -178,6 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
     { value: 'dark', labelKey: 'themeOptionDark' }
   ];
   const themeSelect = createCustomSelect('themeSelector', themeOptions, 'theme');
+
+  const appearanceOptions = [
+    { value: 'dimmed', labelKey: 'glassAppearanceOptionDimmed' },
+    { value: 'clear', labelKey: 'glassAppearanceOptionClear' }
+  ];
+  const appearanceSelect = createCustomSelect('appearanceSelector', appearanceOptions, 'appearance');
 
   const voiceColorOptions = [
     { value: 'default', labelKey: 'voiceColorOptionDefault', color: '#8EBBFF' },
@@ -213,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bgScalingSelect.update(settings.backgroundScaling);
     themeSelect.update(settings.theme);
+    appearanceSelect.update(settings.appearance || 'dimmed');
     voiceColorSelect.update(settings.voiceColor);
 
     const url = settings.customBgUrl;
@@ -221,6 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!url) {
       bgPresetSelect.update('default');
+    } else if (url === GROK_HORIZON_URL) {
+      bgPresetSelect.update('grokHorizon');
     } else if (url === BLUE_WALLPAPER_URL) {
       bgPresetSelect.update('blue');
     } else if (url === '__local__') {
