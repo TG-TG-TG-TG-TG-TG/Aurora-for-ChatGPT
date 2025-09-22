@@ -1,62 +1,46 @@
-﻿{
-    "manifest_version":  3,
-    "name":  "__MSG_extensionName__",
-    "version":  "1.1.0",
-    "default_locale":  "en",
-    "description":  "__MSG_extensionDescription__",
-    "icons":  {
-                  "16":  "icons/logo-16.png",
-                  "32":  "icons/logo-32.png",
-                  "48":  "icons/logo-48.png",
-                  "128":  "icons/logo-128.png"
-              },
-    "permissions":  [
-                        "storage"
-                    ],
-    "action":  {
-                   "default_title":  "__MSG_actionTitle__",
-                   "default_popup":  "popup.html",
-                   "default_icon":  {
-                                        "16":  "icons/logo-16.png",
-                                        "32":  "icons/logo-32.png",
-                                        "48":  "icons/logo-48.png",
-                                        "128":  "icons/logo-128.png"
-                                    }
-               },
-    "content_scripts":  [
-                            {
-                                "matches":  [
-                                                "https://x.ai/*",
-                                                "https://www.x.ai/*",
-                                                "https://chat.x.ai/*",
-                                                "https://grok.com/*",
-                                                "https://www.grok.com/*",
-                                                "https://grok.x.ai/*"
-                                            ],
-                                "js":  [
-                                           "content.js"
-                                       ],
-                                "css":  [
-                                            "styles.css",
-                                            "sidebar.css"
-                                        ],
-                                "run_at":  "document_start"
-                            }
-                        ],
-    "web_accessible_resources":  [
-                                     {
-                                         "matches":  [
-                                                         "https://x.ai/*",
-                                                         "https://www.x.ai/*",
-                                                         "https://chat.x.ai/*",
-                                                         "https://grok.com/*",
-                                                         "https://www.grok.com/*",
-                                                         "https://grok.x.ai/*"
-                                                     ],
-                                         "resources":  [
-                                                           "Aurora/grok-4.webp",
-                                                           "Aurora/Chatgpt.webp"
-                                                       ]
-                                     }
-                                 ]
+{
+  "manifest_version": 3,
+  "name": "__MSG_extensionName__",
+  "version": "1.5.5",
+  "default_locale": "en",
+  "description": "__MSG_extensionDescription__",
+  "icons": {
+    "16":  "icons/logo-16.png",
+    "32":  "icons/logo-32.png",
+    "48":  "icons/logo-48.png",
+    "128": "icons/logo-128.png"
+  },
+  "permissions": ["storage"],
+  "action": {
+    "default_title": "__MSG_actionTitle__",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16":  "icons/logo-16.png",
+      "32":  "icons/logo-32.png",
+      "48":  "icons/logo-48.png",
+      "128": "icons/logo-128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://chatgpt.com/*",
+        "https://openai.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css", "sidebar.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["Aurora/grok-4.webp"],
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://chatgpt.com/*",
+        "https://openai.com/*"
+      ]
+    }
+  ]
 }
