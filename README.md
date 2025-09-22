@@ -5,6 +5,13 @@ Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
 
 ---
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8c67ef7c-a3e3-449c-b62d-2760f56df9c9" width="70%">
+</p>
+
+
+---
+
 ## Highlights
 
 * 🌌 **Ambient Aurora background** — a subtle gradient blur behind the ChatGPT interface
