@@ -1,0 +1,239 @@
+/* Aurora for ChatGPT - Quick Settings UI Styles */
+
+#cgpt-qs-btn {
+  position: fixed;
+  bottom: 12px;
+  right: 16px;
+  z-index: 99998;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(30, 30, 30, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+#cgpt-qs-btn:hover { transform: scale(1.08); }
+#cgpt-qs-btn svg { width: 20px; height: 20px; color: white; opacity: 0.9; }
+html.cgpt-light-mode #cgpt-qs-btn {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(0,0,0,0.1);
+}
+html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
+
+#cgpt-qs-panel {
+  position: fixed;
+  bottom: 60px;
+  right: 16px;
+  z-index: 99997;
+  width: 260px;
+  background: rgba(44, 44, 51, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  border-radius: 14px;
+  box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.07), 0 16px 40px rgba(0,0,0,0.35);
+  padding: 8px;
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease;
+  color: #fff;
+}
+#cgpt-qs-panel.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+html.cgpt-light-mode #cgpt-qs-panel {
+    background: rgba(242, 242, 247, 0.8);
+    border-color: rgba(0,0,0,0.1);
+    box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.7), 0 16px 40px rgba(0,0,0,0.15);
+    color: #000;
+}
+
+.qs-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  opacity: 0.6;
+  padding: 8px 8px 4px;
+}
+.qs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+.qs-row:hover { background: rgba(255, 255, 255, 0.08); }
+html.cgpt-light-mode .qs-row:hover { background: rgba(0,0,0,0.06); }
+.qs-row > label { font-size: 13px; opacity: 0.95; }
+
+.qs-row .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
+.qs-row .switch input { display: none; }
+.qs-row .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(0,0,0,0.3); transition: background .2s ease; }
+html.cgpt-light-mode .qs-row .track { background: rgba(0,0,0,0.2); }
+.qs-row input:checked + .track { background: #4f8cff; }
+.qs-row .thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
+.qs-row input:checked + .track .thumb { transform: translateX(18px); }
+
+.qs-custom-select {
+  position: relative;
+  max-width: 150px;
+  width: 100%;
+}
+.qs-select-trigger {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+html.cgpt-light-mode .qs-select-trigger {
+  border-color: rgba(0, 0, 0, 0.08);
+  background-color: rgba(0, 0, 0, 0.03);
+}
+.qs-select-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+html.cgpt-light-mode .qs-select-trigger:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+.qs-select-trigger > .qs-select-label {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qs-select-trigger svg {
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+.qs-select-trigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.qs-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+html:not(.cgpt-light-mode) .qs-color-dot {
+  border-color: rgba(255,255,255,0.1);
+}
+.qs-select-options {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  z-index: 99999;
+  min-width: 170px;
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  background: rgba(36, 36, 41, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  border-radius: 12px;
+  box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.1), 0 16px 40px rgba(0,0,0,0.35);
+  max-height: 200px;
+  overflow-y: auto;
+}
+.qs-select-options::-webkit-scrollbar {
+  display: none;
+}
+html.cgpt-light-mode .qs-select-options {
+  background: rgba(242, 242, 247, 0.85);
+  border-color: rgba(0,0,0,0.1);
+  box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.7), 0 16px 40px rgba(0,0,0,0.15);
+}
+.qs-select-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+.qs-select-option:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+html.cgpt-light-mode .qs-select-option:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.qs-select-option[aria-selected="true"] {
+  font-weight: 500;
+}
+.qs-select-option .qs-checkmark {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  opacity: 0;
+}
+.qs-select-option[aria-selected="true"] .qs-checkmark {
+  opacity: 1;
+}
+
+.qs-pill-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+}
+html.cgpt-light-mode .qs-pill-group {
+  border-color: rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.05);
+}
+.qs-pill {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.qs-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+html.cgpt-light-mode .qs-pill:hover {
+  background: rgba(0,0,0,0.08);
+}
+.qs-pill.active {
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+}
+html.cgpt-light-mode .qs-pill.active {
+  background: rgba(0,0,0,0.12);
+}

@@ -4,6 +4,9 @@
   "version": "1.5.5",
   "default_locale": "en",
   "description": "__MSG_extensionDescription__",
+  "background": {
+    "service_worker": "background.js"
+  },
   "icons": {
     "16":  "icons/logo-16.png",
     "32":  "icons/logo-32.png",
@@ -29,7 +32,7 @@
         "https://openai.com/*"
       ],
       "js": ["content.js"],
-      "css": ["styles.css", "sidebar.css"],
+      "css": ["styles.css", "sidebar.css", "quick-settings.css"],
       "run_at": "document_start"
     }
   ],

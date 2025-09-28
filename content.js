@@ -10,8 +10,7 @@
   const ANIMATIONS_DISABLED_CLASS = 'cgpt-animations-disabled';
   const BG_ANIM_DISABLED_CLASS = 'cgpt-bg-anim-disabled';
   const CLEAR_APPEARANCE_CLASS = 'cgpt-appearance-clear';
-  const DEFAULTS = { legacyComposer: false, theme: 'auto', appearance: 'dimmed', hideGpt5Limit: false, hideUpgradeButtons: false, disableAnimations: false, disableBgAnimation: false, focusMode: false, hideQuickSettings: false, customBgUrl: '', hideSoraButton: false, hideGptsButton: false, backgroundBlur: '60', backgroundScaling: 'contain', voiceColor: 'default', cuteVoiceUI: false, showInNewChatsOnly: false };
-  let settings = { ...DEFAULTS };
+  let settings = {};
 
   const LOCAL_BG_KEY = 'customBgData';
   const HIDE_LIMIT_CLASS = 'cgpt-hide-gpt5-limit';
@@ -20,6 +19,38 @@
   const HIDE_GPTS_CLASS = 'cgpt-hide-gpts';
   const TIMESTAMP_KEY = 'gpt5LimitHitTimestamp';
   const FIVE_MINUTES_MS = 5 * 60 * 1000;
+
+  // Group DOM selectors for easier maintenance. Fragile selectors are noted.
+  const SELECTORS = {
+    GPT5_LIMIT_POPUP: 'div[class*="text-token-text-primary"]',
+    UPGRADE_MENU_ITEM: 'a.__menu-item', // In user profile menu
+    UPGRADE_TOP_BUTTON_CONTAINER: '.start-1\\/2.absolute', // Fragile: top-center button on free plan
+    UPGRADE_PROFILE_BUTTON_TRAILING_ICON: '[data-testid="accounts-profile-button"] .__menu-item-trailing-btn', // Good selector
+    UPGRADE_SIDEBAR_BUTTON: 'div.gap-1\\.5.__menu-item.group', // Fragile: sidebar button
+    UPGRADE_TINY_SIDEBAR_ICON: '#stage-sidebar-tiny-bar > div:nth-of-type(4)', // Fragile: depends on element order
+    UPGRADE_SETTINGS_ROW_CONTAINER: 'div.py-2.border-b', // Container for settings row
+    SORA_BUTTON_ID: 'sora', // Use with getElementById
+    GPTS_BUTTON: 'a[href="/gpts"]',
+    PROFILE_BUTTON: '[data-testid="accounts-profile-button"]',
+  };
+
+  const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  };
+
+  const toggleClassForElements = (elements, className, force) => {
+    elements.forEach(el => {
+      if (el) el.classList.toggle(className, force);
+    });
+  };
 
   const getMessage = (key) => {
     try {
@@ -37,7 +68,7 @@
   };
 
   function manageGpt5LimitPopup() {
-    const popup = document.querySelector('div[class*="text-token-text-primary"]');
+    const popup = document.querySelector(SELECTORS.GPT5_LIMIT_POPUP);
     if (popup && !popup.textContent.toLowerCase().includes('you\'ve reached the gpt-5 limit')) return;
     if (!settings.hideGpt5Limit) {
       if (popup) popup.classList.remove(HIDE_LIMIT_CLASS); return;
@@ -45,36 +76,49 @@
     if (!chrome?.runtime?.id) return;
     if (popup) {
       chrome.storage.local.get([TIMESTAMP_KEY], (result) => {
-        if (chrome.runtime.lastError) return;
+        if (chrome.runtime.lastError) {
+          console.error("Aurora Extension Error (manageGpt5LimitPopup):", chrome.runtime.lastError.message);
+          return;
+        }
         if (!result[TIMESTAMP_KEY]) {
-          chrome.storage.local.set({ [TIMESTAMP_KEY]: Date.now() }, () => { if (chrome.runtime.lastError) {} });
+          chrome.storage.local.set({ [TIMESTAMP_KEY]: Date.now() }, () => {
+            if (chrome.runtime.lastError) {
+              console.error("Aurora Extension Error (manageGpt5LimitPopup):", chrome.runtime.lastError.message);
+            }
+          });
         } else if (Date.now() - result[TIMESTAMP_KEY] > FIVE_MINUTES_MS) {
           popup.classList.add(HIDE_LIMIT_CLASS);
         }
       });
     } else {
-      chrome.storage.local.remove([TIMESTAMP_KEY], () => { if (chrome.runtime.lastError) {} });
+      chrome.storage.local.remove([TIMESTAMP_KEY], () => {
+        if (chrome.runtime.lastError) {
+          console.error("Aurora Extension Error (manageGpt5LimitPopup):", chrome.runtime.lastError.message);
+        }
+      });
     }
   }
 
   function manageUpgradeButtons() {
-    // This selector finds the "Upgrade plan" menu item inside the settings popup
-    const panelButton = Array.from(document.querySelectorAll('a.__menu-item')).find(el => el.textContent.toLowerCase().includes('upgrade'));
-    
-    // This selector finds the button at the very top of the page (e.g., "Upgrade to Plus")
-    const topButtonContainer = document.querySelector('.start-1\\/2.absolute');
-    
-    // This handles the "Upgrade" button WITHIN the profile item at the bottom of the sidebar
-    const profileButtonUpgrade = document.querySelector('[data-testid="accounts-profile-button"] .__menu-item-trailing-btn');
-    
-    // REVISED: This now specifically finds the sidebar item containing the text "Upgrade", which is much more robust
-    const newSidebarUpgradeButton = Array.from(document.querySelectorAll('div.gap-1\\.5.__menu-item.group')).find(el => el.textContent.toLowerCase().includes('upgrade'));
-    
-    const tinySidebarUpgradeIcon = document.querySelector('#stage-sidebar-tiny-bar > div:nth-of-type(4)');
+    const upgradeElements = [];
 
-    // This finds the upgrade section in the main settings page
+    const panelButton = Array.from(document.querySelectorAll(SELECTORS.UPGRADE_MENU_ITEM)).find(el => el.textContent.toLowerCase().includes('upgrade'));
+    upgradeElements.push(panelButton);
+
+    const topButtonContainer = document.querySelector(SELECTORS.UPGRADE_TOP_BUTTON_CONTAINER);
+    upgradeElements.push(topButtonContainer);
+
+    const profileButtonUpgrade = document.querySelector(SELECTORS.UPGRADE_PROFILE_BUTTON_TRAILING_ICON);
+    upgradeElements.push(profileButtonUpgrade);
+    
+    const newSidebarUpgradeButton = Array.from(document.querySelectorAll(SELECTORS.UPGRADE_SIDEBAR_BUTTON)).find(el => el.textContent.toLowerCase().includes('upgrade'));
+    upgradeElements.push(newSidebarUpgradeButton);
+    
+    const tinySidebarUpgradeIcon = document.querySelector(SELECTORS.UPGRADE_TINY_SIDEBAR_ICON);
+    upgradeElements.push(tinySidebarUpgradeIcon);
+
     let accountUpgradeSection = null;
-    const allSettingRows = document.querySelectorAll('div.py-2.border-b');
+    const allSettingRows = document.querySelectorAll(SELECTORS.UPGRADE_SETTINGS_ROW_CONTAINER);
     for (const row of allSettingRows) {
         const hasTitle = Array.from(row.querySelectorAll('div')).some(d => d.textContent.trim() === 'Get ChatGPT Plus');
         const hasButton = row.querySelector('button')?.textContent.trim() === 'Upgrade';
@@ -83,21 +127,14 @@
             break;
         }
     }
+    upgradeElements.push(accountUpgradeSection);
 
-    // --- Apply the hiding class to all targets ---
-    if (panelButton) panelButton.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
-    if (topButtonContainer) topButtonContainer.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
-    if (profileButtonUpgrade) profileButtonUpgrade.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
-    if (newSidebarUpgradeButton) newSidebarUpgradeButton.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
-    if (tinySidebarUpgradeIcon) tinySidebarUpgradeIcon.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
-    if (accountUpgradeSection) accountUpgradeSection.classList.toggle(HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
+    toggleClassForElements(upgradeElements, HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
   }
 
   function manageSidebarButtons() {
-    const soraButton = document.getElementById('sora');
-    const gptsButton = document.querySelector('a[href="/gpts"]');
-    if (soraButton) soraButton.classList.toggle(HIDE_SORA_CLASS, settings.hideSoraButton);
-    if (gptsButton) gptsButton.classList.toggle(HIDE_GPTS_CLASS, settings.hideGptsButton);
+    toggleClassForElements([document.getElementById(SELECTORS.SORA_BUTTON_ID)], HIDE_SORA_CLASS, settings.hideSoraButton);
+    toggleClassForElements([document.querySelector(SELECTORS.GPTS_BUTTON)], HIDE_GPTS_CLASS, settings.hideGptsButton);
   }
 
   const isChatPage = () => location.pathname.startsWith('/c/');
@@ -115,13 +152,20 @@
     wrap.id = ID;
     wrap.setAttribute('aria-hidden', 'true');
     Object.assign(wrap.style, { position: 'fixed', inset: '0', zIndex: '-1', pointerEvents: 'none' });
-    wrap.innerHTML = `<video playsinline autoplay muted loop></video><picture><source type="image/webp" srcset=""><img alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high" src="" srcset=""></picture><div class="haze"></div><div class="overlay"></div>`;
+    wrap.innerHTML = `<div class="animated-bg"><div class="blob"></div><div class="blob"></div><div class="blob"></div></div><video playsinline autoplay muted loop></video><picture><source type="image/webp" srcset=""><img alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high" src="" srcset=""></picture><div class="haze"></div><div class="overlay"></div>`;
     return wrap;
   }
 
   function updateBackgroundImage() {
     const bgNode = document.getElementById(ID);
     if (!bgNode) return;
+
+    bgNode.classList.toggle('gpt5-active', settings.customBgUrl === '__gpt5_animated__');
+
+    if (settings.customBgUrl === '__gpt5_animated__') {
+      return; // Animated background is handled by CSS, no need to update media elements.
+    }
+
     const img = bgNode.querySelector('img');
     const source = bgNode.querySelector('source');
     const video = bgNode.querySelector('video');
@@ -150,11 +194,12 @@
     };
     if (settings.customBgUrl) {
       if (settings.customBgUrl === '__local__') {
-        // Check if the extension context (chrome.runtime.id) is still valid before making an API call.
         if (chrome?.runtime?.id && chrome?.storage?.local) {
           chrome.storage.local.get(LOCAL_BG_KEY, (res) => {
-            // A final check inside the callback is best practice.
-            if (chrome.runtime.lastError) { return; }
+            if (chrome.runtime.lastError) {
+              console.error("Aurora Extension Error (updateBackgroundImage):", chrome.runtime.lastError.message);
+              return;
+            }
             if (res && res[LOCAL_BG_KEY]) {
               applyMedia(res[LOCAL_BG_KEY]);
             } else {
@@ -162,7 +207,6 @@
             }
           });
         } else {
-          // If the context is gone, don't even try. Fall back to default.
           applyDefault();
         }
       } else {
@@ -208,6 +252,81 @@
   }
 
   let qsInitScheduled = false;
+
+  function setupQuickSettingsToggles(settings) {
+    const toggleConfig = [
+      { id: 'qs-focusMode', key: 'focusMode' },
+      { id: 'qs-hideUpgradeButtons', key: 'hideUpgradeButtons' },
+      { id: 'qs-hideGptsButton', key: 'hideGptsButton' },
+      { id: 'qs-disableBgAnimation', key: 'disableBgAnimation' },
+      { id: 'qs-cuteVoiceUI', key: 'cuteVoiceUI' },
+    ];
+
+    toggleConfig.forEach(({ id, key }) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.checked = !!settings[key];
+        el.addEventListener('change', () => {
+          chrome.storage.sync.set({ [key]: el.checked });
+        });
+      }
+    });
+  }
+
+  function setupQuickSettingsVoiceSelector(settings) {
+    const voiceColorOptions = [
+      { value: 'default', labelKey: 'voiceColorOptionDefault', color: '#8EBBFF' },
+      { value: 'orange', labelKey: 'voiceColorOptionOrange', color: '#FF9900' },
+      { value: 'yellow', labelKey: 'voiceColorOptionYellow', color: '#FFD700' },
+      { value: 'pink', labelKey: 'voiceColorOptionPink', color: '#FF69B4' },
+      { value: 'green', labelKey: 'voiceColorOptionGreen', color: '#32CD32' },
+      { value: 'dark', labelKey: 'voiceColorOptionDark', color: '#555555' }
+    ];
+    const selectContainer = document.getElementById('qs-voice-color-select');
+    if (!selectContainer) return;
+
+    const trigger = selectContainer.querySelector('.qs-select-trigger');
+    const optionsContainer = selectContainer.querySelector('.qs-select-options');
+    const triggerDot = trigger.querySelector('.qs-color-dot');
+    const triggerLabel = trigger.querySelector('.qs-select-label');
+
+    const resolveVoiceLabel = (option) => getMessage(option.labelKey);
+
+    const renderVoiceOptions = (selectedValue) => {
+      optionsContainer.innerHTML = voiceColorOptions.map(option => `
+        <div class="qs-select-option" role="option" data-value="${option.value}" aria-selected="${option.value === selectedValue}">
+            <span class="qs-color-dot" style="background-color: ${option.color};"></span>
+            <span class="qs-select-label">${resolveVoiceLabel(option)}</span>
+            <svg class="qs-checkmark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+      `).join('');
+      optionsContainer.querySelectorAll('.qs-select-option').forEach(optionEl => {
+        optionEl.addEventListener('click', () => {
+          const newValue = optionEl.dataset.value;
+          chrome.storage.sync.set({ voiceColor: newValue });
+          trigger.setAttribute('aria-expanded', 'false');
+          optionsContainer.style.display = 'none';
+        });
+      });
+    };
+
+    const updateSelectorState = (value) => {
+      const selectedOption = voiceColorOptions.find(opt => opt.value === value) || voiceColorOptions[0];
+      triggerDot.style.backgroundColor = selectedOption.color;
+      triggerLabel.textContent = resolveVoiceLabel(selectedOption);
+      renderVoiceOptions(value);
+    };
+
+    updateSelectorState(settings.voiceColor);
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+      trigger.setAttribute('aria-expanded', String(!isExpanded));
+      optionsContainer.style.display = isExpanded ? 'none' : 'block';
+    });
+  }
+
   function manageQuickSettingsUI() {
     if (!document.body) {
       if (!qsInitScheduled) {
@@ -236,7 +355,7 @@
       });
 
       document.addEventListener('click', (e) => {
-        if (!panel.contains(e.target) && panel.classList.contains('active')) {
+        if (panel && !panel.contains(e.target) && panel.classList.contains('active')) {
           panel.classList.remove('active');
         }
         const selectContainer = document.getElementById('qs-voice-color-select');
@@ -294,93 +413,25 @@
       </div>
     `;
 
-    document.getElementById('qs-focusMode').checked = !!settings.focusMode;
-    document.getElementById('qs-hideUpgradeButtons').checked = !!settings.hideUpgradeButtons;
-    document.getElementById('qs-hideGptsButton').checked = !!settings.hideGptsButton;
-    document.getElementById('qs-disableBgAnimation').checked = !!settings.disableBgAnimation;
-    document.getElementById('qs-cuteVoiceUI').checked = !!settings.cuteVoiceUI;
+    setupQuickSettingsToggles(settings);
 
     const appearanceButtons = Array.from(panel.querySelectorAll('[data-appearance]'));
     const syncAppearanceButtons = () => {
       appearanceButtons.forEach((btn) => {
-        const isActive = settings.appearance === btn.dataset.appearance;
+        const isActive = (settings.appearance || 'dimmed') === btn.dataset.appearance;
         btn.classList.toggle('active', isActive);
-        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        btn.setAttribute('aria-pressed', String(isActive));
       });
     };
     syncAppearanceButtons();
     appearanceButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const value = btn.dataset.appearance;
-        if (!value || value === settings.appearance) return;
-        settings.appearance = value;
-        syncAppearanceButtons();
-        applyRootFlags();
         chrome.storage.sync.set({ appearance: value });
       });
     });
 
-    const addCheckboxListener = (id, settingName) => {
-      const el = document.getElementById(id);
-      if(el) el.addEventListener('change', () => {
-        chrome.storage.sync.set({ [settingName]: el.checked });
-      });
-    };
-    addCheckboxListener('qs-focusMode', 'focusMode');
-    addCheckboxListener('qs-hideUpgradeButtons', 'hideUpgradeButtons');
-    addCheckboxListener('qs-hideGptsButton', 'hideGptsButton');
-    addCheckboxListener('qs-disableBgAnimation', 'disableBgAnimation');
-    addCheckboxListener('qs-cuteVoiceUI', 'cuteVoiceUI');
-
-    const voiceColorOptions = [
-        { value: 'default', labelKey: 'voiceColorOptionDefault', color: '#8EBBFF' },
-        { value: 'orange', labelKey: 'voiceColorOptionOrange', color: '#FF9900' },
-        { value: 'yellow', labelKey: 'voiceColorOptionYellow', color: '#FFD700' },
-        { value: 'pink', labelKey: 'voiceColorOptionPink', color: '#FF69B4' },
-        { value: 'green', labelKey: 'voiceColorOptionGreen', color: '#32CD32' },
-        { value: 'dark', labelKey: 'voiceColorOptionDark', color: '#555555' }
-    ];
-    const selectContainer = document.getElementById('qs-voice-color-select');
-    const trigger = selectContainer.querySelector('.qs-select-trigger');
-    const optionsContainer = selectContainer.querySelector('.qs-select-options');
-    const triggerDot = trigger.querySelector('.qs-color-dot');
-    const triggerLabel = trigger.querySelector('.qs-select-label');
-
-    const resolveVoiceLabel = (option) => getMessage(option.labelKey);
-
-    const renderVoiceOptions = (selectedValue) => {
-        optionsContainer.innerHTML = voiceColorOptions.map(option => `
-        <div class="qs-select-option" role="option" data-value="${option.value}" aria-selected="${option.value === selectedValue}">
-            <span class="qs-color-dot" style="background-color: ${option.color};"></span>
-            <span class="qs-select-label">${resolveVoiceLabel(option)}</span>
-            <svg class="qs-checkmark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </div>
-    `).join('');
-        optionsContainer.querySelectorAll('.qs-select-option').forEach(optionEl => {
-            optionEl.addEventListener('click', () => {
-                const newValue = optionEl.dataset.value;
-                chrome.storage.sync.set({ voiceColor: newValue });
-                trigger.setAttribute('aria-expanded', 'false');
-                optionsContainer.style.display = 'none';
-            });
-        });
-    };
-
-    const updateSelectorState = (value) => {
-        const selectedOption = voiceColorOptions.find(opt => opt.value === value) || voiceColorOptions[0];
-        triggerDot.style.backgroundColor = selectedOption.color;
-        triggerLabel.textContent = resolveVoiceLabel(selectedOption);
-        renderVoiceOptions(value);
-    };
-
-    updateSelectorState(settings.voiceColor);
-
-    trigger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
-        trigger.setAttribute('aria-expanded', String(!isExpanded));
-        optionsContainer.style.display = isExpanded ? 'none' : 'block';
-    });
+    setupQuickSettingsVoiceSelector(settings);
   }
 
   function applyRootFlags() {
@@ -399,7 +450,9 @@
     try {
       if (chrome?.runtime?.id && chrome?.storage?.local) {
         chrome.storage.local.set({ detectedTheme: applyLightMode ? 'light' : 'dark' }, () => {
-          if (chrome.runtime.lastError) { /* Silently ignore */ }
+          if (chrome.runtime.lastError) {
+            console.error("Aurora Extension Error (applyRootFlags):", chrome.runtime.lastError.message);
+          }
         });
       }
     } catch (e) {
@@ -412,39 +465,29 @@
   }
 
   function showBg() {
-    // If the background doesn't exist, create and fade it in.
-    if (!document.getElementById(ID)) {
-      const node = makeBgNode();
-      const add = () => {
-        document.body.prepend(node);
-        ensureAppOnTop();
-        try { applyCustomStyles(); } catch {}
-        try { updateBackgroundImage(); } catch {}
-
-        // This is the key change: Add the 'bg-visible' class after a brief delay.
-        // This forces the browser to apply the transition correctly.
-        setTimeout(() => {
-          node.classList.add('bg-visible');
-        }, 10); // A small delay is enough to trigger the animation.
-      };
-      
-      // Standard check to ensure the body exists before appending.
-      if (document.body) add(); else document.addEventListener('DOMContentLoaded', add, { once: true });
-    }
+    if (document.getElementById(ID)) return;
+    const node = makeBgNode();
+    const add = () => {
+      document.body.prepend(node);
+      ensureAppOnTop();
+      try { applyCustomStyles(); } catch {}
+      try { updateBackgroundImage(); } catch {}
+      setTimeout(() => node.classList.add('bg-visible'), 10);
+    };
+    if (document.body) add(); else document.addEventListener('DOMContentLoaded', add, { once: true });
   }
 
   function hideBg() {
     const node = document.getElementById(ID);
     if (node) {
-      // 1. Remove the class to trigger the CSS fade-out transition.
+      node.addEventListener('transitionend', () => node.remove(), { once: true });
       node.classList.remove('bg-visible');
-      
-      // 2. Remove the element from the DOM ONLY after the 500ms transition is complete.
       setTimeout(() => {
-        node.remove();
-      }, 500); // This duration must match the 'transition' time in styles.css.
+        if (node?.parentNode) node.remove();
+      }, 550); // Fallback for safety, duration is 500ms in CSS
     }
   }
+
   function shouldShow() {
     if (settings.showInNewChatsOnly) {
       return !isChatPage();
@@ -477,7 +520,7 @@
   }
 
   const initialize = (loadedSettings) => {
-    settings = { ...DEFAULTS, ...loadedSettings };
+    settings = loadedSettings;
     startObservers();
     applyAllSettings();
   };
@@ -487,27 +530,15 @@
     if (observersStarted) return;
     observersStarted = true;
 
-    // --- START: Added Code for Race Condition Fix ---
-    // This observer waits for a key part of the UI to load,
-    // then re-runs the settings to ensure the background sticks.
     const uiReadyObserver = new MutationObserver((mutations, obs) => {
-      // The user profile button is a reliable indicator that the main interface has finished loading.
-      const stableUiElement = document.querySelector('[data-testid="accounts-profile-button"]');
-
+      const stableUiElement = document.querySelector(SELECTORS.PROFILE_BUTTON);
       if (stableUiElement) {
-        // UI is ready, so apply all settings again.
         applyAllSettings();
-        // The job is done, so we disconnect this observer to save resources.
         obs.disconnect();
       }
     });
 
-    // We start observing the entire document body for any added elements.
-    uiReadyObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-    // --- END: Added Code for Race Condition Fix ---
+    uiReadyObserver.observe(document.body, { childList: true, subtree: true });
 
     window.addEventListener('focus', applyAllSettings, { passive: true });
     let lastUrl = location.href;
@@ -517,18 +548,34 @@
     history.pushState = function(...args) { originalPushState.apply(this, args); setTimeout(checkUrl, 0); };
     const originalReplaceState = history.replaceState;
     history.replaceState = function(...args) { originalReplaceState.apply(this, args); setTimeout(checkUrl, 0); };
-    const domObserver = new MutationObserver(() => {
+
+    // For performance, debounce less-critical UI checks that don't cause flicker.
+    const debouncedOtherChecks = debounce(() => {
       manageGpt5LimitPopup();
-      manageUpgradeButtons();
       manageSidebarButtons();
+    }, 150);
+
+    // This observer handles all dynamic UI changes.
+    const domObserver = new MutationObserver(() => {
+      // Run the upgrade button check immediately on every DOM change to prevent the menu item from flickering.
+      manageUpgradeButtons();
+      
+      // Run the less-critical checks on a debounce timer.
+      debouncedOtherChecks();
     });
+    
     domObserver.observe(document.body, { childList: true, subtree: true });
+
     const themeObserver = new MutationObserver(() => { if (settings.theme === 'auto') applyRootFlags(); });
     themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   }
 
-  if (chrome?.storage?.sync) {
-    chrome.storage.sync.get(DEFAULTS, (res) => {
+  if (chrome?.runtime?.sendMessage) {
+    chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (res) => {
+      if (chrome.runtime.lastError) {
+        console.error("Aurora Extension Error: Could not get settings.", chrome.runtime.lastError.message);
+        return;
+      }
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => initialize(res), { once: true });
       } else {
@@ -545,11 +592,5 @@
         applyAllSettings();
       }
     });
-  } else {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => initialize({}), { once: true });
-    } else {
-        initialize({});
-    }
   }
 })();

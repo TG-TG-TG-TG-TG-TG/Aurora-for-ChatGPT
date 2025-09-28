@@ -1,27 +1,4 @@
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
-  --glass-radius: 14px;
-  --glass-blur: 22px; 
-  --glass-sat: 140%;
-  --glass-bg: rgba(18, 18, 18, 0.14);
-  --glass-stroke: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-@media (prefers-color-scheme: light) {
-  html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
-    --glass-bg: rgba(255, 255, 255, 0.22);
-    --glass-stroke: rgba(0, 0, 0, 0.072);
-    --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  }
-}
-
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
-  --glass-bg: rgba(255, 255, 255, 0.22);
-  --glass-stroke: rgba(0, 0, 0, 0.072);
-  --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-}
-
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
   position: relative;
   background: transparent !important;
   border-radius: var(--glass-radius);
@@ -41,10 +18,10 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-  box-shadow: inset -1px 0 0 var(--glass-stroke), var(--glass-shadow);
+  background: var(--sidebar-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  box-shadow: inset -1px 0 0 var(--sidebar-glass-stroke), var(--sidebar-glass-shadow);
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar > * {
@@ -69,28 +46,16 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-  box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, var(--glass-shadow);
+  background: var(--sidebar-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  box-shadow: 0 1px 0 var(--sidebar-sticky-highlight) inset, var(--sidebar-glass-shadow);
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky > *,
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky > * {
   position: relative;
   z-index: 1;
-}
-
-@media (prefers-color-scheme: light) {
-  html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
-  html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
-    box-shadow: 0 1px 0 rgba(0,0,0,0.06) inset, var(--glass-shadow);
-  }
-}
-
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
-  box-shadow: 0 1px 0 rgba(0,0,0,0.06) inset, var(--glass-shadow);
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .hover\:bg-token-surface-hover:hover,
@@ -105,15 +70,5 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after 
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
-  background: linear-gradient( to bottom, rgba(255,255,255,0.015), rgba(0,0,0,0.015) );
-}
-
-@media (prefers-color-scheme: light) {
-  html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
-    background: linear-gradient( to bottom, rgba(0,0,0,0.015), rgba(255,255,255,0.015) );
-  }
-}
-
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
-  background: linear-gradient( to bottom, rgba(0,0,0,0.015), rgba(255,255,255,0.015) );
+  background: var(--sidebar-gradient-overlay);
 }

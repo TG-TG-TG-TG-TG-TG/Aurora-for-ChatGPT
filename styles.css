@@ -1,5 +1,76 @@
 /* Aurora for ChatGPT - Main Stylesheet */
 
+/* ---
+  THEME REFACTOR: CSS CUSTOM PROPERTIES
+  All theme-related colors and styles are now defined here.
+  The :root selector holds the default (dark theme) values.
+  The html.cgpt-light-mode selector overrides these variables for the light theme.
+  This eliminates ~100 lines of redundant CSS.
+--- */
+:root {
+  /* Base Colors & Background */
+  --theme-bg-color: #000;
+  --theme-text-primary: #000000; /* NOTE: Set to black, but overridden by specific selectors */
+  --bg-filter: brightness(0.55);
+  --bg-opacity: 0.58;
+  --haze-gradient: linear-gradient( to bottom, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.10) 22%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 68%, rgba(255,255,255,0.00) 85% );
+  --overlay-gradient: linear-gradient( to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.75) 18%, rgba(0, 0, 0, 0.50) 36%, rgba(0, 0, 0, 0.24) 60%, rgba(0, 0, 0, 0.00) 80% );
+  
+  /* Glass Effects */
+  --glass-blur: 40px;
+  --glass-saturate: 180%;
+  --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  --glass-bg: rgba(44, 44, 51, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-inner-highlight: rgba(255, 255, 255, 0.1);
+  --menu-item-hover: color-mix(in oklab, currentColor 12%, transparent);
+
+  /* Composer */
+  --composer-blur: 14px;
+  --composer-bg: rgba(0,0,0,0.35);
+  --composer-border: rgba(255,255,255,0.14);
+  --composer-shadow: 0 8px 30px rgba(0,0,0,.40);
+
+  /* User Message Bubble */
+  --user-bubble-border: rgba(255, 255, 255, 0.25);
+
+  /* Sidebar */
+  --glass-radius: 14px;
+  --sidebar-glass-blur: 22px;
+  --sidebar-glass-sat: 140%;
+  --sidebar-glass-bg: rgba(18, 18, 18, 0.14);
+  --sidebar-glass-stroke: rgba(255, 255, 255, 0.08);
+  --sidebar-glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --sidebar-sticky-highlight: rgba(255,255,255,0.06);
+  --sidebar-gradient-overlay: linear-gradient( to bottom, rgba(255,255,255,0.015), rgba(0,0,0,0.015) );
+}
+
+html.cgpt-ambient-on.cgpt-light-mode {
+  --theme-bg-color: #fff;
+  --theme-text-primary: #000000;
+  --bg-filter: brightness(0.99) contrast(1);
+  --bg-opacity: 0.72;
+  --haze-gradient: linear-gradient( to bottom, rgba(0,0,0,0.153) 0%, rgba(0,0,0,0.09) 22%, rgba(0,0,0,0.045) 45%, rgba(0,0,0,0.0225) 68%, rgba(0,0,0,0.00) 85% );
+  --overlay-gradient: linear-gradient( to top, rgba(255,255,255,0.693) 0%, rgba(255,255,255,0.539) 18%, rgba(255,255,255,0.346) 36%, rgba(255,255,255,0.154) 60%, rgba(255,255,255,0.00) 80% );
+  
+  --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+  --glass-bg: rgba(242, 242, 247, 0.8);
+  --glass-border: rgba(0,0,0,0.1);
+  --glass-inner-highlight: rgba(255, 255, 255, 0.7);
+  
+  --composer-bg: rgba(255,255,255,0.2);
+  --composer-border: rgba(0,0,0,0.09);
+  --composer-shadow: 0 6px 26px rgba(0,0,0,0.20);
+
+  --user-bubble-border: rgba(0, 0, 0, 0.12);
+
+  --sidebar-glass-bg: rgba(255, 255, 255, 0.22);
+  --sidebar-glass-stroke: rgba(0, 0, 0, 0.072);
+  --sidebar-glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --sidebar-sticky-highlight: rgba(0,0,0,0.06);
+  --sidebar-gradient-overlay: linear-gradient( to bottom, rgba(0,0,0,0.015), rgba(255,255,255,0.015) );
+}
+
 /* --- Base Transparency --- */
 html.cgpt-ambient-on,
 html.cgpt-ambient-on body {
@@ -12,8 +83,7 @@ html.cgpt-ambient-on body {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-color: #000;
-  /* --- NEW: Smooth Transition Logic --- */
+  background-color: var(--theme-bg-color);
   opacity: 0; /* Hidden by default */
   transition: opacity 0.5s ease-in-out;
 }
@@ -30,7 +100,8 @@ html.cgpt-bg-anim-disabled #cgpt-ambient-bg {
 #cgpt-ambient-bg img,
 #cgpt-ambient-bg video,
 #cgpt-ambient-bg .haze,
-#cgpt-ambient-bg .overlay {
+#cgpt-ambient-bg .overlay,
+#cgpt-ambient-bg .animated-bg {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -39,49 +110,79 @@ html.cgpt-bg-anim-disabled #cgpt-ambient-bg {
 
 #cgpt-ambient-bg img,
 #cgpt-ambient-bg video {
-  /* object-fit is controlled dynamically by content.js */
-  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(0.55);
-  opacity: 0.58;
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) var(--bg-filter);
+  opacity: var(--bg-opacity);
   will-change: transform, filter;
   z-index: 0;
 }
 
-/* --- Background Effects --- */
 #cgpt-ambient-bg .haze {
-  pointer-events: none;
   z-index: 2;
-  background: linear-gradient( to bottom, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.10) 22%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 68%, rgba(255,255,255,0.00) 85% );
+  background: var(--haze-gradient);
 }
 
-html.cgpt-ambient-on #cgpt-ambient-bg .overlay {
-  pointer-events: none !important;
+#cgpt-ambient-bg .overlay {
   z-index: 1;
-  background: linear-gradient( to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.75) 18%, rgba(0, 0, 0, 0.50) 36%, rgba(0, 0, 0, 0.24) 60%, rgba(0, 0, 0, 0.00) 80% ) !important;
+  background: var(--overlay-gradient) !important;
 }
 
-html.cgpt-appearance-clear #cgpt-ambient-bg .overlay {
-  background: transparent !important;
+
+/* --- NEW: Animated Gradient Background --- */
+@keyframes move-blob-1 {
+  0%   { transform: scale(1)   translate(0px, 0px); }
+  33%  { transform: scale(1.1) translate(30vw, -15vh); }
+  66%  { transform: scale(0.9) translate(-20vw, 20vh); }
+  100% { transform: scale(1)   translate(0px, 0px); }
+}
+@keyframes move-blob-2 {
+  0%   { transform: scale(1)    translate(0px, 0px); }
+  33%  { transform: scale(1.2)  translate(-25vw, 10vh); }
+  66%  { transform: scale(0.8)  translate(15vw, -20vh); }
+  100% { transform: scale(1)    translate(0px, 0px); }
+}
+@keyframes move-blob-3 {
+  0%   { transform: scale(1)    translate(0px, 0px); }
+  33%  { transform: scale(1.15) translate(20vw, 20vh); }
+  66%  { transform: scale(0.85) translate(-30vw, -10vh); }
+  100% { transform: scale(1)    translate(0px, 0px); }
 }
 
-html.cgpt-appearance-clear #cgpt-ambient-bg .haze {
-  display: none !important;
+#cgpt-ambient-bg .animated-bg {
+  display: none;
+  z-index: 0;
+  overflow: hidden;
+  position: relative;
+}
+#cgpt-ambient-bg.gpt5-active .animated-bg { display: block; }
+#cgpt-ambient-bg.gpt5-active video,
+#cgpt-ambient-bg.gpt5-active picture { display: none; }
+
+.animated-bg .blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.45;
+  filter: blur(100px);
+  will-change: transform;
+}
+.animated-bg .blob:nth-child(1) {
+  width: 60vmax; height: 60vmax;
+  top: -30vmax; left: -20vmax;
+  background: #ff99c8;
+  animation: move-blob-1 45s infinite alternate ease-in-out;
+}
+.animated-bg .blob:nth-child(2) {
+  width: 70vmax; height: 70vmax;
+  bottom: -40vmax; right: -30vmax;
+  background: #a9d6ff;
+  animation: move-blob-2 60s infinite alternate ease-in-out;
+}
+.animated-bg .blob:nth-child(3) {
+  width: 50vmax; height: 50vmax;
+  bottom: -20vmax; left: 10vmax;
+  background: #fcf6bd;
+  animation: move-blob-3 75s infinite alternate ease-in-out;
 }
 
-html.cgpt-appearance-clear #cgpt-ambient-bg img,
-html.cgpt-appearance-clear #cgpt-ambient-bg video {
-  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.04);
-  opacity: 1;
-}
-
-html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg img,
-html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg video {
-  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.02);
-  opacity: 1;
-}
-
-html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg .overlay {
-  background: transparent !important;
-}
 
 /* --- Animations for Menus --- */
 @keyframes aurora-menu-open {
@@ -94,58 +195,25 @@ html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg .overlay {
   to { opacity: 0; transform: scale(0.95); }
 }
 
-/*
-  --- REFACTORED: Unified Composer Glass Effect ---
-  This single, more accurate selector replaces the two older, redundant ones.
-  It targets the main container of the ChatGPT textbox.
-*/
+/* --- Unified Composer Glass Effect --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div {
-  background: rgba(0,0,0,0.35) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  box-shadow: 0 8px 30px rgba(0,0,0,.40) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-  backdrop-filter: blur(14px) saturate(140%) !important;
+  background: var(--composer-bg) !important;
+  border: 1px solid var(--composer-border) !important;
+  box-shadow: var(--composer-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div {
-  background: rgba(255, 255, 255, 0.14) !important;
-  border: 1px solid rgba(255, 255, 255, 0.24) !important;
-  box-shadow: 0 14px 32px rgba(12, 20, 38, 0.22) !important;
-}
-
-html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div {
-  background: rgba(255, 255, 255, 0.28) !important;
-  border: 1px solid rgba(15, 24, 44, 0.14) !important;
-  box-shadow: 0 12px 28px rgba(30, 42, 68, 0.18) !important;
-}
-
-/*
-  --- REFACTORED: Simplified Composer Text Area ---
-  Removed the old, obsolete selector for the legacy composer's label.
-  This now correctly targets the modern ProseMirror editor and its textarea fallback.
-*/
-html.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  form[data-type="unified-composer"] :is(.ProseMirror, textarea) {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer"] :is(.ProseMirror, textarea) {
   background: transparent !important;
 }
 
-
 /* User message bubble: Glass effect */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border: 1px solid var(--user-bubble-border) !important;
   -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
   backdrop-filter: blur(12px) saturate(160%) !important;
-}
-
-html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: rgba(255, 255, 255, 0.32) !important;
-}
-
-html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
-  background: rgba(255, 255, 255, 0.18) !important;
-  border-color: rgba(15, 20, 32, 0.18) !important;
 }
 
 /* --- General Transparency Overrides --- */
@@ -180,7 +248,6 @@ html.cgpt-ambient-on #thread-bottom-container .content-fade::after {
   content: none !important;
 }
 
-
 /* --- Menu & Popup Glass Effects --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   :is(
@@ -189,23 +256,33 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
     div[role="dialog"][class*="shadow-long"],
     .popover.bg-token-main-surface-primary.max-w-xs,
     div.sticky.top-14.bg-token-main-surface-primary,
-    input#search[placeholder="Search GPTs"],
-    textarea.bg-token-main-surface-primary.border-token-border-default
+    div[role="dialog"]:has(input#search[placeholder="Search GPTs"]),
+    textarea.bg-token-main-surface-primary.border-token-border-default,
+    .bg-token-main-surface-primary.sticky.top-\[-1px\]
   ) {
-  background: rgba(255, 255, 255, 0.10) !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
-  backdrop-filter: blur(22px) saturate(140%) !important;
-  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45) !important;
+  /* Use composer variables to match its appearance */
+  background: var(--composer-bg) !important;
+  border: 1px solid var(--composer-border) !important;
+  box-shadow: var(--composer-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
 }
 
-/* Glass effect for thread title/header elements */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) .bg-token-main-surface-primary.sticky.top-\[-1px\].z-1.px-\(--thread-content-margin\).text-center.text-lg.text-pretty.md\:static {
-  background: rgba(0, 0, 0, 0.35) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
-  backdrop-filter: blur(22px) saturate(140%) !important;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.40) !important;
+/* --- GPTs Search Popup Glass Effect --- */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) input#search[placeholder="Search GPTs"] {
+  background: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[role="dialog"]:has(input#search[placeholder="Search GPTs"]) li[role="option"]:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary button:hover {
+  background: color-mix(in oklab, currentColor 7%, transparent) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary button {
+  background-color: transparent !important;
+}
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary {
+  border-radius: 12px !important;
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
@@ -224,44 +301,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled)
   animation: aurora-menu-close 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer)
-  :is(
-    .popover.bg-token-main-surface-primary[data-radix-menu-content],
-    .popover.bg-token-main-surface-primary[role="dialog"],
-    div[role="dialog"][class*="shadow-long"]
-  ) {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border-color: rgba(255, 255, 255, 0.26) !important;
-  box-shadow: 0 18px 44px rgba(12, 20, 32, 0.2) !important;
-}
-
-html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
-  :is(
-    .popover.bg-token-main-surface-primary[data-radix-menu-content],
-    .popover.bg-token-main-surface-primary[role="dialog"],
-    div[role="dialog"][class*="shadow-long"]
-  ) {
-  background: rgba(255, 255, 255, 0.32) !important;
-  border-color: rgba(15, 24, 44, 0.12) !important;
-  box-shadow: 0 16px 40px rgba(30, 42, 64, 0.18) !important;
-}
-
-@media (prefers-color-scheme: dark) {
-  html.cgpt-ambient-on:not(.cgpt-light-mode):not(.cgpt-legacy-composer)
-    :is(
-      .popover.bg-token-main-surface-primary[data-radix-menu-content],
-      .popover.bg-token-main-surface-primary[role="dialog"],
-      div[role="dialog"][class*="shadow-long"],
-      .popover.bg-token-main-surface-primary.max-w-xs,
-      div.sticky.top-14.bg-token-main-surface-primary,
-      input#search[placeholder="Search GPTs"],
-      textarea.bg-token-main-surface-primary.border-token-border-default
-    ) {
-    background: rgba(0, 0, 0, 0.35) !important;
-    border-color: rgba(255, 255, 255, 0.14) !important;
-  }
-}
-
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   .popover[role="dialog"]
   .md\:flex-row.flex-col,
@@ -277,15 +316,19 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer)
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer)
   :is(.popover[data-radix-menu-content], .popover[role="dialog"]) .__menu-item:hover {
-  background: color-mix(in oklab, currentColor 12%, transparent) !important;
+  background: var(--menu-item-hover) !important;
 }
-
 
 .cgpt-hide-gpt5-limit,
 .cgpt-hide-upgrade,
 .cgpt-hide-sora,
 .cgpt-hide-gpts {
   display: none !important;
+}
+
+/* ADDED: Hide red error banners by default as requested */
+.bg-red-500.text-white.border-red-500 {
+    display: none !important;
 }
 
 /* --- Misc Glass UI elements --- */
@@ -314,74 +357,23 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-5
   -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
   backdrop-filter: blur(16px) saturate(140%) !important;
 }
-
-html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
-  background: rgba(255, 255, 255, 0.2) !important;
-  color: inherit;
-}
-
-
-/* --- Light Mode Overrides --- */
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg {
-  background-color: #fff;
-}
-
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg img,
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg video {
-  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(0.99) contrast(1);
-  opacity: 0.72;
-}
-
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .haze {
-  background: linear-gradient( to bottom, rgba(0,0,0,0.153) 0%, rgba(0,0,0,0.09) 22%, rgba(0,0,0,0.045) 45%, rgba(0,0,0,0.0225) 68%, rgba(0,0,0,0.00) 85% );
-}
-
-html.cgpt-ambient-on.cgpt-light-mode #cgpt-ambient-bg .overlay {
-  background: linear-gradient( to top, rgba(255,255,255,0.693) 0%, rgba(255,255,255,0.539) 18%, rgba(255,255,255,0.346) 36%, rgba(255,255,255,0.154) 60%, rgba(255,255,255,0.00) 80% ) !important;
-}
-
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div {
-  background: rgba(255,255,255,0.2) !important;
-  border: 1px solid rgba(0,0,0,0.09) !important;
-  box-shadow: 0 6px 26px rgba(0,0,0,0.20) !important;
-}
-
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer)
-  :is(
-    .popover.bg-token-main-surface-primary[data-radix-menu-content],
-    .popover.bg-token-main-surface-primary[role="dialog"],
-    div[role="dialog"][class*="shadow-long"]
-  ) {
-  background: rgba(255,255,255,0.242) !important;
-  border-color: rgba(0,0,0,0.072) !important;
-}
-
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .bg-token-main-surface-primary.sticky.top-\[-1px\].z-1.px-\(--thread-content-margin\).text-center.text-lg.text-pretty.md\:static {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 1px solid rgba(0, 0, 0, 0.09) !important;
-  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.20) !important;
-}
-
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
   background: rgba(255, 255, 255, 0.5) !important;
 }
 
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
-}
-
+/* --- Light Mode Text & Icon Color Overrides --- */
 html.cgpt-ambient-on.cgpt-light-mode body,
 html.cgpt-ambient-on.cgpt-light-mode [class*="text-token-text-"],
 html.cgpt-ambient-on.cgpt-light-mode [class*="text-gray-"] {
-  color: #000000 !important;
+  color: var(--theme-text-primary) !important;
 }
 
 html.cgpt-ambient-on.cgpt-light-mode svg {
-  color: #000000 !important;
+  color: var(--theme-text-primary) !important;
 }
 
 html.cgpt-ambient-on.cgpt-light-mode ::placeholder {
-  color: #000000 !important;
+  color: var(--theme-text-primary) !important;
   opacity: 0.7;
 }
 
@@ -389,7 +381,17 @@ html.cgpt-ambient-on.cgpt-light-mode ::placeholder {
 html.cgpt-ambient-on.cgpt-light-mode button {
   background: transparent !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
-  color: #000000 !important;
+  color: var(--theme-text-primary) !important;
+}
+
+/* FIX: Ensure native Radix UI switches have a visible track in light mode */
+html.cgpt-ambient-on.cgpt-light-mode button[role="switch"][data-state="unchecked"] {
+  background-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ADDED: Ensure checked switches are also visible with an accent color */
+html.cgpt-ambient-on.cgpt-light-mode button[role="switch"][data-state="checked"] {
+  background-color: #4f8cff !important;
 }
 
 html.cgpt-ambient-on.cgpt-light-mode .bg-token-main-surface-primary {
@@ -425,278 +427,13 @@ html.cgpt-cute-voice-on .min-h-bloop::after {
   height: 65px;
   background: #8EBBFF;
   filter: var(--voice-filter);
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  border-radius: 50% 50% 50% / 60% 60% 40% 40%;
   top: -15px;
   z-index: 0;
 }
 html.cgpt-cute-voice-on .min-h-bloop::before { left: 45px; transform: rotate(-35deg); }
 html.cgpt-cute-voice-on .min-h-bloop::after { right: 45px; transform: rotate(35deg); }
 html.cgpt-cute-voice-on .min-h-bloop > canvas { position: relative; z-index: 1; }
-
-/* --- Quick Settings UI --- */
-#cgpt-qs-btn {
-  position: fixed;
-  bottom: 12px;
-  right: 16px;
-  z-index: 99998;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: rgba(30, 30, 30, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease, transform 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-#cgpt-qs-btn:hover { transform: scale(1.08); }
-#cgpt-qs-btn svg { width: 20px; height: 20px; color: white; opacity: 0.9; }
-html.cgpt-light-mode #cgpt-qs-btn {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(0,0,0,0.1);
-}
-html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
-
-html.cgpt-appearance-clear #cgpt-qs-btn {
-  background: rgba(255, 255, 255, 0.22);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 10px 26px rgba(20, 30, 48, 0.24);
-}
-html.cgpt-appearance-clear #cgpt-qs-btn svg {
-  color: rgba(16, 28, 48, 0.9);
-}
-#cgpt-qs-panel {
-  position: fixed;
-  bottom: 60px;
-  right: 16px;
-  z-index: 99997;
-  width: 260px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  -webkit-backdrop-filter: blur(22px) saturate(140%);
-  backdrop-filter: blur(22px) saturate(140%);
-  border-radius: 18px;
-  box-shadow: 0 16px 50px rgba(0,0,0,0.45);
-  padding: 8px;
-  opacity: 0;
-  transform: translateY(10px) scale(0.95);
-  pointer-events: none;
-  transition: opacity 200ms ease, transform 200ms ease;
-  color: #fff;
-}
-#cgpt-qs-panel.active {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
-}
-html.cgpt-light-mode #cgpt-qs-panel {
-    background: rgba(255, 255, 255, 0.242);
-    border-color: rgba(0,0,0,0.072);
-    color: #000;
-}
-
-html.cgpt-appearance-clear #cgpt-qs-panel {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.28);
-  color: rgba(18, 26, 42, 0.92);
-  box-shadow: 0 18px 44px rgba(12, 20, 32, 0.26);
-}
-html.cgpt-appearance-clear.cgpt-light-mode #cgpt-qs-panel {
-  background: rgba(255, 255, 255, 0.38);
-  border-color: rgba(15, 24, 40, 0.12);
-  color: rgba(15, 24, 40, 0.92);
-  box-shadow: 0 14px 32px rgba(30, 42, 64, 0.18);
-}
-.qs-section-title {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  opacity: 0.6;
-  padding: 8px 8px 4px;
-}
-.qs-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 8px;
-  border-radius: 6px;
-  transition: background 0.2s ease;
-}
-.qs-row:hover { background: rgba(255, 255, 255, 0.08); }
-html.cgpt-light-mode .qs-row:hover { background: rgba(0,0,0,0.06); }
-.qs-row > label { font-size: 13px; opacity: 0.95; }
-
-.qs-row .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
-.qs-row .switch input { display: none; }
-.qs-row .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(0,0,0,0.3); transition: background .2s ease; }
-html.cgpt-light-mode .qs-row .track { background: rgba(0,0,0,0.1); }
-.qs-row input:checked + .track { background: #4f8cff; }
-.qs-row .thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
-.qs-row input:checked + .track .thumb { transform: translateX(18px); }
-
-
-.qs-pill-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.07);
-}
-.qs-pill {
-  border: none;
-  background: transparent;
-  color: inherit;
-  font-size: 12px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-.qs-pill:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-.qs-pill:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 1px currentColor;
-}
-.qs-pill.active {
-  background: rgba(255, 255, 255, 0.2);
-}
-html.cgpt-light-mode .qs-pill-group {
-  border-color: rgba(0,0,0,0.12);
-  background: rgba(0,0,0,0.05);
-}
-html.cgpt-light-mode .qs-pill {
-  color: inherit;
-}
-html.cgpt-light-mode .qs-pill:hover {
-  background: rgba(0,0,0,0.08);
-}
-html.cgpt-light-mode .qs-pill.active {
-  background: rgba(0,0,0,0.12);
-}
-
-.qs-custom-select {
-  position: relative;
-  max-width: 150px;
-  width: 100%;
-}
-.qs-select-trigger {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 4px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: rgba(255, 255, 255, 0.05);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  color: inherit;
-  font-size: 13px;
-  text-align: left;
-  cursor: pointer;
-  gap: 8px;
-  transition: background-color 0.2s ease;
-}
-html.cgpt-light-mode .qs-select-trigger {
-  border-color: rgba(0, 0, 0, 0.08);
-  background-color: rgba(0, 0, 0, 0.03);
-}
-.qs-select-trigger:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-html.cgpt-light-mode .qs-select-trigger:hover {
-  background-color: rgba(0, 0, 0, 0.08);
-}
-.qs-select-trigger > .qs-select-label {
-  flex-grow: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.qs-select-trigger svg {
-  flex-shrink: 0;
-  margin-left: auto;
-  width: 16px;
-  height: 16px;
-  stroke: currentColor;
-  opacity: 0.7;
-  transition: transform 0.2s ease;
-}
-.qs-select-trigger[aria-expanded="true"] svg {
-  transform: rotate(180deg);
-}
-.qs-color-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  border: 1px solid rgba(0,0,0,0.1);
-}
-html:not(.cgpt-light-mode) .qs-color-dot {
-  border-color: rgba(255,255,255,0.1);
-}
-.qs-select-options {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  right: 0;
-  z-index: 99999;
-  min-width: 170px;
-  list-style: none;
-  padding: 6px;
-  margin: 0;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  -webkit-backdrop-filter: blur(22px) saturate(140%);
-  backdrop-filter: blur(22px) saturate(140%);
-  border-radius: 10px;
-  box-shadow: 0 16px 50px rgba(0,0,0,0.45);
-  max-height: 200px;
-  overflow-y: auto;
-}
-.qs-select-options::-webkit-scrollbar {
-  display: none;
-}
-html.cgpt-light-mode .qs-select-options {
-  background: rgba(255, 255, 255, 0.242);
-  border-color: rgba(0,0,0,0.072);
-}
-.qs-select-option {
-  display: flex;
-  align-items: center;
-  padding: 8px 10px;
-  font-size: 13px;
-  border-radius: 6px;
-  cursor: pointer;
-  gap: 8px;
-  transition: background-color 0.2s ease;
-}
-.qs-select-option:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-}
-html.cgpt-light-mode .qs-select-option:hover {
-  background-color: rgba(0, 0, 0, 0.06);
-}
-.qs-select-option[aria-selected="true"] {
-  font-weight: 500;
-}
-.qs-select-option .qs-checkmark {
-  margin-left: auto;
-  width: 16px;
-  height: 16px;
-  stroke: currentColor;
-  opacity: 0;
-}
-.qs-select-option[aria-selected="true"] .qs-checkmark {
-  opacity: 1;
-}
-
 
 /* Focus Mode Rules */
 html.cgpt-focus-mode-on .flex-shrink-0[class*="bg-token-sidebar-surface-primary"],
@@ -724,4 +461,124 @@ form[data-type="unified-composer"] > div:is(.bg-token-bg-primary, [class*="dark:
 /* Fix for composer's inner container background covering the blur effect */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div > div {
     background: transparent !important;
+}
+
+/* --- Clear Appearance Style Overrides --- */
+html.cgpt-appearance-clear #cgpt-ambient-bg .overlay {
+  background: transparent !important;
+}
+
+html.cgpt-appearance-clear #cgpt-ambient-bg .haze {
+  display: none !important;
+}
+
+html.cgpt-appearance-clear #cgpt-ambient-bg img,
+html.cgpt-appearance-clear #cgpt-ambient-bg video {
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.04);
+  opacity: 1;
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg img,
+html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg video {
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.02);
+  opacity: 1;
+}
+
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  box-shadow: 0 14px 32px rgba(12, 20, 38, 0.22) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) form[data-type="unified-composer"] > div > div {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border: 1px solid rgba(15, 24, 44, 0.14) !important;
+  box-shadow: 0 12px 28px rgba(30, 42, 68, 0.18) !important;
+}
+
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(15, 20, 32, 0.18) !important;
+}
+
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) :is(.popover[data-radix-menu-content], .popover[role="dialog"], div[role="dialog"][class*="shadow-long"]) {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+  box-shadow: 0 18px 44px rgba(12, 20, 32, 0.2) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) :is(.popover[data-radix-menu-content], .popover[role="dialog"], div[role="dialog"][class*="shadow-long"]) {
+  background: rgba(255, 255, 255, 0.32) !important;
+  border-color: rgba(15, 24, 44, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(30, 42, 64, 0.18) !important;
+}
+
+/* --- FIX: Glass Effect for Custom GPT/Project Header --- */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div.sticky:has(button[data-testid="project-modal-trigger"]) {
+  /* Apply base glass styles */
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) !important;
+  box-shadow: inset 0 1.5px 1px 0 var(--glass-inner-highlight), var(--glass-shadow) !important;
+  
+  /* Add padding and rounded corners for better appearance */
+  padding: 8px 12px;
+  border-radius: var(--glass-radius);
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+/* --- Override for 'Clear' Appearance --- */
+html.cgpt-ambient-on.cgpt-appearance-clear:not(.cgpt-legacy-composer) div.sticky:has(button[data-testid="project-modal-trigger"]) {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+  box-shadow: 0 18px 44px rgba(12, 20, 32, 0.2) !important;
+}
+
+/* --- Override for 'Clear' Appearance in Light Mode --- */
+html.cgpt-ambient-on.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div.sticky:has(button[data-testid="project-modal-trigger"]) {
+  background: rgba(255, 255, 255, 0.32) !important;
+  border-color: rgba(15, 24, 44, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(30, 42, 64, 0.18) !important;
+}
+
+/* --- FIX: Apply Composer Style to Suggestion Chips --- */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary {
+  /* Use composer variables for a consistent look */
+  background: var(--composer-bg) !important;
+  border: 1px solid var(--composer-border) !important;
+  box-shadow: var(--composer-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  
+  /* Match composer styling exactly */
+  border-radius: 28px !important; 
+  margin-top: 4px !important;
+}
+
+/* Make individual suggestion buttons transparent with a subtle hover effect */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary button {
+  background-color: transparent !important;
+}
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary button:hover {
+  background: color-mix(in oklab, currentColor 7%, transparent) !important;
+}
+
+/* --- Overrides for 'Clear' Appearance --- */
+html.cgpt-ambient-on.cgpt-appearance-clear:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  box-shadow: 0 14px 32px rgba(12, 20, 38, 0.22) !important;
+}
+
+html.cgpt-ambient-on.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border: 1px solid rgba(15, 24, 44, 0.14) !important;
+  box-shadow: 0 12px 28px rgba(30, 42, 68, 0.18) !important;
 }

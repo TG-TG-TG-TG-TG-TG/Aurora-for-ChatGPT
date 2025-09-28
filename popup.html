@@ -8,51 +8,62 @@
     :root {
       color-scheme: light dark;
       /* --- Base Colors (Dark Theme) --- */
-      --background-dark: #1a1a1f;
-      --text-dark: #f0f4f8;
-      --card-background-dark: rgba(40, 40, 40, 0.55);
-      --border-dark: rgba(255, 255, 255, 0.18);
-      --input-background-dark: rgba(255, 255, 255, 0.08);
-      --hover-background-dark: rgba(255, 255, 255, 0.15);
+      --popup-bg: #1a1a1f;
+      --popup-text: #f0f4f8;
+      --popup-card-bg: rgba(44, 44, 51, 0.75);
+      --popup-border: rgba(255, 255, 255, 0.12);
+      --popup-inner-highlight: rgba(255, 255, 255, 0.07);
+      --popup-input-bg: rgba(255, 255, 255, 0.08);
+      --popup-hover-bg: rgba(255, 255, 255, 0.15);
+      --popup-track-bg: rgba(255, 255, 255, 0.15);
+      --popup-dropdown-bg: rgba(36, 36, 41, 0.8);
+      --popup-dropdown-border: rgba(255, 255, 255, 0.15);
+      --popup-option-hover-bg: rgba(255, 255, 255, 0.1);
+      --popup-dot-border: rgba(255, 255, 255, 0.1);
       --primary-accent: #4f8cff;
-      /* --- Base Colors (Light Theme) --- */
-      --background-light: #f0f4f8;
-      --text-light: #1d1d1f;
-      --card-background-light: rgba(245, 245, 245, 0.7);
-      --border-light: rgba(0, 0, 0, 0.1);
-      --input-background-light: rgba(0, 0, 0, 0.05);
-      --hover-background-light: rgba(0, 0, 0, 0.1);
-    }
-    html {
-      background-color: var(--background-dark);
-      background-image: radial-gradient(at top center, rgba(88, 70, 160, 0.45), transparent 70%);
-      overflow: hidden;
-      border-radius: 14px;
+      --popup-gradient: radial-gradient(at top center, rgba(88, 70, 160, 0.45), transparent 70%);
     }
     html.theme-light {
-      background-color: var(--background-light);
-      background-image: radial-gradient(at top center, rgba(79, 140, 255, 0.2), transparent 70%);
+      /* --- Base Colors (Light Theme) --- */
+      --popup-bg: #f0f4f8;
+      --popup-text: #1d1d1f;
+      --popup-card-bg: rgba(242, 242, 247, 0.8);
+      --popup-border: rgba(0, 0, 0, 0.1);
+      --popup-inner-highlight: rgba(255, 255, 255, 0.7);
+      --popup-input-bg: rgba(0, 0, 0, 0.05);
+      --popup-hover-bg: rgba(0, 0, 0, 0.1);
+      --popup-track-bg: rgba(0, 0, 0, 0.15);
+      --popup-dropdown-bg: rgba(242, 242, 247, 0.85);
+      --popup-dropdown-border: rgba(0,0,0,0.1);
+      --popup-option-hover-bg: rgba(0, 0, 0, 0.08);
+      --popup-dot-border: rgba(0,0,0,0.1);
+      --popup-gradient: radial-gradient(at top center, rgba(79, 140, 255, 0.2), transparent 70%);
+    }
+    html {
+      background-color: var(--popup-bg);
+      background-image: var(--popup-gradient);
+      overflow: hidden;
+      border-radius: 14px;
     }
     body {
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       margin: 10px;
       min-width: 310px;
-      color: var(--text-dark);
+      color: var(--popup-text);
       background: transparent;
     }
-    html.theme-light body { color: var(--text-light); }
     .settings-card {
-      background: var(--card-background-dark);
-      border: 1px solid var(--border-dark);
-      border-radius: 18px;
+      background: var(--popup-card-bg);
+      border: 1px solid var(--popup-border);
+      border-radius: 14px;
       margin-bottom: 8px;
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      backdrop-filter: blur(40px) saturate(180%);
       overflow: hidden; /* Important: remains hidden by default */
+      box-shadow: inset 0 1.5px 1px 0 var(--popup-inner-highlight), 0 16px 40px rgba(0,0,0,0.35);
     }
     html.theme-light .settings-card {
-      background: var(--card-background-light);
-      border-color: var(--border-light);
+      box-shadow: inset 0 1.5px 1px 0 var(--popup-inner-highlight), 0 16px 40px rgba(0,0,0,0.15);
     }
     details.settings-card { position: relative; }
     details.settings-card:has(.custom-select.is-open) { z-index: 10; overflow: visible; }
@@ -64,17 +75,17 @@
     .card-title::-webkit-details-marker { display: none; }
     .card-title::after {
       content: ''; display: inline-block; width: 16px; height: 16px;
-      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
-      background-repeat: no-repeat; background-position: center; background-size: 16px;
+      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>');
+      background-repeat: no-repeat; background-position: center; background-size: 100%;
       transform: rotate(0deg); transition: transform 0.2s ease; opacity: 0.6;
+      transform-origin: center;
     }
     html.theme-light .card-title::after {
-      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24" 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="%231d1d1f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>');
     }
     .settings-card[open] > .card-title {
-      border-bottom: 1px solid var(--border-dark); padding-bottom: 10px;
+      border-bottom: 1px solid var(--popup-border); padding-bottom: 10px;
     }
-    html.theme-light .settings-card[open] > .card-title { border-bottom-color: var(--border-light); }
     .settings-card[open] > .card-title::after { transform: rotate(180deg); }
     .card-content { padding: 4px 12px 12px 12px; }
     .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; }
@@ -83,9 +94,8 @@
     .switch input { display: none; }
     .track {
       position: absolute; inset: 0; border-radius: 11px;
-      background: rgba(255, 255, 255, 0.15); transition: background .2s ease;
+      background: var(--popup-track-bg); transition: background .2s ease;
     }
-    html.theme-light .track { background: rgba(0, 0, 0, 0.15); }
     input:checked + .track { background: var(--primary-accent); }
     .thumb {
       position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
@@ -96,15 +106,11 @@
     .credit a { color: inherit; }
     input[type="text"], button, .file-input-label {
       font-size: 12px; padding: 6px 10px; border-radius: 6px; color: inherit;
-      border: 1px solid var(--border-dark); background-color: var(--input-background-dark);
+      border: 1px solid var(--popup-border); background-color: var(--popup-input-bg);
       transition: border-color .2s ease, background-color .2s ease;
     }
-    html.theme-light input[type="text"], html.theme-light button, html.theme-light .file-input-label {
-      border-color: var(--border-light); background-color: var(--input-background-light);
-    }
     button, .file-input-label { cursor: pointer; }
-    button:hover, .file-input-label:hover { background: var(--hover-background-dark); }
-    html.theme-light button:hover, html.theme-light .file-input-label:hover { background: var(--hover-background-light); }
+    button:hover, .file-input-label:hover { background: var(--popup-hover-bg); }
     input[type="text"] { width: 100%; -webkit-appearance: none; appearance: none; }
     input[type="range"] { width: 100%; accent-color: var(--primary-accent); }
     .file-input-wrapper { display: flex; gap: 10px; align-items: center; width: 100%; }
@@ -123,7 +129,7 @@
           <div class="custom-select" id="bgPreset">
             <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
               <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>
             </button>
             <div class="select-options" role="listbox"></div>
           </div>
@@ -151,7 +157,7 @@
           <div class="custom-select" id="bgScalingSelector">
             <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
               <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>
             </button>
             <div class="select-options" role="listbox"></div>
           </div>
@@ -169,24 +175,28 @@
           <div class="custom-select" id="themeSelector">
             <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
               <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>
             </button>
             <div class="select-options" role="listbox"></div>
           </div>
         </div>
       </div>
+      
+      <!-- ADD THIS NEW ROW FOR GLASS STYLE -->
       <div class="row">
         <div class="label" data-i18n="labelGlassStyle">__MSG_labelGlassStyle__</div>
         <div class="custom-select-wrapper">
           <div class="custom-select" id="appearanceSelector">
             <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
               <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>
             </button>
             <div class="select-options" role="listbox"></div>
           </div>
         </div>
       </div>
+      <!-- END OF ADDED SECTION -->
+
       <div class="row">
         <div class="label" data-i18n="labelLegacyComposer"></div>
         <label class="switch" title="__MSG_tooltipLegacyComposer__" data-i18n-title="tooltipLegacyComposer">
@@ -248,7 +258,7 @@
               <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
                 <span class="color-dot"></span>
                 <span class="select-label"></span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>
               </button>
               <div class="select-options" role="listbox"></div>
             </div>
