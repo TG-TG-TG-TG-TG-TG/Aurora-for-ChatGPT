@@ -1,7 +1,18 @@
-# Aurora-for-ChatGPT V1.5.5
+# Aurora-for-ChatGPT V1.5.4
 
 Bring a **soft, ambient, blurred glow** behind the ChatGPT UI — plus a **chat visibility toggle** and a **legacy composer** option.
 Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
+
+### Quick Install Guide
+
+Clone the repo **OR** Download/Extract the zip $\rightarrow$ Navigate to `chrome://extensions` $\rightarrow$ Enable **Developer mode** $\rightarrow$ Click **Load unpacked** and select the *unpacked* project folder $\rightarrow$ Pin the extension from the puzzle icon.
+
+---
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8c67ef7c-a3e3-449c-b62d-2760f56df9c9" width="70%">
+</p>
+
 
 ---
 
