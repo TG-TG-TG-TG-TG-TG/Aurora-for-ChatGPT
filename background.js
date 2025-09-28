@@ -12,7 +12,7 @@ const DEFAULTS = {
   hideQuickSettings: false,
   customBgUrl: '',
   backgroundBlur: '60',
-  backgroundScaling: 'contain',
+  backgroundScaling: 'cover',
   hideGptsButton: false,
   hideSoraButton: false,
   voiceColor: 'default',
@@ -36,6 +36,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse(settings);
     });
     // Return true to indicate that the response will be sent asynchronously.
+    return true;
+  }
+  if (request.type === 'GET_DEFAULTS') {
+    sendResponse(DEFAULTS);
     return true;
   }
 });

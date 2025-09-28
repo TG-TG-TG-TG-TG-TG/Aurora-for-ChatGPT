@@ -474,13 +474,15 @@ html.cgpt-appearance-clear #cgpt-ambient-bg .haze {
 
 html.cgpt-appearance-clear #cgpt-ambient-bg img,
 html.cgpt-appearance-clear #cgpt-ambient-bg video {
-  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.04);
+  /* Drastically reduce brightness and boost saturation/contrast for a deep, vibrant look */
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(.65) saturate(1.8) contrast(1.2);
   opacity: 1;
 }
 
 html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg img,
 html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg video {
-  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.02);
+  /* A more subtle enhancement for light mode to avoid over-saturation */
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1.05) saturate(1.4);
   opacity: 1;
 }
 
@@ -535,14 +537,14 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) div.sticky:has(button[data-testi
 }
 
 /* --- Override for 'Clear' Appearance --- */
-html.cgpt-ambient-on.cgpt-appearance-clear:not(.cgpt-legacy-composer) div.sticky:has(button[data-testid="project-modal-trigger"]) {
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div.sticky:has(button[data-testid="project-modal-trigger"]) {
   background: rgba(255, 255, 255, 0.16) !important;
   border-color: rgba(255, 255, 255, 0.26) !important;
   box-shadow: 0 18px 44px rgba(12, 20, 32, 0.2) !important;
 }
 
 /* --- Override for 'Clear' Appearance in Light Mode --- */
-html.cgpt-ambient-on.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div.sticky:has(button[data-testid="project-modal-trigger"]) {
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div.sticky:has(button[data-testid="project-modal-trigger"]) {
   background: rgba(255, 255, 255, 0.32) !important;
   border-color: rgba(15, 24, 44, 0.12) !important;
   box-shadow: 0 16px 40px rgba(30, 42, 64, 0.18) !important;
@@ -571,14 +573,112 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-t
 }
 
 /* --- Overrides for 'Clear' Appearance --- */
-html.cgpt-ambient-on.cgpt-appearance-clear:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary {
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary {
   background: rgba(255, 255, 255, 0.14) !important;
   border: 1px solid rgba(255, 255, 255, 0.24) !important;
   box-shadow: 0 14px 32px rgba(12, 20, 38, 0.22) !important;
 }
 
-html.cgpt-ambient-on.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary {
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary {
   background: rgba(255, 255, 255, 0.28) !important;
   border: 1px solid rgba(15, 24, 44, 0.14) !important;
   box-shadow: 0 12px 28px rgba(30, 42, 68, 0.18) !important;
+}
+
+/* --- FIX: Increase Animated Background Visibility in Light Mode --- */
+html.cgpt-ambient-on.cgpt-light-mode .animated-bg .blob {
+  opacity: 0.65 !important;
+}
+
+/* --- ENHANCEMENT: More Vibrant Animated Background in Light Mode --- */
+html.cgpt-ambient-on.cgpt-light-mode .animated-bg .blob {
+  /* Adjust opacity for the new, more vibrant colors */
+  opacity: 0.6 !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode .animated-bg .blob:nth-child(1) {
+  /* Original: #ff99c8 (light pink) -> New: More saturated magenta */
+  background: #ff78b4;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode .animated-bg .blob:nth-child(2) {
+  /* Original: #a9d6ff (light blue) -> New: More vibrant sky blue */
+  background: #77b5fe;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode .animated-bg .blob:nth-child(3) {
+  /* Original: #fcf6bd (light yellow) -> New: Richer golden yellow */
+  background: #fdd26e;
+}
+
+/* --- Clear Glass Style (Liquid Effect) --- */
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) :is(
+  form[data-type="unified-composer"] > div > div,
+  .popover.bg-token-main-surface-primary[data-radix-menu-content],
+  .popover.bg-token-main-surface-primary[role="dialog"],
+  div[role="dialog"][class*="shadow-long"],
+  #cgpt-qs-panel,
+  div.sticky:has(button[data-testid="project-modal-trigger"]),
+  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary
+) {
+  --clear-blur: 28px;
+  --clear-saturate: 180%;
+  --clear-shadow: 0 16px 70px rgba(0,0,0,0.55);
+  --clear-bg: rgba(0,0,0,0.15);
+  --clear-border: rgba(255,255,255,0.2);
+  --clear-glow: rgba(255,255,255,0.08);
+  
+  background: var(--clear-bg) !important;
+  border: 1px solid var(--clear-border) !important;
+  box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
+}
+
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
+  -webkit-backdrop-filter: blur(var(--clear-blur, 28px)) saturate(var(--clear-saturate, 180%)) !important;
+  backdrop-filter: blur(var(--clear-blur, 28px)) saturate(var(--clear-saturate, 180%)) !important;
+  border: 1px solid var(--clear-border, rgba(255,255,255,0.2)) !important;
+  box-shadow: inset 0 0 2px 0 var(--clear-glow, rgba(255,255,255,0.08));
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
+}
+
+/* Light Mode Overrides for Clear/Liquid Style */
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) :is(
+  form[data-type="unified-composer"] > div > div,
+  .popover.bg-token-main-surface-primary[data-radix-menu-content],
+  .popover.bg-token-main-surface-primary[role="dialog"],
+  div[role="dialog"][class*="shadow-long"],
+  #cgpt-qs-panel,
+  div.sticky:has(button[data-testid="project-modal-trigger"]),
+  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary
+) {
+  --clear-shadow-light: 0 16px 60px rgba(0,0,0,0.25);
+  --clear-bg-light: rgba(255,255,255,0.3);
+  --clear-border-light: rgba(0,0,0,0.15);
+  --clear-glow-light: rgba(255,255,255,0.25);
+
+  background: var(--clear-bg-light) !important;
+  border-color: var(--clear-border-light) !important;
+  box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
+  border-color: var(--clear-border-light, rgba(0,0,0,0.15)) !important;
+  box-shadow: inset 0 0 2px 0 var(--clear-glow-light, rgba(255,255,255,0.25));
+}
+
+/* Dark Mode override for the background media in 'Clear' style */
+html.cgpt-appearance-clear:not(.cgpt-light-mode) #cgpt-ambient-bg img,
+html.cgpt-appearance-clear:not(.cgpt-light-mode) #cgpt-ambient-bg video {
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(0.85) saturate(1.04);
+  opacity: 1;
+}
+
+/* Light Mode override for the background media in 'Clear' style */
+html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg img,
+html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg video {
+  filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.02);
+  opacity: 1;
 }

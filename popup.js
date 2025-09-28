@@ -18,6 +18,7 @@ const getMessage = (key, substitutions) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   let settingsCache = {}; // Cache for current settings to enable synchronous checks and quick updates.
+  let DEFAULTS_CACHE = {}; // Add this line
 
   document.title = getMessage('popupTitle');
 
@@ -271,14 +272,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Initial Load ---
   if (chrome.runtime?.sendMessage) {
-    chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (settings) => {
+    // Fetch the DEFAULTS object from the background script first
+    chrome.runtime.sendMessage({ type: 'GET_DEFAULTS' }, (defaults) => {
       if (chrome.runtime.lastError) {
-        console.error("Aurora Popup Error (Initial Load):", chrome.runtime.lastError.message);
-        document.body.innerHTML = `<div style="padding: 20px; text-align: center;">${getMessage('errorLoadingSettings')}</div>`;
-        return;
+        console.error("Aurora Popup Error (Fetching Defaults):", chrome.runtime.lastError.message);
+        // Fallback to hardcoded values if the message fails
+        DEFAULTS_CACHE = { customBgUrl: '', backgroundBlur: '60', backgroundScaling: 'cover' };
+      } else {
+        DEFAULTS_CACHE = defaults;
       }
-      settingsCache = settings;
-      updateUi(settings);
+
+      // Now, fetch the user's current settings
+      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (settings) => {
+        if (chrome.runtime.lastError) {
+          console.error("Aurora Popup Error (Initial Load):", chrome.runtime.lastError.message);
+          document.body.innerHTML = `<div style="padding: 20px; text-align: center;">${getMessage('errorLoadingSettings')}</div>`;
+          return;
+        }
+        settingsCache = settings;
+        updateUi(settings);
+      });
     });
   }
 
@@ -322,9 +335,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnClearBg.addEventListener('click', () => {
     chrome.storage.sync.set({
-      customBgUrl: '',
-      backgroundBlur: '60',
-      backgroundScaling: 'contain'
+      customBgUrl: DEFAULTS_CACHE.customBgUrl,
+      backgroundBlur: DEFAULTS_CACHE.backgroundBlur,
+      backgroundScaling: DEFAULTS_CACHE.backgroundScaling
     });
     chrome.storage.local.remove(LOCAL_BG_KEY);
   });
