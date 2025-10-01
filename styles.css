@@ -203,6 +203,38 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer
   -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
   backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
   transition: background 0.3s ease, border-color 0.3s ease;
+  isolation: isolate;
+}
+
+/* --- Glass Effect for Sticky Header Container --- */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("] {
+    isolation: isolate;
+    background: transparent !important;
+    border-radius: 22px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    contain: paint; /* Optimization for sticky elements with pseudo-elements */
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
+    
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky.content-fade-top {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer"] :is(.ProseMirror, textarea) {
@@ -359,6 +391,72 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-5
 }
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
   background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Glass effect for various buttons and containers from settings */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(
+  .shrink-0.btn-secondary.relative.btn,
+  .shrink-0.btn-danger-outline.relative.btn,
+  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
+  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary,
+  .p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary,
+  .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary
+) {
+  background: var(--composer-bg) !important;
+  border: 1px solid var(--composer-border) !important;
+  box-shadow: var(--composer-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(
+  .shrink-0.btn-secondary.relative.btn,
+  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
+  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary
+):hover {
+  background: var(--menu-item-hover) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .shrink-0.btn-danger-outline.relative.btn:hover {
+  background: color-mix(in oklab, #ef4444 15%, transparent) !important;
+}
+
+/* Glass effect for message action toolbar (Edit, Copy, etc.) */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary {
+  background: var(--composer-bg) !important;
+  border: 1px solid var(--composer-border) !important;
+  box-shadow: var(--composer-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+}
+
+/* Glass effect for reply context bar */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1 {
+  background: var(--composer-bg) !important;
+  border: 1px solid var(--composer-border) !important;
+  box-shadow: var(--composer-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  /* Remove the divider line */
+  --tw-divide-opacity: 0 !important;
+}
+
+/* Make the inner content of the reply bar transparent */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1 > * {
+  background-color: transparent !important;
+}
+
+/* Glass effect for suggestion chips ("Ask ChatGPT") */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn {
+  background: var(--composer-bg) !important;
+  border: 1px solid var(--composer-border) !important;
+  box-shadow: var(--composer-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn:hover {
+  background: var(--menu-item-hover) !important;
 }
 
 /* --- Light Mode Text & Icon Color Overrides --- */
@@ -520,36 +618,6 @@ html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) :is(.popov
   box-shadow: 0 16px 40px rgba(30, 42, 64, 0.18) !important;
 }
 
-/* --- FIX: Glass Effect for Custom GPT/Project Header --- */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) div.sticky:has(button[data-testid="project-modal-trigger"]) {
-  /* Apply base glass styles */
-  background: var(--glass-bg) !important;
-  border: 1px solid var(--glass-border) !important;
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) !important;
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) !important;
-  box-shadow: inset 0 1.5px 1px 0 var(--glass-inner-highlight), var(--glass-shadow) !important;
-  
-  /* Add padding and rounded corners for better appearance */
-  padding: 8px 12px;
-  border-radius: var(--glass-radius);
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
-/* --- Override for 'Clear' Appearance --- */
-html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div.sticky:has(button[data-testid="project-modal-trigger"]) {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border-color: rgba(255, 255, 255, 0.26) !important;
-  box-shadow: 0 18px 44px rgba(12, 20, 32, 0.2) !important;
-}
-
-/* --- Override for 'Clear' Appearance in Light Mode --- */
-html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div.sticky:has(button[data-testid="project-modal-trigger"]) {
-  background: rgba(255, 255, 255, 0.32) !important;
-  border-color: rgba(15, 24, 44, 0.12) !important;
-  box-shadow: 0 16px 40px rgba(30, 42, 64, 0.18) !important;
-}
-
 /* --- FIX: Apply Composer Style to Suggestion Chips --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary {
   /* Use composer variables for a consistent look */
@@ -587,11 +655,6 @@ html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) ul.p-2\.5.
 
 /* --- FIX: Increase Animated Background Visibility in Light Mode --- */
 html.cgpt-ambient-on.cgpt-light-mode .animated-bg .blob {
-  opacity: 0.65 !important;
-}
-
-/* --- ENHANCEMENT: More Vibrant Animated Background in Light Mode --- */
-html.cgpt-ambient-on.cgpt-light-mode .animated-bg .blob {
   /* Adjust opacity for the new, more vibrant colors */
   opacity: 0.6 !important;
 }
@@ -618,13 +681,21 @@ html.cgpt-appearance-clear:not(.cgpt-legacy-composer) :is(
   .popover.bg-token-main-surface-primary[role="dialog"],
   div[role="dialog"][class*="shadow-long"],
   #cgpt-qs-panel,
-  div.sticky:has(button[data-testid="project-modal-trigger"]),
-  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary
+  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary,
+  .py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary,
+  .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1,
+  .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn,
+  .shrink-0.btn-secondary.relative.btn,
+  .shrink-0.btn-danger-outline.relative.btn,
+  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
+  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary,
+  .p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary,
+  .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary
 ) {
-  --clear-blur: 28px;
+  --clear-blur: 24px;
   --clear-saturate: 180%;
-  --clear-shadow: 0 16px 70px rgba(0,0,0,0.55);
-  --clear-bg: rgba(0,0,0,0.15);
+  --clear-shadow: 0 16px 50px rgba(0,0,0,0.4);
+  --clear-bg: rgba(255, 255, 255, 0.08);
   --clear-border: rgba(255,255,255,0.2);
   --clear-glow: rgba(255,255,255,0.08);
   
@@ -634,6 +705,14 @@ html.cgpt-appearance-clear:not(.cgpt-legacy-composer) :is(
   -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
+}
+
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("]::before {
+    background: var(--clear-bg) !important;
+    border: 1px solid var(--clear-border) !important;
+    box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow) !important;
+    -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+    backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
 }
 
 html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
@@ -651,17 +730,31 @@ html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) :is(
   .popover.bg-token-main-surface-primary[role="dialog"],
   div[role="dialog"][class*="shadow-long"],
   #cgpt-qs-panel,
-  div.sticky:has(button[data-testid="project-modal-trigger"]),
-  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary
+  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary,
+  .py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary,
+  .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1,
+  .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn,
+  .shrink-0.btn-secondary.relative.btn,
+  .shrink-0.btn-danger-outline.relative.btn,
+  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
+  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary,
+  .p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary,
+  .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary
 ) {
-  --clear-shadow-light: 0 16px 60px rgba(0,0,0,0.25);
-  --clear-bg-light: rgba(255,255,255,0.3);
+  --clear-shadow-light: 0 16px 40px rgba(0,0,0,0.18);
+  --clear-bg-light: rgba(255,255,255,0.2);
   --clear-border-light: rgba(0,0,0,0.15);
   --clear-glow-light: rgba(255,255,255,0.25);
 
   background: var(--clear-bg-light) !important;
   border-color: var(--clear-border-light) !important;
   box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("]::before {
+    background: var(--clear-bg-light) !important;
+    border-color: var(--clear-border-light) !important;
+    box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light) !important;
 }
 
 html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
@@ -681,4 +774,24 @@ html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg img,
 html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg video {
   filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.02);
   opacity: 1;
+}
+
+/* --- FIX: Nested Composer Style Override --- */
+/* When composer is inside the sticky glass header, neutralize its individual glass effect to let the header's unified blur show through. */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("] form[data-type="unified-composer"] > div > div {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  /* Use a more subtle border derived from the main glass border */
+  border: 1px solid color-mix(in srgb, var(--glass-border) 60%, transparent) !important;
+}
+
+/* Override for 'Clear' appearance (dark) */
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer):not(.cgpt-light-mode) .offset-padding-top-4.sticky[class*="top-("] form[data-type="unified-composer"] > div > div {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+/* Override for 'Clear' appearance (light) */
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("] form[data-type="unified-composer"] > div > div {
+  border-color: rgba(0, 0, 0, 0.1) !important;
 }
