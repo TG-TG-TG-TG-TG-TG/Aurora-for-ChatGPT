@@ -1,16 +1,10 @@
 /* Aurora for ChatGPT - Main Stylesheet */
 
-/* ---
-  THEME REFACTOR: CSS CUSTOM PROPERTIES
-  All theme-related colors and styles are now defined here.
-  The :root selector holds the default (dark theme) values.
-  The html.cgpt-light-mode selector overrides these variables for the light theme.
-  This eliminates ~100 lines of redundant CSS.
---- */
 :root {
   /* Base Colors & Background */
   --theme-bg-color: #000;
-  --theme-text-primary: #000000; /* NOTE: Set to black, but overridden by specific selectors */
+  --theme-text-primary: #f0f4f8;
+  --theme-text-secondary: rgba(240, 244, 248, 0.7);
   --bg-filter: brightness(0.55);
   --bg-opacity: 0.58;
   --haze-gradient: linear-gradient( to bottom, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.10) 22%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.02) 68%, rgba(255,255,255,0.00) 85% );
@@ -47,7 +41,8 @@
 
 html.cgpt-ambient-on.cgpt-light-mode {
   --theme-bg-color: #fff;
-  --theme-text-primary: #000000;
+  --theme-text-primary: #1d1d1f;
+  --theme-text-secondary: rgba(29, 29, 31, 0.7);
   --bg-filter: brightness(0.99) contrast(1);
   --bg-opacity: 0.72;
   --haze-gradient: linear-gradient( to bottom, rgba(0,0,0,0.153) 0%, rgba(0,0,0,0.09) 22%, rgba(0,0,0,0.045) 45%, rgba(0,0,0,0.0225) 68%, rgba(0,0,0,0.00) 85% );
@@ -94,6 +89,18 @@ html.cgpt-bg-anim-disabled #cgpt-ambient-bg {
 
 #cgpt-ambient-bg.bg-visible {
   opacity: 1; /* Made visible via this class */
+}
+
+#cgpt-ambient-bg .media-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 750ms ease-in-out;
+}
+#cgpt-ambient-bg .media-layer.active {
+  opacity: 1;
 }
 
 #cgpt-ambient-bg picture,
@@ -153,9 +160,9 @@ html.cgpt-bg-anim-disabled #cgpt-ambient-bg {
   overflow: hidden;
   position: relative;
 }
-#cgpt-ambient-bg.gpt5-active .animated-bg { display: block; }
-#cgpt-ambient-bg.gpt5-active video,
-#cgpt-ambient-bg.gpt5-active picture { display: none; }
+#cgpt-ambient-bg .media-layer.gpt5-active .animated-bg { display: block; }
+#cgpt-ambient-bg .media-layer.gpt5-active video,
+#cgpt-ambient-bg .media-layer.gpt5-active picture { display: none; }
 
 .animated-bg .blob {
   position: absolute;
@@ -181,6 +188,11 @@ html.cgpt-bg-anim-disabled #cgpt-ambient-bg {
   bottom: -20vmax; left: 10vmax;
   background: #fcf6bd;
   animation: move-blob-3 75s infinite alternate ease-in-out;
+}
+
+/* --- Performance: Pause animations when tab is hidden --- */
+html.cgpt-tab-hidden .animated-bg .blob {
+  animation-play-state: paused !important;
 }
 
 
@@ -459,6 +471,76 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) .active\:opacity-1.border-none.r
   background: var(--menu-item-hover) !important;
 }
 
+/* --- Glass Effect for Code Blocks --- */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre > div[class*="bg-"] {
+  background: var(--composer-bg) !important;
+  border: 1px solid var(--composer-border) !important;
+  box-shadow: var(--composer-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+}
+
+/* Make the code block header and body transparent to let the glass effect from the parent show through */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre > div[class*="bg-"] > div[class*="bg-"] {
+  background-color: transparent !important;
+}
+
+/* Ensure the code itself is readable and has no background */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre code {
+  background: transparent !important;
+}
+
+/* Glass effect for "Copy code" button */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(120%) !important;
+  backdrop-filter: blur(8px) saturate(120%) !important;
+  padding: 4px 10px !important;
+  border-radius: 8px !important;
+  transition: background 0.2s ease, transform 250ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+  will-change: transform, box-shadow;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Light mode version */
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 'Clear' appearance override for "Copy code" button */
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button {
+  background: var(--clear-bg, rgba(255, 255, 255, 0.08)) !important;
+  border: 1px solid var(--clear-border, rgba(255,255,255,0.2)) !important;
+  box-shadow: inset 0 0 1px 0 var(--clear-glow, rgba(255,255,255,0.08)), 0 4px 12px rgba(0,0,0,0.25) !important;
+  -webkit-backdrop-filter: blur(var(--clear-blur, 24px)) saturate(var(--clear-saturate, 180%)) !important;
+  backdrop-filter: blur(var(--clear-blur, 24px)) saturate(var(--clear-saturate, 180%)) !important;
+}
+
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover {
+    background: rgba(255, 255, 255, 0.16) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button {
+  background: var(--clear-bg-light, rgba(255,255,255,0.2)) !important;
+  border-color: var(--clear-border-light, rgba(0,0,0,0.15)) !important;
+  box-shadow: inset 0 0 1px 0 var(--clear-glow-light, rgba(255,255,255,0.25)), 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
 /* --- Light Mode Text & Icon Color Overrides --- */
 html.cgpt-ambient-on.cgpt-light-mode body,
 html.cgpt-ambient-on.cgpt-light-mode [class*="text-token-text-"],
@@ -677,6 +759,7 @@ html.cgpt-ambient-on.cgpt-light-mode .animated-bg .blob:nth-child(3) {
 /* --- Clear Glass Style (Liquid Effect) --- */
 html.cgpt-appearance-clear:not(.cgpt-legacy-composer) :is(
   form[data-type="unified-composer"] > div > div,
+  div[data-message-author-role="assistant"] pre > div[class*="bg-"],
   .popover.bg-token-main-surface-primary[data-radix-menu-content],
   .popover.bg-token-main-surface-primary[role="dialog"],
   div[role="dialog"][class*="shadow-long"],
@@ -726,6 +809,7 @@ html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-ro
 /* Light Mode Overrides for Clear/Liquid Style */
 html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) :is(
   form[data-type="unified-composer"] > div > div,
+  div[data-message-author-role="assistant"] pre > div[class*="bg-"],
   .popover.bg-token-main-surface-primary[data-radix-menu-content],
   .popover.bg-token-main-surface-primary[role="dialog"],
   div[role="dialog"][class*="shadow-long"],
@@ -794,4 +878,162 @@ html.cgpt-appearance-clear:not(.cgpt-legacy-composer):not(.cgpt-light-mode) .off
 /* Override for 'Clear' appearance (light) */
 html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("] form[data-type="unified-composer"] > div > div {
   border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* --- Aurora Welcome Screen --- */
+#aurora-welcome-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: rgba(10, 10, 10, 0.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  animation: welcome-fade-in 0.5s ease-out;
+  transition: background 0.3s ease, backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease;
+}
+
+@keyframes welcome-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes welcome-screen-in { to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes content-fade-in { to { opacity: 1; transform: translateY(0); } }
+@keyframes screen-out { to { opacity: 0; transform: translateY(-20px); } }
+
+#aurora-welcome-overlay .screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  pointer-events: none;
+}
+#aurora-welcome-overlay .screen.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: welcome-screen-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: auto;
+}
+#aurora-welcome-overlay .screen:not(.active) {
+  animation: screen-out 0.3s ease-out forwards;
+}
+
+#aurora-welcome-overlay .content-panel {
+  position: relative;
+  width: 480px;
+  max-width: 90vw;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 32px 40px;
+  text-align: center;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: inset 0 1.5px 1px 0 var(--glass-inner-highlight), var(--glass-shadow);
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, opacity 0.3s ease;
+}
+
+/* Animate content inside the panel */
+#aurora-welcome-overlay .screen.active :is(.logo, h1, p, .welcome-btn, .setup-section) {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: content-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+#aurora-welcome-overlay .screen.active h1 { animation-delay: 0.1s; }
+#aurora-welcome-overlay .screen.active p { animation-delay: 0.2s; }
+#aurora-welcome-overlay .screen.active .welcome-btn,
+#aurora-welcome-overlay .screen.active .setup-section:nth-of-type(1) { animation-delay: 0.3s; }
+#aurora-welcome-overlay .screen.active .setup-section:nth-of-type(2) { animation-delay: 0.4s; }
+
+html.cgpt-appearance-clear #aurora-welcome-overlay .content-panel {
+  background: var(--clear-bg, rgba(255, 255, 255, 0.08)) !important;
+  border: 1px solid var(--clear-border, rgba(255,255,255,0.2)) !important;
+  box-shadow: inset 0 0 2px 0 var(--clear-glow, rgba(255,255,255,0.08)), var(--clear-shadow, 0 16px 50px rgba(0,0,0,0.4)) !important;
+}
+
+#aurora-welcome-overlay .logo { font-size: 48px; margin-bottom: 16px; }
+#aurora-welcome-overlay h1, #aurora-welcome-overlay h2 { color: var(--theme-text-primary); font-size: 32px; font-weight: 600; margin: 0 0 12px 0; }
+#aurora-welcome-overlay h2 { font-size: 28px; }
+#aurora-welcome-overlay p { font-size: 16px; color: var(--theme-text-secondary); line-height: 1.6; margin: 0 0 24px 0; }
+#aurora-welcome-overlay p.subtitle { margin-bottom: 32px; }
+
+#aurora-welcome-overlay .welcome-btn {
+  font-family: inherit; font-size: 16px; font-weight: 500; padding: 12px 24px;
+  border-radius: 12px; border: none; cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  width: 100%; margin-top: 16px;
+}
+#aurora-welcome-overlay .welcome-btn.primary { background-color: #4f8cff; color: white; }
+#aurora-welcome-overlay .welcome-btn:hover { transform: scale(1.02); }
+
+#aurora-welcome-overlay .setup-section { margin-bottom: 24px; }
+#aurora-welcome-overlay .section-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 12px; text-align: left; color: var(--theme-text-primary); opacity: 0.8; }
+#aurora-welcome-overlay .preset-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+#aurora-welcome-overlay .preset-tile {
+  background: rgba(255, 255, 255, 0.05); border: 2px solid transparent; border-radius: 12px;
+  padding: 12px; cursor: pointer; transition: all 0.2s ease;
+  color: var(--theme-text-secondary); font-family: inherit; font-size: 14px;
+}
+html.cgpt-light-mode #aurora-welcome-overlay .preset-tile { background: rgba(0,0,0,0.05); }
+#aurora-welcome-overlay .preset-tile:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+html.cgpt-light-mode #aurora-welcome-overlay .preset-tile:hover { background: rgba(0,0,0,0.1); }
+#aurora-welcome-overlay .preset-tile.active { border-color: #4f8cff; background: rgba(79, 140, 255, 0.2); color: var(--theme-text-primary); }
+#aurora-welcome-overlay .preset-tile .preview { width: 100%; height: 70px; border-radius: 8px; margin-bottom: 8px; background-size: cover; background-position: center; }
+#aurora-welcome-overlay .preview.default { background-image: url('https://persistent.oaistatic.com/burrito-nux/640.webp'); }
+#aurora-welcome-overlay .preview.animated { background: linear-gradient(45deg, #ff99c8, #a9d6ff, #fcf6bd); }
+#aurora-welcome-overlay .preview.grok { background-image: url('chrome-extension://__MSG_@@extension_id__/Aurora/grok-4.webp'); }
+#aurora-welcome-overlay .preview.blue { background-color: #3b82f6; }
+
+#aurora-welcome-overlay .pill-group { display: flex; gap: 8px; background: rgba(0,0,0,0.2); border-radius: 99px; padding: 4px; }
+html.cgpt-light-mode #aurora-welcome-overlay .pill-group { background: rgba(0,0,0,0.1); }
+#aurora-welcome-overlay .pill-btn {
+  flex-grow: 1; border: none; background: transparent; color: var(--theme-text-secondary) !important;
+  font-family: inherit; font-size: 14px; padding: 8px 16px; border-radius: 99px; cursor: pointer;
+  transition: all 0.2s ease;
+}
+#aurora-welcome-overlay .pill-btn.active {
+  background: rgba(255, 255, 255, 0.15); color: var(--theme-text-primary) !important;
+  font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+html.cgpt-light-mode #aurora-welcome-overlay .pill-btn.active { background: rgba(255, 255, 255, 0.5); }
+
+/* --- Peek Mode --- */
+.peek-btn {
+  position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
+  border-radius: 50%; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1);
+  color: var(--theme-text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+}
+.peek-btn:hover { background: rgba(0,0,0,0.2); color: var(--theme-text-primary); }
+.peek-btn .eye-closed { display: none; }
+.peek-btn .eye-open { display: block; }
+
+#aurora-welcome-overlay.peek-mode {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  cursor: pointer;
+}
+#aurora-welcome-overlay.peek-mode .content-panel {
+  opacity: 0;
+  pointer-events: none;
+}
+#aurora-welcome-overlay.peek-mode .peek-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+#aurora-welcome-overlay.peek-mode .peek-btn .eye-closed { display: block; }
+#aurora-welcome-overlay.peek-mode .peek-btn .eye-open { display: none; }
+
+html.cgpt-light-mode .peek-btn { border-color: rgba(0,0,0,0.1); background: rgba(255,255,255,0.2); }
+html.cgpt-light-mode .peek-btn:hover { background: rgba(255,255,255,0.4); }
+
+/* Remove transform from hover effects on main site */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .__menu-item,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary button {
+  transition: background 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: background;
+}
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .__menu-item:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary button:hover {
+  background: var(--menu-item-hover) !important;
 }

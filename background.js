@@ -3,7 +3,7 @@
 const DEFAULTS = {
   legacyComposer: false,
   theme: 'auto',
-  appearance: 'dimmed',
+  appearance: 'clear',
   hideGpt5Limit: false,
   hideUpgradeButtons: false,
   disableAnimations: false,
@@ -17,12 +17,14 @@ const DEFAULTS = {
   hideSoraButton: false,
   voiceColor: 'default',
   cuteVoiceUI: false,
-  showInNewChatsOnly: false
+  showInNewChatsOnly: false,
+  hasSeenWelcomeScreen: false
 };
 
 // On install or update, ensure all settings have a value.
 // This is crucial for adding new settings in future updates.
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener((details) => {
+  // The welcome screen is now shown in-page via the content script on first install.
   chrome.storage.sync.get(DEFAULTS, (settings) => {
     chrome.storage.sync.set(settings);
   });

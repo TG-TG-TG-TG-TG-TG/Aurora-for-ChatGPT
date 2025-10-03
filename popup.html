@@ -4,125 +4,42 @@
   <meta charset="utf-8" />
   <title>__MSG_popupTitle__</title>
   <link rel="stylesheet" href="popup.css">
-  <style>
-    :root {
-      color-scheme: light dark;
-      /* --- Base Colors (Dark Theme) --- */
-      --popup-bg: #1a1a1f;
-      --popup-text: #f0f4f8;
-      --popup-card-bg: rgba(44, 44, 51, 0.75);
-      --popup-border: rgba(255, 255, 255, 0.12);
-      --popup-inner-highlight: rgba(255, 255, 255, 0.07);
-      --popup-input-bg: rgba(255, 255, 255, 0.08);
-      --popup-hover-bg: rgba(255, 255, 255, 0.15);
-      --popup-track-bg: rgba(255, 255, 255, 0.15);
-      --popup-dropdown-bg: rgba(36, 36, 41, 0.8);
-      --popup-dropdown-border: rgba(255, 255, 255, 0.15);
-      --popup-option-hover-bg: rgba(255, 255, 255, 0.1);
-      --popup-dot-border: rgba(255, 255, 255, 0.1);
-      --primary-accent: #4f8cff;
-      --popup-gradient: radial-gradient(at top center, rgba(88, 70, 160, 0.45), transparent 70%);
-    }
-    html.theme-light {
-      /* --- Base Colors (Light Theme) --- */
-      --popup-bg: #f0f4f8;
-      --popup-text: #1d1d1f;
-      --popup-card-bg: rgba(242, 242, 247, 0.8);
-      --popup-border: rgba(0, 0, 0, 0.1);
-      --popup-inner-highlight: rgba(255, 255, 255, 0.7);
-      --popup-input-bg: rgba(0, 0, 0, 0.05);
-      --popup-hover-bg: rgba(0, 0, 0, 0.1);
-      --popup-track-bg: rgba(0, 0, 0, 0.15);
-      --popup-dropdown-bg: rgba(242, 242, 247, 0.85);
-      --popup-dropdown-border: rgba(0,0,0,0.1);
-      --popup-option-hover-bg: rgba(0, 0, 0, 0.08);
-      --popup-dot-border: rgba(0,0,0,0.1);
-      --popup-gradient: radial-gradient(at top center, rgba(79, 140, 255, 0.2), transparent 70%);
-    }
-    html {
-      background-color: var(--popup-bg);
-      background-image: var(--popup-gradient);
-      overflow: hidden;
-      border-radius: 14px;
-    }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      margin: 10px;
-      min-width: 310px;
-      color: var(--popup-text);
-      background: transparent;
-    }
-    .settings-card {
-      background: var(--popup-card-bg);
-      border: 1px solid var(--popup-border);
-      border-radius: 14px;
-      margin-bottom: 8px;
-      -webkit-backdrop-filter: blur(40px) saturate(180%);
-      backdrop-filter: blur(40px) saturate(180%);
-      overflow: hidden; /* Important: remains hidden by default */
-      box-shadow: inset 0 1.5px 1px 0 var(--popup-inner-highlight), 0 16px 40px rgba(0,0,0,0.35);
-    }
-    html.theme-light .settings-card {
-      box-shadow: inset 0 1.5px 1px 0 var(--popup-inner-highlight), 0 16px 40px rgba(0,0,0,0.15);
-    }
-    details.settings-card { position: relative; }
-    details.settings-card:has(.custom-select.is-open) { z-index: 10; overflow: visible; }
-    .card-title {
-      font-size: 15px; font-weight: 500; padding: 10px 12px;
-      cursor: pointer; list-style: none; display: flex;
-      justify-content: space-between; align-items: center;
-    }
-    .card-title::-webkit-details-marker { display: none; }
-    .card-title::after {
-      content: ''; display: inline-block; width: 16px; height: 16px;
-      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>');
-      background-repeat: no-repeat; background-position: center; background-size: 100%;
-      transform: rotate(0deg); transition: transform 0.2s ease; opacity: 0.6;
-      transform-origin: center;
-    }
-    html.theme-light .card-title::after {
-      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="%231d1d1f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>');
-    }
-    .settings-card[open] > .card-title {
-      border-bottom: 1px solid var(--popup-border); padding-bottom: 10px;
-    }
-    .settings-card[open] > .card-title::after { transform: rotate(180deg); }
-    .card-content { padding: 4px 12px 12px 12px; }
-    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; }
-    .label { font-size: 13px; white-space: nowrap; }
-    .switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
-    .switch input { display: none; }
-    .track {
-      position: absolute; inset: 0; border-radius: 11px;
-      background: var(--popup-track-bg); transition: background .2s ease;
-    }
-    input:checked + .track { background: var(--primary-accent); }
-    .thumb {
-      position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
-      background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease;
-    }
-    input:checked + .track .thumb { transform: translateX(18px); }
-    .credit { padding-top: 4px; font-size: 12px; opacity: .7; text-align: center; }
-    .credit a { color: inherit; }
-    input[type="text"], button, .file-input-label {
-      font-size: 12px; padding: 6px 10px; border-radius: 6px; color: inherit;
-      border: 1px solid var(--popup-border); background-color: var(--popup-input-bg);
-      transition: border-color .2s ease, background-color .2s ease;
-    }
-    button, .file-input-label { cursor: pointer; }
-    button:hover, .file-input-label:hover { background: var(--popup-hover-bg); }
-    input[type="text"] { width: 100%; -webkit-appearance: none; appearance: none; }
-    input[type="range"] { width: 100%; accent-color: var(--primary-accent); }
-    .file-input-wrapper { display: flex; gap: 10px; align-items: center; width: 100%; }
-    input[type="file"] { width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1; }
-    .file-input-label { flex-shrink: 0; white-space: nowrap; }
-  </style>
 </head>
 <body>
 
-  <details class="settings-card" open>
-    <summary class="card-title" data-i18n="sectionBackground">__MSG_sectionBackground__</summary>
-    <div class="card-content">
+  <header class="popup-header">
+    <h1 data-i18n="popupTitle">__MSG_popupTitle__</h1>
+  </header>
+
+  <div class="search-wrapper">
+    <input type="search" id="settingsSearch" data-i18n-placeholder="placeholderSearch" autocomplete="off">
+    <button id="clearSearchBtn" class="clear-search-btn" hidden title="__MSG_tooltipClearSearch__" data-i18n-title="tooltipClearSearch">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  </div>
+
+  <nav class="tab-nav">
+    <button class="tab-link active" data-tab="style">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4c-.83 0-1.5-.67-1.5-1.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+      <span data-i18n="tabStyle">Style</span>
+    </button>
+    <button class="tab-link" data-tab="interface">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+      <span data-i18n="tabInterface">Interface</span>
+    </button>
+    <button class="tab-link" data-tab="elements">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-4.41 0-8-3.59-8-8a8.87 8.87 0 0 1 .1-1.42M1.93 5.43A9.97 9.97 0 0 1 12 4c4.41 0 8 3.59 8 8 0 .42-.03.83-.08 1.23M22 2 2 22"/><path d="M12 15a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+      <span data-i18n="tabElements">Elements</span>
+    </button>
+    <button class="tab-link" data-tab="voice">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+      <span data-i18n="tabVoice">Voice</span>
+    </button>
+  </nav>
+
+  <main class="tab-content">
+    <!-- Style Tab -->
+    <div id="style" class="tab-pane active">
       <div class="row">
         <div class="label" data-i18n="labelPreset">__MSG_labelPreset__</div>
         <div class="custom-select-wrapper">
@@ -163,26 +80,6 @@
           </div>
         </div>
       </div>
-    </div>
-  </details>
-
-  <details class="settings-card">
-    <summary class="card-title" data-i18n="sectionAppearance">__MSG_sectionAppearance__</summary>
-    <div class="card-content">
-      <div class="row">
-        <div class="label" data-i18n="labelTheme"></div>
-        <div class="custom-select-wrapper">
-          <div class="custom-select" id="themeSelector">
-            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>
-            </button>
-            <div class="select-options" role="listbox"></div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- ADD THIS NEW ROW FOR GLASS STYLE -->
       <div class="row">
         <div class="label" data-i18n="labelGlassStyle">__MSG_labelGlassStyle__</div>
         <div class="custom-select-wrapper">
@@ -195,35 +92,43 @@
           </div>
         </div>
       </div>
-      <!-- END OF ADDED SECTION -->
+    </div>
 
+    <!-- Interface Tab -->
+    <div id="interface" class="tab-pane">
+       <div class="row">
+        <div class="label" data-i18n="labelTheme">__MSG_labelTheme__</div>
+        <div class="custom-select-wrapper">
+          <div class="custom-select" id="themeSelector">
+            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="select-label"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>
+            </button>
+            <div class="select-options" role="listbox"></div>
+          </div>
+        </div>
+      </div>
       <div class="row">
-        <div class="label" data-i18n="labelLegacyComposer"></div>
+        <div class="label" data-i18n="labelLegacyComposer">__MSG_labelLegacyComposer__</div>
         <label class="switch" title="__MSG_tooltipLegacyComposer__" data-i18n-title="tooltipLegacyComposer">
           <input type="checkbox" id="legacyComposer">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label" data-i18n="labelDisableBgAnimation"></div>
+        <div class="label" data-i18n="labelDisableBgAnimation">__MSG_labelDisableBgAnimation__</div>
         <label class="switch" title="__MSG_tooltipDisableBgAnimation__" data-i18n-title="tooltipDisableBgAnimation">
           <input type="checkbox" id="disableBgAnimation">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
       <div class="row">
-        <div class="label" data-i18n="labelDisableAnimations"></div>
+        <div class="label" data-i18n="labelDisableAnimations">__MSG_labelDisableAnimations__</div>
         <label class="switch" title="__MSG_tooltipDisableAnimations__" data-i18n-title="tooltipDisableAnimations">
           <input type="checkbox" id="disableAnimations">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
-    </div>
-  </details>
-
-  <details class="settings-card">
-    <summary class="card-title" data-i18n="sectionInterface">__MSG_sectionInterface__</summary>
-    <div class="card-content">
       <div class="row">
         <div class="label" data-i18n="labelFocusMode">__MSG_labelFocusMode__</div>
         <label class="switch" title="__MSG_tooltipFocusMode__" data-i18n-title="tooltipFocusMode">
@@ -246,38 +151,10 @@
         </label>
       </div>
     </div>
-  </details>
 
-  <details class="settings-card">
-    <summary class="card-title" data-i18n="sectionVoiceUi">__MSG_sectionVoiceUi__</summary>
-    <div class="card-content">
-      <div class="row">
-          <div class="label" data-i18n="labelVoiceColor">__MSG_labelVoiceColor__</div>
-          <div class="custom-select-wrapper">
-            <div class="custom-select" id="voiceColorSelector">
-              <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-                <span class="color-dot"></span>
-                <span class="select-label"></span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>
-              </button>
-              <div class="select-options" role="listbox"></div>
-            </div>
-          </div>
-      </div>
-      <div class="row">
-          <div class="label" data-i18n="labelCuteVoice">__MSG_labelCuteVoice__</div>
-          <label class="switch" title="__MSG_tooltipCuteVoice__" data-i18n-title="tooltipCuteVoice">
-              <input type="checkbox" id="cuteVoiceUI">
-              <span class="track"><span class="thumb"></span></span>
-          </label>
-      </div>
-    </div>
-  </details>
-
-  <details class="settings-card">
-    <summary class="card-title" data-i18n="sectionHideElements">__MSG_sectionHideElements__</summary>
-    <div class="card-content">
-      <div class="row">
+    <!-- Elements Tab -->
+    <div id="elements" class="tab-pane">
+       <div class="row">
         <div class="label" data-i18n="labelHideGpt5Limit">__MSG_labelHideGpt5Limit__</div>
         <label class="switch" title="__MSG_tooltipHideGpt5Limit__" data-i18n-title="tooltipHideGpt5Limit">
           <input type="checkbox" id="hideGpt5Limit">
@@ -306,7 +183,31 @@
         </label>
       </div>
     </div>
-  </details>
+
+    <!-- Voice Tab -->
+    <div id="voice" class="tab-pane">
+       <div class="row">
+          <div class="label" data-i18n="labelVoiceColor">__MSG_labelVoiceColor__</div>
+          <div class="custom-select-wrapper">
+            <div class="custom-select" id="voiceColorSelector">
+              <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="color-dot"></span>
+                <span class="select-label"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>
+              </button>
+              <div class="select-options" role="listbox"></div>
+            </div>
+          </div>
+      </div>
+      <div class="row">
+          <div class="label" data-i18n="labelCuteVoice">__MSG_labelCuteVoice__</div>
+          <label class="switch" title="__MSG_tooltipCuteVoice__" data-i18n-title="tooltipCuteVoice">
+              <input type="checkbox" id="cuteVoiceUI">
+              <span class="track"><span class="thumb"></span></span>
+          </label>
+      </div>
+    </div>
+  </main>
 
   <div class="credit">
     <span data-i18n="creditPrefix">__MSG_creditPrefix__</span>

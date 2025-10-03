@@ -20,6 +20,9 @@
   const TIMESTAMP_KEY = 'gpt5LimitHitTimestamp';
   const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
+  const BLUE_WALLPAPER_URL = 'https://img.freepik.com/free-photo/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner_1258-54581.jpg?semt=ais_hybrid&w=740&q=80';
+  const GROK_HORIZON_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
+
   // Group DOM selectors for easier maintenance. Fragile selectors are noted.
   const SELECTORS = {
     GPT5_LIMIT_POPUP: 'div[class*="text-token-text-primary"]',
@@ -152,65 +155,130 @@
     wrap.id = ID;
     wrap.setAttribute('aria-hidden', 'true');
     Object.assign(wrap.style, { position: 'fixed', inset: '0', zIndex: '-1', pointerEvents: 'none' });
-    wrap.innerHTML = `<div class="animated-bg"><div class="blob"></div><div class="blob"></div><div class="blob"></div></div><video playsinline autoplay muted loop></video><picture><source type="image/webp" srcset=""><img alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high" src="" srcset=""></picture><div class="haze"></div><div class="overlay"></div>`;
+
+    const createLayerContent = () => `
+      <div class="animated-bg">
+        <div class="blob"></div><div class="blob"></div><div class="blob"></div>
+      </div>
+      <video playsinline autoplay muted loop></video>
+      <picture>
+        <source type="image/webp" srcset="">
+        <img alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high" src="" srcset="">
+      </picture>
+    `;
+
+    wrap.innerHTML = `
+      <div class="media-layer active" data-layer-id="a">${createLayerContent()}</div>
+      <div class="media-layer" data-layer-id="b">${createLayerContent()}</div>
+      <div class="haze"></div>
+      <div class="overlay"></div>
+    `;
     return wrap;
   }
+  
+  let activeLayerId = 'a';
+  let isTransitioning = false;
 
   function updateBackgroundImage() {
     const bgNode = document.getElementById(ID);
-    if (!bgNode) return;
+    if (!bgNode || isTransitioning) return;
 
-    bgNode.classList.toggle('gpt5-active', settings.customBgUrl === '__gpt5_animated__');
+    const url = settings.customBgUrl;
+    const inactiveLayerId = activeLayerId === 'a' ? 'b' : 'a';
+    const activeLayer = bgNode.querySelector(`.media-layer[data-layer-id="${activeLayerId}"]`);
+    const inactiveLayer = bgNode.querySelector(`.media-layer[data-layer-id="${inactiveLayerId}"]`);
 
-    if (settings.customBgUrl === '__gpt5_animated__') {
-      return; // Animated background is handled by CSS, no need to update media elements.
+    if (!activeLayer || !inactiveLayer) return;
+
+    // --- Prepare inactive layer for new content ---
+    inactiveLayer.classList.remove('gpt5-active');
+    const inactiveImg = inactiveLayer.querySelector('img');
+    const inactiveSource = inactiveLayer.querySelector('source');
+    const inactiveVideo = inactiveLayer.querySelector('video');
+
+    const transitionToInactive = () => {
+      isTransitioning = true;
+      inactiveLayer.classList.add('active');
+      activeLayer.classList.remove('active');
+      activeLayerId = inactiveLayerId;
+      // Wait for CSS transition to complete + buffer
+      setTimeout(() => { isTransitioning = false; }, 800);
+    };
+
+    // --- Handle different background types ---
+    if (url === '__gpt5_animated__') {
+      inactiveLayer.classList.add('gpt5-active');
+      transitionToInactive();
+      return;
     }
 
-    const img = bgNode.querySelector('img');
-    const source = bgNode.querySelector('source');
-    const video = bgNode.querySelector('video');
-    if (!img || !source || !video) return;
     const defaultWebpSrcset = `https://persistent.oaistatic.com/burrito-nux/640.webp 640w, https://persistent.oaistatic.com/burrito-nux/1280.webp 1280w, https://persistent.oaistatic.com/burrito-nux/1920.webp 1920w`;
     const defaultImgSrc = "https://persistent.oaistatic.com/burrito-nux/640.webp";
     const videoExtensions = ['.mp4', '.webm', '.ogv'];
-    const applyMedia = (url) => {
-      const isVideo = videoExtensions.some(ext => url.includes(ext)) || url.startsWith('data:video');
-      img.style.display = isVideo ? 'none' : 'block';
-      video.style.display = isVideo ? 'block' : 'none';
+
+    const applyMedia = (mediaUrl) => {
+      const isVideo = videoExtensions.some(ext => mediaUrl.toLowerCase().includes(ext)) || mediaUrl.startsWith('data:video');
+      inactiveImg.style.display = isVideo ? 'none' : 'block';
+      inactiveVideo.style.display = isVideo ? 'block' : 'none';
+
+      const mediaEl = isVideo ? inactiveVideo : inactiveImg;
+      const eventType = isVideo ? 'loadeddata' : 'load';
+
+      const onMediaReady = () => {
+        transitionToInactive();
+        mediaEl.removeEventListener(eventType, onMediaReady);
+        mediaEl.removeEventListener('error', onMediaReady); // Also clean up error handler
+      };
+
+      mediaEl.addEventListener(eventType, onMediaReady, { once: true });
+      // If media fails to load, still perform transition to avoid getting stuck
+      mediaEl.addEventListener('error', onMediaReady, { once: true });
+
       if (isVideo) {
-        video.src = url;
-        img.src = ''; img.srcset = ''; source.srcset = '';
+        inactiveVideo.src = mediaUrl;
+        inactiveVideo.load();
+        inactiveVideo.play().catch(e => {}); // Autoplay might be blocked by browser
+        inactiveImg.src = ''; inactiveImg.srcset = ''; inactiveSource.srcset = '';
       } else {
-        img.src = url; img.srcset = ''; source.srcset = '';
+        inactiveImg.src = mediaUrl; inactiveImg.srcset = ''; inactiveSource.srcset = '';
+        inactiveVideo.src = '';
       }
     };
+
     const applyDefault = () => {
-      img.style.display = 'block';
-      video.style.display = 'none';
-      video.src = '';
-      img.src = defaultImgSrc;
-      img.srcset = defaultWebpSrcset;
-      source.srcset = defaultWebpSrcset;
+      inactiveImg.style.display = 'block';
+      inactiveVideo.style.display = 'none';
+      inactiveVideo.src = '';
+
+      const onMediaReady = () => {
+        transitionToInactive();
+        inactiveImg.removeEventListener('load', onMediaReady);
+        inactiveImg.removeEventListener('error', onMediaReady);
+      };
+      inactiveImg.addEventListener('load', onMediaReady, { once: true });
+      inactiveImg.addEventListener('error', onMediaReady, { once: true });
+
+      inactiveImg.src = defaultImgSrc;
+      inactiveImg.srcset = defaultWebpSrcset;
+      inactiveSource.srcset = defaultWebpSrcset;
     };
-    if (settings.customBgUrl) {
-      if (settings.customBgUrl === '__local__') {
+
+    if (url) {
+      if (url === '__local__') {
         if (chrome?.runtime?.id && chrome?.storage?.local) {
           chrome.storage.local.get(LOCAL_BG_KEY, (res) => {
-            if (chrome.runtime.lastError) {
-              console.error("Aurora Extension Error (updateBackgroundImage):", chrome.runtime.lastError.message);
-              return;
-            }
-            if (res && res[LOCAL_BG_KEY]) {
-              applyMedia(res[LOCAL_BG_KEY]);
-            } else {
+            if (chrome.runtime.lastError || !res || !res[LOCAL_BG_KEY]) {
+              console.error("Aurora Extension Error (updateBackgroundImage):", chrome.runtime.lastError?.message || 'Local BG not found.');
               applyDefault();
+            } else {
+              applyMedia(res[LOCAL_BG_KEY]);
             }
           });
         } else {
           applyDefault();
         }
       } else {
-        applyMedia(settings.customBgUrl);
+        applyMedia(url);
       }
     } else {
       applyDefault();
@@ -258,7 +326,6 @@
       { id: 'qs-focusMode', key: 'focusMode' },
       { id: 'qs-hideUpgradeButtons', key: 'hideUpgradeButtons' },
       { id: 'qs-hideGptsButton', key: 'hideGptsButton' },
-      { id: 'qs-disableBgAnimation', key: 'disableBgAnimation' },
       { id: 'qs-cuteVoiceUI', key: 'cuteVoiceUI' },
     ];
 
@@ -349,14 +416,30 @@
       panel.id = QS_PANEL_ID;
       document.body.appendChild(panel);
 
+      // --- NEW STATE-DRIVEN ANIMATION LOGIC ---
+      panel.setAttribute('data-state', 'closed');
+      const openPanel = () => panel.setAttribute('data-state', 'open');
+      const closePanel = () => panel.setAttribute('data-state', 'closing');
+
+      panel.addEventListener('animationend', (e) => {
+        if (e.animationName === 'qs-panel-close' && panel.getAttribute('data-state') === 'closing') {
+          panel.setAttribute('data-state', 'closed');
+        }
+      });
+
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        panel.classList.toggle('active');
+        const state = panel.getAttribute('data-state');
+        if (state === 'closed') {
+          openPanel();
+        } else if (state === 'open') {
+          closePanel();
+        }
       });
 
       document.addEventListener('click', (e) => {
-        if (panel && !panel.contains(e.target) && panel.classList.contains('active')) {
-          panel.classList.remove('active');
+        if (panel && !panel.contains(e.target) && panel.getAttribute('data-state') === 'open') {
+          closePanel();
         }
         const selectContainer = document.getElementById('qs-voice-color-select');
         if (selectContainer && !selectContainer.contains(e.target)) {
@@ -384,15 +467,11 @@
           <label>${getMessage('quickSettingsLabelHideGptsButton')}</label>
           <label class="switch"><input type="checkbox" id="qs-hideGptsButton"><span class="track"><span class="thumb"></span></span></label>
       </div>
-      <div class="qs-row" data-setting="disableBgAnimation">
-          <label>${getMessage('quickSettingsLabelDisableBgAnimation')}</label>
-          <label class="switch"><input type="checkbox" id="qs-disableBgAnimation"><span class="track"><span class="thumb"></span></span></label>
-      </div>
       <div class="qs-row" data-setting="appearance">
           <label>${getMessage('quickSettingsLabelGlassStyle')}</label>
           <div class="qs-pill-group" role="group" aria-label="${getMessage('quickSettingsLabelGlassStyle')}">
-            <button type="button" class="qs-pill" data-appearance="dimmed">${getMessage('glassAppearanceOptionDimmed')}</button>
             <button type="button" class="qs-pill" data-appearance="clear">${getMessage('glassAppearanceOptionClear')}</button>
+            <button type="button" class="qs-pill" data-appearance="dimmed">${getMessage('glassAppearanceOptionDimmed')}</button>
           </div>
       </div>
       <div class="qs-section-title">${getMessage('quickSettingsSectionVoice')}</div>
@@ -418,7 +497,7 @@
     const appearanceButtons = Array.from(panel.querySelectorAll('[data-appearance]'));
     const syncAppearanceButtons = () => {
       appearanceButtons.forEach((btn) => {
-        const isActive = (settings.appearance || 'dimmed') === btn.dataset.appearance;
+        const isActive = (settings.appearance || 'clear') === btn.dataset.appearance;
         btn.classList.toggle('active', isActive);
         btn.setAttribute('aria-pressed', String(isActive));
       });
@@ -465,26 +544,28 @@
   }
 
   function showBg() {
-    if (document.getElementById(ID)) return;
-    const node = makeBgNode();
-    const add = () => {
-      document.body.prepend(node);
-      ensureAppOnTop();
-      try { applyCustomStyles(); } catch {}
-      try { updateBackgroundImage(); } catch {}
-      setTimeout(() => node.classList.add('bg-visible'), 10);
-    };
-    if (document.body) add(); else document.addEventListener('DOMContentLoaded', add, { once: true });
+    let node = document.getElementById(ID);
+    if (!node) {
+      node = makeBgNode();
+      const add = () => {
+        document.body.prepend(node);
+        ensureAppOnTop();
+        applyCustomStyles();
+        updateBackgroundImage(); // Initial background set
+        setTimeout(() => node.classList.add('bg-visible'), 50);
+      };
+      if (document.body) add();
+      else document.addEventListener('DOMContentLoaded', add, { once: true });
+    } else {
+        node.classList.add('bg-visible');
+        updateBackgroundImage();
+    }
   }
 
   function hideBg() {
     const node = document.getElementById(ID);
     if (node) {
-      node.addEventListener('transitionend', () => node.remove(), { once: true });
       node.classList.remove('bg-visible');
-      setTimeout(() => {
-        if (node?.parentNode) node.remove();
-      }, 550); // Fallback for safety, duration is 500ms in CSS
     }
   }
 
@@ -521,6 +602,9 @@
 
   const initialize = (loadedSettings) => {
     settings = loadedSettings;
+    if (!settings.hasSeenWelcomeScreen) {
+        showWelcomeScreen();
+    }
     startObservers();
     applyAllSettings();
   };
@@ -529,6 +613,25 @@
   function startObservers() {
     if (observersStarted) return;
     observersStarted = true;
+    
+    // Performance: Pause animations and video when tab is not visible.
+    document.addEventListener('visibilitychange', () => {
+      const bgNode = document.getElementById(ID);
+      document.documentElement.classList.toggle('cgpt-tab-hidden', document.hidden);
+      if (!bgNode) return;
+      
+      const videos = bgNode.querySelectorAll('video');
+      videos.forEach(video => {
+        if (document.hidden) {
+          video.pause();
+        } else {
+          // Only play if it's supposed to be playing
+          if (video.style.display !== 'none') {
+            video.play().catch(e => { /* Autoplay might be blocked by browser policies */ });
+          }
+        }
+      });
+    }, { passive: true });
 
     const uiReadyObserver = new MutationObserver((mutations, obs) => {
       const stableUiElement = document.querySelector(SELECTORS.PROFILE_BUTTON);
@@ -570,26 +673,191 @@
     themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   }
 
-  if (chrome?.runtime?.sendMessage) {
-    chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (res) => {
-      if (chrome.runtime.lastError) {
-        console.error("Aurora Extension Error: Could not get settings.", chrome.runtime.lastError.message);
-        return;
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => initialize(res), { once: true });
-      } else {
-        initialize(res);
-      }
+  const getWelcomeScreenHTML = () => `
+    <div id="aurora-welcome-overlay">
+        <div class="welcome-container">
+            <!-- Screen 1: Introduction -->
+            <div id="screen-1" class="screen active">
+                <div class="content-panel">
+                    <button id="aurora-peek-btn-1" class="peek-btn" title="Preview Theme">
+                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9 9 0 0 1 12 3c7 0 10 7 10 7a13.2 13.2 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" x2="22" y1="2" y2="22"></line></svg>
+                    </button>
+                    <div class="logo">✨</div>
+                    <h1>Welcome to Aurora</h1>
+                    <p>A beautiful, customizable interface for ChatGPT, designed to enhance your experience with ambient backgrounds, glass effects, and more.</p>
+                    <button id="get-started-btn" class="welcome-btn primary">Get Started</button>
+                </div>
+            </div>
+
+            <!-- Screen 2: Setup -->
+            <div id="screen-2" class="screen">
+                <div class="content-panel">
+                    <button id="aurora-peek-btn-2" class="peek-btn" title="Preview Theme">
+                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9 9 0 0 1 12 3c7 0 10 7 10 7a13.2 13.2 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" x2="22" y1="2" y2="22"></line></svg>
+                    </button>
+                    <h2>Choose Your Look</h2>
+                    <p class="subtitle">Select a background and style to personalize your experience. You can always change this later.</p>
+
+                    <div class="setup-section">
+                        <label class="section-label">Background Preset</label>
+                        <div class="preset-grid">
+                            <button class="preset-tile" data-bg-url="default">
+                                <div class="preview default"></div>
+                                <span>Default</span>
+                            </button>
+                            <button class="preset-tile" data-bg-url="__gpt5_animated__">
+                                <div class="preview animated"></div>
+                                <span>Animated</span>
+                            </button>
+                            <button class="preset-tile" data-bg-url="grokHorizon">
+                                <div class="preview grok"></div>
+                                <span>Horizon</span>
+                            </button>
+                            <button class="preset-tile" data-bg-url="blue">
+                                <div class="preview blue"></div>
+                                <span>Blue</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setup-section">
+                        <label class="section-label">Glass Style</label>
+                        <div class="pill-group">
+                            <button class="pill-btn" data-appearance="clear">Clear</button>
+                            <button class="pill-btn" data-appearance="dimmed">Dimmed</button>
+                        </div>
+                    </div>
+
+                    <button id="finish-btn" class="welcome-btn primary">Finish Setup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  `;
+
+  function showWelcomeScreen() {
+    const welcomeNode = document.createElement('div');
+    welcomeNode.innerHTML = getWelcomeScreenHTML();
+    if (welcomeNode.firstElementChild) {
+      document.body.appendChild(welcomeNode.firstElementChild);
+    }
+
+    const screen1 = document.getElementById('screen-1');
+    const screen2 = document.getElementById('screen-2');
+    const getStartedBtn = document.getElementById('get-started-btn');
+    const finishBtn = document.getElementById('finish-btn');
+    const welcomeOverlay = document.getElementById('aurora-welcome-overlay');
+    
+    let tempSettings = { ...settings }; // Clone settings for preview
+
+    // --- Event Listeners ---
+    if (getStartedBtn) {
+      getStartedBtn.addEventListener('click', () => {
+          screen1.classList.remove('active');
+          screen2.classList.add('active');
+          // Initialize with defaults visually
+          document.querySelector('.preset-tile[data-bg-url="default"]').classList.add('active');
+          document.querySelector('.pill-btn[data-appearance="clear"]').classList.add('active');
+      });
+    }
+
+    document.querySelectorAll('.preset-tile').forEach(tile => {
+        tile.addEventListener('click', () => {
+            document.querySelectorAll('.preset-tile').forEach(t => t.classList.remove('active'));
+            tile.classList.add('active');
+            const bgChoice = tile.dataset.bgUrl;
+            let newUrl = '';
+            if (bgChoice === 'blue') newUrl = BLUE_WALLPAPER_URL;
+            else if (bgChoice === 'grokHorizon') newUrl = GROK_HORIZON_URL;
+            else if (bgChoice === '__gpt5_animated__') newUrl = '__gpt5_animated__';
+            
+            tempSettings.customBgUrl = newUrl;
+            settings.customBgUrl = newUrl; // Mutate global settings for live preview
+            applyAllSettings();
+        });
     });
 
-    chrome.storage.onChanged.addListener((changes, area) => {
-      if (area === 'sync') {
-        let needsUpdate = false;
-        for (let key in changes) { if (key in settings) { settings[key] = changes[key].newValue; needsUpdate = true; } }
-        if (needsUpdate) applyAllSettings();
-      } else if (area === 'local' && changes[LOCAL_BG_KEY]) {
+    document.querySelectorAll('.pill-btn').forEach(pill => {
+        pill.addEventListener('click', () => {
+            document.querySelectorAll('.pill-btn').forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            const appearanceChoice = pill.dataset.appearance;
+            tempSettings.appearance = appearanceChoice;
+            settings.appearance = appearanceChoice; // Mutate for live preview
+            applyAllSettings();
+        });
+    });
+
+    if (finishBtn) {
+      finishBtn.addEventListener('click', () => {
+          tempSettings.hasSeenWelcomeScreen = true;
+          chrome.storage.sync.set(tempSettings, () => {
+              if (chrome.runtime.lastError) {
+                  console.error("Aurora Extension Error (Welcome Finish):", chrome.runtime.lastError.message);
+                  return;
+              }
+              const overlay = document.getElementById('aurora-welcome-overlay');
+              if (overlay) overlay.remove();
+          });
+      });
+    }
+
+    // --- Peek Mode Logic ---
+    document.querySelectorAll('.peek-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent this click from being caught by the overlay's listener
+        if (welcomeOverlay) {
+          welcomeOverlay.classList.add('peek-mode');
+        }
+      });
+    });
+
+    if (welcomeOverlay) {
+      welcomeOverlay.addEventListener('click', () => {
+        // If in peek mode, any click on the overlay will deactivate it.
+        if (welcomeOverlay.classList.contains('peek-mode')) {
+          welcomeOverlay.classList.remove('peek-mode');
+        }
+      });
+    }
+  }
+
+  // --- NEW: Initialization and Robust Settings Listener ---
+  if (chrome?.runtime?.sendMessage) {
+    // This function will be our single point of entry for processing settings updates.
+    const refreshSettingsAndApply = () => {
+      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
+        if (chrome.runtime.lastError) {
+          console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
+          return;
+        }
+        // Update the global settings object with the fresh, authoritative state.
+        settings = freshSettings;
+        // Apply all visual changes based on the new settings.
         applyAllSettings();
+      });
+    };
+
+    // Initial load when the script first runs.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        // We call the same function on initial load to keep logic consistent.
+        refreshSettingsAndApply();
+        // The observers only need to be started once.
+        startObservers();
+      }, { once: true });
+    } else {
+      refreshSettingsAndApply();
+      startObservers();
+    }
+
+    // New, robust listener. Whenever any sync or relevant local setting changes,
+    // we re-fetch the entire settings object to ensure perfect state consistency.
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === 'sync' || (area === 'local' && changes[LOCAL_BG_KEY])) {
+        refreshSettingsAndApply();
       }
     });
   }

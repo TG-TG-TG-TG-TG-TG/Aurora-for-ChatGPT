@@ -19,8 +19,7 @@ const getMessage = (key, substitutions) => {
 document.addEventListener('DOMContentLoaded', () => {
   let settingsCache = {}; // Cache for current settings to enable synchronous checks and quick updates.
   let DEFAULTS_CACHE = {}; // Add this line
-
-  document.title = getMessage('popupTitle');
+  let searchableSettings = []; // New: For search functionality
 
   const applyStaticLocalization = () => {
     document.querySelectorAll('[data-i18n]').forEach((el) => {
@@ -41,6 +40,129 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   applyStaticLocalization();
+  
+  // --- New: Tab Switching Logic ---
+  const tabs = document.querySelectorAll('.tab-link');
+  const panes = document.querySelectorAll('.tab-pane');
+  const mainContent = document.querySelector('.tab-content');
+  const tabNav = document.querySelector('.tab-nav');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetPaneId = tab.dataset.tab;
+
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      panes.forEach(pane => {
+        pane.classList.toggle('active', pane.id === targetPaneId);
+      });
+    });
+  });
+
+  // --- New: Search Functionality ---
+  const searchInput = document.getElementById('settingsSearch');
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
+  let noResultsMessage = null;
+
+  function buildSearchableData() {
+    searchableSettings = [];
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      const tabId = pane.id;
+      const tabTitle = document.querySelector(`.tab-link[data-tab="${tabId}"]`)?.textContent || '';
+      pane.querySelectorAll('.row').forEach(row => {
+        const label = row.querySelector('.label')?.getAttribute('data-i18n');
+        const tooltip = row.querySelector('[data-i18n-title]')?.getAttribute('data-i18n-title');
+
+        let keywords = `${tabTitle} `;
+        if (label) keywords += getMessage(label) + ' ';
+        if (tooltip) keywords += getMessage(tooltip) + ' ';
+
+        searchableSettings.push({
+          element: row,
+          tab: tabId,
+          keywords: keywords.toLowerCase().trim()
+        });
+      });
+    });
+  }
+
+  function handleSearch() {
+    const query = searchInput.value.toLowerCase().trim();
+    const matchedTabs = new Set();
+    let matchCount = 0;
+
+    clearSearchBtn.hidden = !query;
+
+    if (!query) {
+      resetSearchView();
+      return;
+    }
+
+    // Hide everything first
+    panes.forEach(p => p.classList.remove('active'));
+    tabs.forEach(t => t.classList.add('is-hidden'));
+
+    searchableSettings.forEach(setting => {
+      const isMatch = setting.keywords.includes(query);
+      setting.element.classList.toggle('is-hidden', !isMatch);
+      if (isMatch) {
+        matchedTabs.add(setting.tab);
+        matchCount++;
+      }
+    });
+
+    if (matchCount > 0) {
+      // Show tabs that have matches
+      tabNav.hidden = false;
+      if (noResultsMessage) noResultsMessage.style.display = 'none';
+
+      tabs.forEach(tab => {
+        const tabId = tab.dataset.tab;
+        const hasMatch = matchedTabs.has(tabId);
+        tab.classList.toggle('is-hidden', !hasMatch);
+      });
+
+      // Activate the first tab with a match
+      const firstMatchedTab = document.querySelector('.tab-link:not(.is-hidden)');
+      if (firstMatchedTab) {
+        firstMatchedTab.click();
+      }
+    } else {
+      // No results found
+      tabNav.hidden = true;
+      if (!noResultsMessage) {
+        noResultsMessage = document.createElement('div');
+        noResultsMessage.className = 'no-results-message';
+        noResultsMessage.textContent = getMessage('noResults');
+        mainContent.appendChild(noResultsMessage);
+      }
+      noResultsMessage.style.display = 'block';
+    }
+  }
+
+  function resetSearchView() {
+    tabNav.hidden = false;
+    if (noResultsMessage) noResultsMessage.style.display = 'none';
+
+    searchableSettings.forEach(setting => setting.element.classList.remove('is-hidden'));
+    tabs.forEach(tab => tab.classList.remove('is-hidden'));
+    
+    // Restore default tab view
+    const activeTab = document.querySelector('.tab-link.active');
+    if (!activeTab || activeTab.classList.contains('is-hidden')) {
+      tabs[0]?.click();
+    } else {
+      activeTab.click(); // Re-click to ensure pane is active
+    }
+  }
+
+  searchInput.addEventListener('input', handleSearch);
+  clearSearchBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    handleSearch();
+    searchInput.focus();
+  });
+  // End of Search Functionality
 
   // --- Data-driven configuration for all toggle switches ---
   const TOGGLE_CONFIG = [
@@ -73,6 +195,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnClearBg = document.getElementById('clearBg');
   const blurSlider = document.getElementById('blurSlider');
   const blurValue = document.getElementById('blurValue');
+
+  // --- Rewritten Feature: Blur Slider Logic ---
+  // This new logic uses a single 'input' event for real-time updates and efficient saving.
+  // It completely replaces any old 'input' or 'change' listeners.
+  if (blurSlider && blurValue) {
+    blurSlider.addEventListener('input', () => {
+      const newBlurValue = blurSlider.value;
+      
+      // 1. Instantly update the 'px' value in the UI.
+      blurValue.textContent = newBlurValue;
+      
+      // 2. Save the value to storage. This automatically triggers the live
+      // update on the main page via the storage.onChanged listener in content.js.
+      chrome.storage.sync.set({ backgroundBlur: newBlurValue });
+    });
+  }
+
 
   // --- Reusable Custom Select Functionality ---
   function createCustomSelect(containerId, options, storageKey, onPresetChange) {
@@ -193,8 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ADD THESE LINES
   const appearanceOptions = [
-    { value: 'dimmed', labelKey: 'glassAppearanceOptionDimmed' },
-    { value: 'clear', labelKey: 'glassAppearanceOptionClear' }
+    { value: 'clear', labelKey: 'glassAppearanceOptionClear' },
+    { value: 'dimmed', labelKey: 'glassAppearanceOptionDimmed' }
   ];
   const appearanceSelect = createCustomSelect('appearanceSelector', appearanceOptions, 'appearance');
   // END OF ADDED SECTION
@@ -243,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bgScalingSelect.update(settings.backgroundScaling);
     themeSelect.update(settings.theme);
-    appearanceSelect.update(settings.appearance || 'dimmed'); // Add this line
+    appearanceSelect.update(settings.appearance || 'clear'); // Add this line
     voiceColorSelect.update(settings.voiceColor);
 
     const url = settings.customBgUrl;
@@ -291,18 +430,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         settingsCache = settings;
         updateUi(settings);
+        buildSearchableData(); // New: Build search index after UI and text is loaded
       });
     });
   }
 
   // --- Event Listeners for Custom Background ---
-  blurSlider.addEventListener('input', () => {
-    blurValue.textContent = blurSlider.value;
-  });
-  blurSlider.addEventListener('change', () => {
-    chrome.storage.sync.set({ backgroundBlur: blurSlider.value });
-  });
-
+  
   tbBgUrl.addEventListener('change', () => {
     const urlValue = tbBgUrl.value.trim();
     const newSettings = { customBgUrl: urlValue };
@@ -333,14 +467,53 @@ document.addEventListener('DOMContentLoaded', () => {
     fileBg.value = '';
   });
 
-  btnClearBg.addEventListener('click', () => {
-    chrome.storage.sync.set({
-      customBgUrl: DEFAULTS_CACHE.customBgUrl,
-      backgroundBlur: DEFAULTS_CACHE.backgroundBlur,
-      backgroundScaling: DEFAULTS_CACHE.backgroundScaling
+  // --- REWRITTEN & STABLE: Reset Button Logic ---
+  // This completely replaces the old reset button logic. It is designed to be
+  // atomic, reliable, and work perfectly with the new robust listener in content.js.
+  if (btnClearBg) {
+    btnClearBg.addEventListener('click', () => {
+      // 1. Check if the defaults have been loaded. This is a safety measure.
+      if (!DEFAULTS_CACHE || Object.keys(DEFAULTS_CACHE).length === 0) {
+        console.error("Aurora Popup Error: Cannot reset because defaults are not loaded.");
+        return;
+      }
+      
+      // 2. Define the complete set of background settings to be reset.
+      // We pull these directly from the DEFAULTS_CACHE, which is our source of truth.
+      const settingsToReset = {
+        customBgUrl: DEFAULTS_CACHE.customBgUrl,
+        backgroundBlur: DEFAULTS_CACHE.backgroundBlur,
+        backgroundScaling: DEFAULTS_CACHE.backgroundScaling
+      };
+
+      // 3. Execute all storage operations.
+      // The `sync.set` will trigger the robust listener in content.js, causing the
+      // website visuals to update correctly and reliably.
+      chrome.storage.sync.set(settingsToReset);
+      
+      // The `local.remove` is a critical cleanup step for any user-provided files.
+      chrome.storage.local.remove(LOCAL_BG_KEY);
+      
+      // 4. Provide immediate visual feedback in the popup UI.
+      // While the storage.onChanged listener will also do this, updating the UI
+      // manually here makes the reset feel instantaneous to the user.
+      
+      // Update the URL input box.
+      tbBgUrl.value = '';
+      
+      // Update the blur slider and its text display.
+      blurSlider.value = settingsToReset.backgroundBlur;
+      blurValue.textContent = settingsToReset.backgroundBlur;
+
+      // Update the custom dropdowns using their dedicated update functions.
+      // This correctly resets the preset to "Default" and scaling to "Cover".
+      bgPresetSelect.update('default'); // 'default' corresponds to an empty customBgUrl
+      bgScalingSelect.update(settingsToReset.backgroundScaling);
+
+      console.log("Aurora Settings: Background and blur have been reset to defaults.");
     });
-    chrome.storage.local.remove(LOCAL_BG_KEY);
-  });
+  }
+
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'sync') {
