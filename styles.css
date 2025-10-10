@@ -218,37 +218,6 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer
   isolation: isolate;
 }
 
-/* --- Glass Effect for Sticky Header Container --- */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("] {
-    isolation: isolate;
-    background: transparent !important;
-    border-radius: 22px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    contain: paint; /* Optimization for sticky elements with pseudo-elements */
-}
-
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("]::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    border-radius: inherit;
-    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
-    
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-}
-
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky.content-fade-top {
-    -webkit-mask-image: none !important;
-    mask-image: none !important;
-}
-
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) form[data-type="unified-composer"] :is(.ProseMirror, textarea) {
   background: transparent !important;
 }
@@ -790,14 +759,6 @@ html.cgpt-appearance-clear:not(.cgpt-legacy-composer) :is(
   transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
 }
 
-html.cgpt-appearance-clear:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("]::before {
-    background: var(--clear-bg) !important;
-    border: 1px solid var(--clear-border) !important;
-    box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow) !important;
-    -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
-    backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
-}
-
 html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
   -webkit-backdrop-filter: blur(var(--clear-blur, 28px)) saturate(var(--clear-saturate, 180%)) !important;
   backdrop-filter: blur(var(--clear-blur, 28px)) saturate(var(--clear-saturate, 180%)) !important;
@@ -835,12 +796,6 @@ html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) :is(
   box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light) !important;
 }
 
-html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("]::before {
-    background: var(--clear-bg-light) !important;
-    border-color: var(--clear-border-light) !important;
-    box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light) !important;
-}
-
 html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="user"] .user-message-bubble-color {
   border-color: var(--clear-border-light, rgba(0,0,0,0.15)) !important;
   box-shadow: inset 0 0 2px 0 var(--clear-glow-light, rgba(255,255,255,0.25));
@@ -858,26 +813,6 @@ html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg img,
 html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg video {
   filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(1) saturate(1.02);
   opacity: 1;
-}
-
-/* --- FIX: Nested Composer Style Override --- */
-/* When composer is inside the sticky glass header, neutralize its individual glass effect to let the header's unified blur show through. */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("] form[data-type="unified-composer"] > div > div {
-  background: transparent !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  box-shadow: none !important;
-  /* Use a more subtle border derived from the main glass border */
-  border: 1px solid color-mix(in srgb, var(--glass-border) 60%, transparent) !important;
-}
-
-/* Override for 'Clear' appearance (dark) */
-html.cgpt-appearance-clear:not(.cgpt-legacy-composer):not(.cgpt-light-mode) .offset-padding-top-4.sticky[class*="top-("] form[data-type="unified-composer"] > div > div {
-  border-color: rgba(255, 255, 255, 0.15) !important;
-}
-/* Override for 'Clear' appearance (light) */
-html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) .offset-padding-top-4.sticky[class*="top-("] form[data-type="unified-composer"] > div > div {
-  border-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 /* --- Aurora Welcome Screen --- */
@@ -1036,4 +971,23 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-t
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .__menu-item:hover,
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary button:hover {
   background: var(--menu-item-hover) !important;
+}
+
+/* --- Custom Override: Remove Top Fade Effect --- */
+.content-fade-top {
+  background: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/*
+
+             main content area, making its background fully transparent.
+*/
+.content-fade-top,
+.content-fade-top::before,
+.content-fade-top::after {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  background: transparent !important; /* Also ensures no background color is present */
 }
