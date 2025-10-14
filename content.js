@@ -600,15 +600,6 @@
     manageSidebarButtons();
   }
 
-  const initialize = (loadedSettings) => {
-    settings = loadedSettings;
-    if (!settings.hasSeenWelcomeScreen) {
-        showWelcomeScreen();
-    }
-    startObservers();
-    applyAllSettings();
-  };
-
   let observersStarted = false;
   function startObservers() {
     if (observersStarted) return;
@@ -827,18 +818,34 @@
   // --- NEW: Initialization and Robust Settings Listener ---
   if (chrome?.runtime?.sendMessage) {
     // This function will be our single point of entry for processing settings updates.
-    const refreshSettingsAndApply = () => {
-      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
-        if (chrome.runtime.lastError) {
-          console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
-          return;
-        }
-        // Update the global settings object with the fresh, authoritative state.
-        settings = freshSettings;
-        // Apply all visual changes based on the new settings.
-        applyAllSettings();
-      });
-    };
+    let welcomeScreenChecked = false;
+
+
+// REPLACE the old refreshSettingsAndApply function with this new one
+
+const refreshSettingsAndApply = () => {
+  chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
+    if (chrome.runtime.lastError) {
+      console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
+      return;
+    }
+    
+    // *** FIX STARTS HERE ***
+    // Check if the welcome screen should be shown, but only once.
+    if (!welcomeScreenChecked) {
+      if (!freshSettings.hasSeenWelcomeScreen) {
+        showWelcomeScreen();
+      }
+      welcomeScreenChecked = true; // Mark as checked for this session.
+    }
+    // *** FIX ENDS HERE ***
+
+    // Update the global settings object with the fresh, authoritative state.
+    settings = freshSettings;
+    // Apply all visual changes based on the new settings.
+    applyAllSettings();
+  });
+};
 
     // Initial load when the script first runs.
     if (document.readyState === 'loading') {
