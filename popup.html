@@ -150,6 +150,21 @@
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
+      <div class="row">
+        <div class="label" data-i18n="labelDefaultModel">__MSG_labelDefaultModel__</div>
+        <div class="custom-select-wrapper">
+          <div class="custom-select" id="defaultModelSelector">
+            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="select-label"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline></svg>
+            </button>
+            <div class="select-options" role="listbox"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row" id="defaultModelCustomRow" hidden>
+        <input type="text" id="defaultModelCustomInput" placeholder="__MSG_placeholderDefaultModel__" data-i18n-placeholder="placeholderDefaultModel">
+      </div>
     </div>
 
     <!-- Elements Tab -->

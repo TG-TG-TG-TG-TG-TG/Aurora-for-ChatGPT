@@ -11,6 +11,23 @@
   const BG_ANIM_DISABLED_CLASS = 'cgpt-bg-anim-disabled';
   const CLEAR_APPEARANCE_CLASS = 'cgpt-appearance-clear';
   let settings = {};
+  let lastDefaultModelApplied = null;
+  let modelApplyCooldownUntil = 0;
+  let defaultModelApplyPromise = null;
+  let applyingDefaultModel = false;
+
+  const MODEL_LABEL_HINTS = {
+    'gpt-5': ['auto', 'gpt-5'],
+    'gpt-5-thinking': ['gpt-5 thinking', 'thinking'],
+    'gpt-5-thinking-mini': ['thinking mini', 'mini'],
+    'gpt-5-thinking-instant': ['instant'],
+    'gpt-4o': ['gpt-4o', '4o'],
+    'gpt-4.1': ['gpt-4.1', 'gpt 4.1'],
+    o3: ['o3'],
+    'o4-mini': ['o4 mini', 'o4-mini']
+  };
+
+  const LEGACY_MODEL_SLUGS = new Set(['gpt-4o', 'gpt-4.1', 'o3', 'o4-mini']);
 
   const LOCAL_BG_KEY = 'customBgData';
   const HIDE_LIMIT_CLASS = 'cgpt-hide-gpt5-limit';
@@ -576,6 +593,182 @@
     return true;
   }
 
+  function normalizeToken(value) {
+    return (value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+
+  function modelTextMatches(text, slug) {
+    const normalizedText = normalizeToken(text);
+    if (!slug) return false;
+    const hints = MODEL_LABEL_HINTS[slug] || [slug.replace(/-/g, ' ')];
+    return hints.some((hint) => normalizedText.includes(normalizeToken(hint)));
+  }
+
+  function isElementVisible(el) {
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  }
+
+  function findModelMenu(button) {
+    const ariaControls = button?.getAttribute('aria-controls');
+    if (ariaControls) {
+      const controlled = document.getElementById(ariaControls);
+      if (controlled && isElementVisible(controlled)) {
+        return controlled;
+      }
+    }
+    const menus = Array.from(document.querySelectorAll('[role="menu"]')).filter(isElementVisible);
+    return menus[menus.length - 1] || null;
+  }
+
+  function findMenuOption(menu, slug) {
+    const hints = MODEL_LABEL_HINTS[slug] || [slug.replace(/-/g, ' ')];
+    const normalizedHints = hints.map(normalizeToken).filter(Boolean);
+    const candidates = Array.from(menu.querySelectorAll('[role="menuitemradio"], [role="menuitem"], button'))
+      .filter((el) => isElementVisible(el) && el.closest('[role="menu"]') === menu);
+
+    for (const el of candidates) {
+      const text = el.getAttribute('aria-label') || el.textContent || '';
+      const normalizedText = normalizeToken(text);
+      if (!normalizedText) continue;
+
+      if (slug === 'gpt-5-thinking' && normalizedText.includes('mini')) {
+        continue;
+      }
+
+      const exactMatch = normalizedHints.find((hint) => normalizedText === hint);
+      if (exactMatch) return el;
+
+      const prefixMatch = normalizedHints.find((hint) => normalizedText.startsWith(`${hint} `));
+      if (prefixMatch) return el;
+
+      const suffixMatch = normalizedHints.find((hint) => normalizedText.endsWith(` ${hint}`));
+      if (suffixMatch) return el;
+
+      const containsMatch = normalizedHints.find((hint) => normalizedText.includes(hint));
+      if (containsMatch) {
+        return el;
+      }
+    }
+    return null;
+  }
+
+  async function openLegacyMenuIfNeeded(currentMenu) {
+    const legacyTrigger = Array.from(currentMenu.querySelectorAll('[role="menuitem"], button'))
+      .find((el) => isElementVisible(el) && normalizeToken(el.textContent || '').includes('legacy models'));
+    if (!legacyTrigger) return currentMenu;
+
+    const pointerInit = { bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true };
+    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerover', pointerInit)); } catch (e) {}
+    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerenter', pointerInit)); } catch (e) {}
+    legacyTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+    legacyTrigger.focus();
+    legacyTrigger.click();
+
+    const submenu = await waitFor(() => {
+      const menus = Array.from(document.querySelectorAll('[role="menu"]')).filter(isElementVisible);
+      return menus.length > 1 ? menus[menus.length - 1] : null;
+    }, 800);
+
+    return submenu || currentMenu;
+  }
+
+  function waitFor(getter, timeout = 1200) {
+    return new Promise((resolve) => {
+      const start = performance.now();
+      const tick = () => {
+        const value = typeof getter === 'function' ? getter() : document.querySelector(getter);
+        if (value) {
+          resolve(value);
+          return;
+        }
+        if (performance.now() - start >= timeout) {
+          resolve(null);
+          return;
+        }
+        requestAnimationFrame(tick);
+      };
+      tick();
+    });
+  }
+
+  async function applyDefaultModelOnce(slug) {
+    const button = document.querySelector('[data-testid="model-switcher-dropdown-button"]');
+    if (!button) return false;
+
+    const currentLabel = button.getAttribute('aria-label') || button.textContent || '';
+    if (modelTextMatches(currentLabel, slug)) {
+      lastDefaultModelApplied = slug;
+      return true;
+    }
+
+    applyingDefaultModel = true;
+    try {
+      if (button.getAttribute('aria-expanded') !== 'true') {
+        button.click();
+      }
+
+      let menu = await waitFor(() => findModelMenu(button), 1200);
+      if (!menu) {
+        return false;
+      }
+
+      if (LEGACY_MODEL_SLUGS.has(slug)) {
+        const legacyMenu = await openLegacyMenuIfNeeded(menu);
+        if (legacyMenu) {
+          menu = legacyMenu;
+        }
+      }
+
+      const option = findMenuOption(menu, slug);
+      if (!option) {
+        return false;
+      }
+
+      option.click();
+      lastDefaultModelApplied = slug;
+      return true;
+    } finally {
+      applyingDefaultModel = false;
+      requestAnimationFrame(() => {
+        if (button.getAttribute('aria-expanded') === 'true') {
+          button.click();
+        }
+      });
+    }
+  }
+
+  function maybeApplyDefaultModel(force = false) {
+    const slug = (settings.defaultModel || '').trim();
+    if (!slug) {
+      lastDefaultModelApplied = null;
+      modelApplyCooldownUntil = 0;
+      return;
+    }
+
+    if (!force && Date.now() < modelApplyCooldownUntil) return;
+    if (applyingDefaultModel || defaultModelApplyPromise) return;
+
+    const attempt = async (remaining) => {
+      const success = await applyDefaultModelOnce(slug);
+      if (success) {
+        modelApplyCooldownUntil = Date.now() + 1500;
+        return true;
+      }
+      if (remaining <= 0) {
+        modelApplyCooldownUntil = Date.now() + 6000;
+        return false;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      return attempt(remaining - 1);
+    };
+
+    defaultModelApplyPromise = attempt(2).finally(() => {
+      defaultModelApplyPromise = null;
+    });
+  }
+
   function applyAllSettings() {
     if (shouldShow()) {
       showBg();
@@ -598,6 +791,7 @@
     manageGpt5LimitPopup();
     manageUpgradeButtons();
     manageSidebarButtons();
+    maybeApplyDefaultModel();
   }
 
   let observersStarted = false;
@@ -656,6 +850,7 @@
       
       // Run the less-critical checks on a debounce timer.
       debouncedOtherChecks();
+      maybeApplyDefaultModel();
     });
     
     domObserver.observe(document.body, { childList: true, subtree: true });
@@ -819,40 +1014,59 @@
   if (chrome?.runtime?.sendMessage) {
     // This function will be our single point of entry for processing settings updates.
     let welcomeScreenChecked = false;
+    let settingsRetryAttempts = 0;
+    let settingsRetryTimer = null;
+    const MAX_SETTINGS_RETRIES = 5;
 
-
-// REPLACE the old refreshSettingsAndApply function with this new one
-
-const refreshSettingsAndApply = () => {
-  chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
-    if (chrome.runtime.lastError) {
-      console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
-      return;
-    }
-    
-    // *** FIX STARTS HERE ***
-    // Check if the welcome screen should be shown, but only once.
-    if (!welcomeScreenChecked) {
-      if (!freshSettings.hasSeenWelcomeScreen) {
-        showWelcomeScreen();
+    function scheduleSettingsRetry(message) {
+      if (settingsRetryAttempts >= MAX_SETTINGS_RETRIES) {
+        console.error("Aurora Extension Error: Could not refresh settings after multiple attempts.", message);
+        return;
       }
-      welcomeScreenChecked = true; // Mark as checked for this session.
+      const delay = Math.min(200 * (settingsRetryAttempts + 1), 2000);
+      settingsRetryAttempts += 1;
+      clearTimeout(settingsRetryTimer);
+      console.info("Aurora Extension Notice: Retrying settings fetch...", { attempt: settingsRetryAttempts, delay, message });
+      settingsRetryTimer = setTimeout(() => refreshSettingsAndApply(true), delay);
     }
-    // *** FIX ENDS HERE ***
 
-    // Update the global settings object with the fresh, authoritative state.
-    settings = freshSettings;
-    // Apply all visual changes based on the new settings.
-    applyAllSettings();
-  });
-};
+    function refreshSettingsAndApply(fromRetry = false) {
+      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
+        if (chrome.runtime.lastError) {
+          const errorMessage = chrome.runtime.lastError.message || '';
+          const shouldRetry =
+            !chrome.runtime?.id ||
+            errorMessage.includes('Receiving end does not exist') ||
+            errorMessage.includes('Could not establish connection') ||
+            errorMessage.includes('The message port closed before a response was received');
+          if (shouldRetry) {
+            scheduleSettingsRetry(errorMessage);
+            return;
+          }
+          console.error("Aurora Extension Error: Could not refresh settings.", errorMessage);
+          return;
+        }
+
+        settingsRetryAttempts = 0;
+        clearTimeout(settingsRetryTimer);
+
+        if (!welcomeScreenChecked) {
+          if (!freshSettings.hasSeenWelcomeScreen) {
+            showWelcomeScreen();
+          }
+          welcomeScreenChecked = true;
+        }
+
+        settings = freshSettings;
+        maybeApplyDefaultModel(true);
+        applyAllSettings();
+      });
+    }
 
     // Initial load when the script first runs.
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
-        // We call the same function on initial load to keep logic consistent.
         refreshSettingsAndApply();
-        // The observers only need to be started once.
         startObservers();
       }, { once: true });
     } else {

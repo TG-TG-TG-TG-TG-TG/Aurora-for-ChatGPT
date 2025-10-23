@@ -195,6 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnClearBg = document.getElementById('clearBg');
   const blurSlider = document.getElementById('blurSlider');
   const blurValue = document.getElementById('blurValue');
+  const defaultModelCustomRow = document.getElementById('defaultModelCustomRow');
+  const defaultModelCustomInput = document.getElementById('defaultModelCustomInput');
 
   // --- Rewritten Feature: Blur Slider Logic ---
   // This new logic uses a single 'input' event for real-time updates and efficient saving.
@@ -214,22 +216,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // --- Reusable Custom Select Functionality ---
-  function createCustomSelect(containerId, options, storageKey, onPresetChange) {
+  function createCustomSelect(containerId, options, storageKey, onPresetChange, config = {}) {
     const container = document.getElementById(containerId);
     if (!container) return { update: () => {} };
     const trigger = container.querySelector('.select-trigger');
     const label = container.querySelector('.select-label');
     const optionsContainer = container.querySelector('.select-options');
     const dotInTrigger = trigger.querySelector('.color-dot');
+    const { manualStorage = false, mapValueToOption, formatLabel } = config;
+    let currentOptionValue = null;
+    let lastRawValue = null;
 
-    const resolveLabel = (option) => option.labelKey ? getMessage(option.labelKey) : (option.label || option.value);
+    const resolveLabel = (option, rawValue) => {
+      if (!option) return rawValue || '';
+      if (typeof option.getLabel === 'function') return option.getLabel(rawValue);
+      if (typeof formatLabel === 'function') {
+        const custom = formatLabel(option, rawValue);
+        if (custom) return custom;
+      }
+      if (option.labelKey) return getMessage(option.labelKey);
+      return option.label || option.value;
+    };
 
     function renderOptions(selectedValue) {
       optionsContainer.innerHTML = options
         .filter(option => !option.hidden)
         .map(option => {
             const colorDotHtml = option.color ? `<span class="color-dot" style="background-color: ${option.color}; display: block;"></span>` : '';
-            const optionLabel = resolveLabel(option);
+            const optionLabel = resolveLabel(option, option.value);
             const isSelected = option.value === selectedValue ? 'true' : 'false';
             return `
             <div class="select-option" role="option" data-value="${option.value}" aria-selected="${isSelected}">
@@ -242,7 +256,9 @@ document.addEventListener('DOMContentLoaded', () => {
       optionsContainer.querySelectorAll('.select-option').forEach(optionEl => {
         optionEl.addEventListener('click', () => {
           const newValue = optionEl.dataset.value;
-          chrome.storage.sync.set({ [storageKey]: newValue });
+          if (!manualStorage && storageKey) {
+            chrome.storage.sync.set({ [storageKey]: newValue });
+          }
           if (onPresetChange) {
             onPresetChange(newValue);
           }
@@ -252,8 +268,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateSelectorState(value) {
-      const selectedOption = options.find(opt => opt.value === value) || options[0];
-      const selectedLabel = resolveLabel(selectedOption);
+      lastRawValue = value;
+      let mappedValue = value;
+      if (typeof mapValueToOption === 'function') {
+        mappedValue = mapValueToOption(value);
+      }
+      currentOptionValue = mappedValue;
+      const selectedOption = options.find(opt => opt.value === mappedValue) || options[0];
+      const selectedLabel = resolveLabel(selectedOption, value);
 
       if (dotInTrigger) {
         if (selectedOption.color) {
@@ -265,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       label.textContent = selectedLabel;
-      renderOptions(value);
+      renderOptions(currentOptionValue);
     }
 
     trigger.addEventListener('click', (e) => {
@@ -348,6 +370,101 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
   const voiceColorSelect = createCustomSelect('voiceColorSelector', voiceColorOptions, 'voiceColor');
 
+  const defaultModelOptions = [
+    { value: '', labelKey: 'defaultModelOptionNone' },
+    { value: 'gpt-5', label: 'Auto' },
+    { value: 'gpt-5-thinking', label: 'GPT-5 Thinking' },
+    { value: 'gpt-5-thinking-mini', label: 'GPT-5 Thinking mini' },
+    { value: 'gpt-5-thinking-instant', label: 'GPT-5 Instant' },
+    { value: 'gpt-4o', label: 'GPT-4o' },
+    { value: 'gpt-4.1', label: 'GPT-4.1' },
+    { value: 'o3', label: 'o3' },
+    { value: 'o4-mini', label: 'o4-mini' },
+    { value: '__custom__', labelKey: 'defaultModelOptionCustom' }
+  ];
+
+  function isCustomModelValue(value) {
+    if (!value) return false;
+    return !defaultModelOptions.some(opt => opt.value && opt.value === value);
+  }
+
+  const defaultModelSelect = createCustomSelect(
+    'defaultModelSelector',
+    defaultModelOptions,
+    null,
+    (selectedValue) => {
+      if (selectedValue === '__custom__') {
+        if (defaultModelCustomRow) {
+          defaultModelCustomRow.hidden = false;
+        }
+        if (defaultModelCustomInput) {
+          defaultModelCustomInput.focus();
+        }
+        const existingValue = settingsCache?.defaultModel || '';
+        defaultModelSelect.update(existingValue || '');
+        return;
+      }
+      if (defaultModelCustomRow) {
+        defaultModelCustomRow.hidden = true;
+      }
+      if (defaultModelCustomInput) {
+        defaultModelCustomInput.value = '';
+      }
+      chrome.storage.sync.set({ defaultModel: selectedValue });
+      applyDefaultModelUiState(selectedValue);
+    },
+    {
+      manualStorage: true,
+      mapValueToOption: (rawValue) => {
+        if (!rawValue) return '';
+        const existing = defaultModelOptions.find(opt => opt.value === rawValue);
+        return existing ? existing.value : '__custom__';
+      },
+      formatLabel: (option, rawValue) => {
+        if (option.value === '__custom__') {
+          if (rawValue && rawValue !== '__custom__') {
+            const baseLabel = getMessage('defaultModelOptionCustomLabel');
+            return `${baseLabel || 'Custom'} (${rawValue})`;
+          }
+          return getMessage('defaultModelOptionCustomLabel') || getMessage('defaultModelOptionCustom') || 'Custom';
+        }
+      }
+    }
+  );
+
+  function applyDefaultModelUiState(rawValue) {
+    const useCustom = isCustomModelValue(rawValue);
+    if (defaultModelCustomRow) {
+      defaultModelCustomRow.hidden = !useCustom;
+    }
+    if (defaultModelCustomInput) {
+      defaultModelCustomInput.value = useCustom ? rawValue : '';
+    }
+    defaultModelSelect.update(rawValue || '');
+  }
+
+  if (defaultModelCustomInput) {
+    const persistCustomModel = () => {
+      const value = defaultModelCustomInput.value.trim();
+      if (!value) {
+        chrome.storage.sync.set({ defaultModel: '' });
+        applyDefaultModelUiState('');
+        return;
+      }
+      chrome.storage.sync.set({ defaultModel: value });
+      applyDefaultModelUiState(value);
+    };
+    defaultModelCustomInput.addEventListener('blur', persistCustomModel);
+    defaultModelCustomInput.addEventListener('change', persistCustomModel);
+    defaultModelCustomInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        persistCustomModel();
+        closeAllSelects();
+      }
+    });
+  }
+
   // --- Function to update the UI based on current settings ---
   async function updateUi(settings) {
     let isLightTheme = settings.theme === 'light';
@@ -384,6 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
     themeSelect.update(settings.theme);
     appearanceSelect.update(settings.appearance || 'clear'); // Add this line
     voiceColorSelect.update(settings.voiceColor);
+    applyDefaultModelUiState(settings.defaultModel || '');
 
     const url = settings.customBgUrl;
     tbBgUrl.disabled = false;
