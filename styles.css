@@ -17,6 +17,7 @@
   --glass-bg: rgba(44, 44, 51, 0.75);
   --glass-border: rgba(255, 255, 255, 0.12);
   --glass-inner-highlight: rgba(255, 255, 255, 0.1);
+  --glass-radius: 24px;
   --menu-item-hover: color-mix(in oklab, currentColor 12%, transparent);
   --composer-blur: 14px;
   --composer-bg: rgba(0,0,0,0.35);
@@ -30,6 +31,7 @@
   --sidebar-glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   --sidebar-sticky-highlight: rgba(255,255,255,0.06);
   --sidebar-gradient-overlay: linear-gradient( to bottom, rgba(255,255,255,0.015), rgba(0,0,0,0.015) );
+  --sidebar-glass-radius: 16px;
 
   /* --- THEME: CLEAR GLASS (LIQUID) --- */
   --clear-blur: 24px;
@@ -253,7 +255,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"][class*="fl
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"][class*="flex-col"][class*="bg-token-bg-primary"] {
   /* Smaller radius on top, larger radius on the bottom to match the composer */
-  border-radius: 16px 16px 16px 16px !important;
+  border-radius: var(--glass-radius) !important;
   
   /* A small margin to visually separate it from the composer */
   margin-top: 2px !important;
@@ -270,6 +272,23 @@ html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-ro
 html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover { background: rgba(255, 255, 255, 0.16) !important; }
 html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button { background: var(--clear-bg-light, rgba(255,255,255,0.2)) !important; border-color: var(--clear-border-light, rgba(0,0,0,0.15)) !important; box-shadow: inset 0 0 1px 0 var(--clear-glow-light, rgba(255,255,255,0.25)), 0 4px 12px rgba(0,0,0,0.1) !important; }
 html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover { background: rgba(255, 255, 255, 0.3) !important; }
+
+/*
+ * @name Copy Code Button Background Fix
+ * @description Makes the copy code button and its wrapper transparent
+ *              to blend in with the code block's glass effect.
+*/
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover {
+    background: color-mix(in oklab, currentColor 10%, transparent) !important;
+}
 
 /* --- Light Mode Color Overrides --- */
 html.cgpt-ambient-on.cgpt-light-mode body, html.cgpt-ambient-on.cgpt-light-mode [class*="text-token-text-"], html.cgpt-ambient-on.cgpt-light-mode [class*="text-gray-"] { color: var(--theme-text-primary) !important; }
@@ -308,62 +327,23 @@ html.cgpt-focus-mode-on main .flex.h-full.flex-col { padding-top: 1.25rem; }
 html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled) :is(.popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="open"], .popover[role="dialog"][class*="md:max-w-"][data-state="open"]) { animation: aurora-menu-open 300ms cubic-bezier(0.16, 1, 0.3, 1); }
 html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled) :is(.popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="closed"], .popover[role="dialog"][class*="md:max-w-"][data-state="closed"]) { animation: aurora-menu-close 300ms cubic-bezier(0.16, 1, 0.3, 1); }
 
+/* --- FIX: Glass Effect for Custom GPT/Project Header --- */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div.sticky.content-fade-top:has(button[data-testid="project-modal-trigger"]) {
+  /* Add padding and rounded corners for better appearance */
+  padding: 8px 12px;
+  border-radius: var(--glass-radius);
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
+  background: rgba(18, 18, 18, 0.5) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+}
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
+  background: rgba(255, 255, 255, 0.5) !important;
+}
 /* --- Welcome Screen --- */
-#aurora-welcome-overlay { position: fixed; inset: 0; z-index: 100000; background: rgba(10, 10, 10, 0.5); -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2); animation: welcome-fade-in 0.5s ease-out; transition: background 0.3s ease, backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease; }
-@keyframes welcome-fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes welcome-screen-in { to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes content-fade-in { to { opacity: 1; transform: translateY(0); } }
-@keyframes screen-out { to { opacity: 0; transform: translateY(-20px); } }
-#aurora-welcome-overlay .screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transform: translateY(20px) scale(0.98); pointer-events: none; }
-#aurora-welcome-overlay .screen.active { opacity: 1; transform: translateY(0) scale(1); animation: welcome-screen-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; pointer-events: auto; }
-#aurora-welcome-overlay .screen:not(.active) { animation: screen-out 0.3s ease-out forwards; }
-#aurora-welcome-overlay .content-panel { position: relative; width: 480px; max-width: 90vw; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 32px 40px; text-align: center; -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); box-shadow: inset 0 1.5px 1px 0 var(--glass-inner-highlight), var(--glass-shadow); transition: all 0.4s ease; }
-#aurora-welcome-overlay .screen.active :is(.logo, h1, p, .welcome-btn, .setup-section) { opacity: 0; transform: translateY(10px); animation: content-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-#aurora-welcome-overlay .screen.active h1 { animation-delay: 0.1s; }
-#aurora-welcome-overlay .screen.active p { animation-delay: 0.2s; }
-#aurora-welcome-overlay .screen.active .welcome-btn, #aurora-welcome-overlay .screen.active .setup-section:nth-of-type(1) { animation-delay: 0.3s; }
-#aurora-welcome-overlay .screen.active .setup-section:nth-of-type(2) { animation-delay: 0.4s; }
-html.cgpt-appearance-clear #aurora-welcome-overlay .content-panel { background: var(--clear-bg, rgba(255, 255, 255, 0.08)) !important; border: 1px solid var(--clear-border, rgba(255,255,255,0.2)) !important; box-shadow: inset 0 0 2px 0 var(--clear-glow, rgba(255,255,255,0.08)), var(--clear-shadow, 0 16px 50px rgba(0,0,0,0.4)) !important; }
-#aurora-welcome-overlay .logo { font-size: 48px; margin-bottom: 16px; }
-#aurora-welcome-overlay h1, #aurora-welcome-overlay h2 { color: var(--theme-text-primary); font-size: 32px; font-weight: 600; margin: 0 0 12px 0; }
-#aurora-welcome-overlay h2 { font-size: 28px; }
-#aurora-welcome-overlay p { font-size: 16px; color: var(--theme-text-secondary); line-height: 1.6; margin: 0 0 24px 0; }
-#aurora-welcome-overlay p.subtitle { margin-bottom: 32px; }
-#aurora-welcome-overlay .welcome-btn { font-family: inherit; font-size: 16px; font-weight: 500; padding: 12px 24px; border-radius: 12px; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease; width: 100%; margin-top: 16px; }
-#aurora-welcome-overlay .welcome-btn.primary { background-color: #4f8cff; color: white; }
-#aurora-welcome-overlay .welcome-btn:hover { transform: scale(1.02); }
-#aurora-welcome-overlay .setup-section { margin-bottom: 24px; }
-#aurora-welcome-overlay .section-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 12px; text-align: left; color: var(--theme-text-primary); opacity: 0.8; }
-#aurora-welcome-overlay .preset-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-#aurora-welcome-overlay .preset-tile { background: rgba(255, 255, 255, 0.05); border: 2px solid transparent; border-radius: 12px; padding: 12px; cursor: pointer; transition: all 0.2s ease; color: var(--theme-text-secondary); font-family: inherit; font-size: 14px; }
-html.cgpt-light-mode #aurora-welcome-overlay .preset-tile { background: rgba(0,0,0,0.05); }
-#aurora-welcome-overlay .preset-tile:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
-html.cgpt-light-mode #aurora-welcome-overlay .preset-tile:hover { background: rgba(0,0,0,0.1); }
-#aurora-welcome-overlay .preset-tile.active { border-color: #4f8cff; background: rgba(79, 140, 255, 0.2); color: var(--theme-text-primary); }
-#aurora-welcome-overlay .preset-tile .preview { width: 100%; height: 70px; border-radius: 8px; margin-bottom: 8px; background-size: cover; background-position: center; }
-#aurora-welcome-overlay .preview.default { background-image: url('https://persistent.oaistatic.com/burrito-nux/640.webp'); }
-#aurora-welcome-overlay .preview.animated { background: linear-gradient(45deg, #ff99c8, #a9d6ff, #fcf6bd); }
-#aurora-welcome-overlay .preview.grok { background-image: url('chrome-extension://__MSG_@@extension_id__/Aurora/grok-4.webp'); }
-#aurora-welcome-overlay .preview.blue { background-color: #3b82f6; }
-#aurora-welcome-overlay .pill-group { display: flex; gap: 8px; background: rgba(0,0,0,0.2); border-radius: 99px; padding: 4px; }
-html.cgpt-light-mode #aurora-welcome-overlay .pill-group { background: rgba(0,0,0,0.1); }
-#aurora-welcome-overlay .pill-btn { flex-grow: 1; border: none; background: transparent; color: var(--theme-text-secondary) !important; font-family: inherit; font-size: 14px; padding: 8px 16px; border-radius: 99px; cursor: pointer; transition: all 0.2s ease; }
-#aurora-welcome-overlay .pill-btn.active { background: rgba(255, 255, 255, 0.15); color: var(--theme-text-primary) !important; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-html.cgpt-light-mode #aurora-welcome-overlay .pill-btn.active { background: rgba(255, 255, 255, 0.5); }
-.peek-btn { position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: var(--theme-text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
-.peek-btn:hover { background: rgba(0,0,0,0.2); color: var(--theme-text-primary); }
-.peek-btn .eye-closed { display: none; }
-.peek-btn .eye-open { display: block; }
-#aurora-welcome-overlay.peek-mode { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; cursor: pointer; }
-#aurora-welcome-overlay.peek-mode .content-panel { opacity: 0; pointer-events: none; }
-#aurora-welcome-overlay.peek-mode .peek-btn { opacity: 0; pointer-events: none; }
-#aurora-welcome-overlay.peek-mode .peek-btn .eye-closed { display: block; }
-#aurora-welcome-overlay.peek-mode .peek-btn .eye-open { display: none; }
-html.cgpt-light-mode .peek-btn { border-color: rgba(0,0,0,0.1); background: rgba(255,255,255,0.2); }
-html.cgpt-light-mode .peek-btn:hover { background: rgba(255,255,255,0.4); }
-html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover { background: rgba(255, 255, 255, 0.3) !important; }
-
-/* --- Aurora Welcome Screen --- */
 #aurora-welcome-overlay {
   position: fixed;
   inset: 0;
@@ -372,162 +352,146 @@ html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-m
   -webkit-backdrop-filter: blur(16px) saturate(1.2);
   backdrop-filter: blur(16px) saturate(1.2);
   animation: welcome-fade-in 0.5s ease-out;
-  transition: background 0.3s ease, backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease;
+  transition: background 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
 }
-
+#aurora-welcome-overlay.setup-active {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
 @keyframes welcome-fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes welcome-screen-in { to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes content-fade-in { to { opacity: 1; transform: translateY(0); } }
-@keyframes screen-out { to { opacity: 0; transform: translateY(-20px); } }
 
-#aurora-welcome-overlay .screen {
+#aurora-welcome-overlay .welcome-container {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  transform: translateY(20px) scale(0.98);
-  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
-#aurora-welcome-overlay .screen.active {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  animation: welcome-screen-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  pointer-events: auto;
-}
-#aurora-welcome-overlay .screen:not(.active) {
-  animation: screen-out 0.3s ease-out forwards;
-}
-
 #aurora-welcome-overlay .content-panel {
   position: relative;
   width: 480px;
   max-width: 90vw;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 24px;
+  border-radius: var(--glass-radius);
   padding: 32px 40px;
   text-align: center;
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: inset 0 1.5px 1px 0 var(--glass-inner-highlight), var(--glass-shadow);
-  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, opacity 0.3s ease;
-}
-
-/* Animate content inside the panel */
-#aurora-welcome-overlay .screen.active :is(.logo, h1, p, .welcome-btn, .setup-section) {
+  transition: inherit;
   opacity: 0;
-  transform: translateY(10px);
-  animation: content-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform: translateY(20px) scale(0.98);
+  animation: content-fade-in 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-#aurora-welcome-overlay .screen.active h1 { animation-delay: 0.1s; }
-#aurora-welcome-overlay .screen.active p { animation-delay: 0.2s; }
-#aurora-welcome-overlay .screen.active .welcome-btn,
-#aurora-welcome-overlay .screen.active .setup-section:nth-of-type(1) { animation-delay: 0.3s; }
-#aurora-welcome-overlay .screen.active .setup-section:nth-of-type(2) { animation-delay: 0.4s; }
-
 html.cgpt-appearance-clear #aurora-welcome-overlay .content-panel {
   background: var(--clear-bg, rgba(255, 255, 255, 0.08)) !important;
   border: 1px solid var(--clear-border, rgba(255,255,255,0.2)) !important;
   box-shadow: inset 0 0 2px 0 var(--clear-glow, rgba(255,255,255,0.08)), var(--clear-shadow, 0 16px 50px rgba(0,0,0,0.4)) !important;
 }
-
-#aurora-welcome-overlay .logo { font-size: 48px; margin-bottom: 16px; }
-#aurora-welcome-overlay h1, #aurora-welcome-overlay h2 { color: var(--theme-text-primary); font-size: 32px; font-weight: 600; margin: 0 0 12px 0; }
-#aurora-welcome-overlay h2 { font-size: 28px; }
-#aurora-welcome-overlay p { font-size: 16px; color: var(--theme-text-secondary); line-height: 1.6; margin: 0 0 24px 0; }
-#aurora-welcome-overlay p.subtitle { margin-bottom: 32px; }
-
-#aurora-welcome-overlay .welcome-btn {
-  font-family: inherit; font-size: 16px; font-weight: 500; padding: 12px 24px;
-  border-radius: 12px; border: none; cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-  width: 100%; margin-top: 16px;
+#aurora-welcome-overlay .content-panel :is(.logo, h1, p, .welcome-btn) {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: content-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-#aurora-welcome-overlay .welcome-btn.primary { background-color: #4f8cff; color: white; }
+#aurora-welcome-overlay .content-panel h1 { animation-delay: 0.3s; }
+#aurora-welcome-overlay .content-panel p { animation-delay: 0.4s; }
+#aurora-welcome-overlay .content-panel .welcome-btn { animation-delay: 0.5s; }
+#aurora-welcome-overlay .logo { font-size: 48px; margin-bottom: 16px; animation-delay: 0.2s; }
+#aurora-welcome-overlay h1 { color: var(--theme-text-primary); font-size: 32px; font-weight: 600; margin: 0 0 12px 0; }
+#aurora-welcome-overlay p { font-size: 16px; color: var(--theme-text-secondary); line-height: 1.6; margin: 0 0 24px 0; }
+#aurora-welcome-overlay .welcome-btn { font-family: inherit; font-size: 16px; font-weight: 500; padding: 12px 24px; border-radius: 12px; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease; width: 100%; margin-top: 16px; }
+#aurora-welcome-overlay .welcome-btn.primary { background-color: #4f8cff; color: white !important; }
 #aurora-welcome-overlay .welcome-btn:hover { transform: scale(1.02); }
 
-#aurora-welcome-overlay .setup-section { margin-bottom: 24px; }
-#aurora-welcome-overlay .section-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 12px; text-align: left; color: var(--theme-text-primary); opacity: 0.8; }
-#aurora-welcome-overlay .preset-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-#aurora-welcome-overlay .preset-tile {
-  background: rgba(255, 255, 255, 0.05); border: 2px solid transparent; border-radius: 12px;
-  padding: 12px; cursor: pointer; transition: all 0.2s ease;
-  color: var(--theme-text-secondary); font-family: inherit; font-size: 14px;
-}
-html.cgpt-light-mode #aurora-welcome-overlay .preset-tile { background: rgba(0,0,0,0.05); }
-#aurora-welcome-overlay .preset-tile:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
-html.cgpt-light-mode #aurora-welcome-overlay .preset-tile:hover { background: rgba(0,0,0,0.1); }
-#aurora-welcome-overlay .preset-tile.active { border-color: #4f8cff; background: rgba(79, 140, 255, 0.2); color: var(--theme-text-primary); }
-#aurora-welcome-overlay .preset-tile .preview { width: 100%; height: 70px; border-radius: 8px; margin-bottom: 8px; background-size: cover; background-position: center; }
-#aurora-welcome-overlay .preview.default { background-image: url('https://persistent.oaistatic.com/burrito-nux/640.webp'); }
-#aurora-welcome-overlay .preview.animated { background: linear-gradient(45deg, #ff99c8, #a9d6ff, #fcf6bd); }
-#aurora-welcome-overlay .preview.grok { background-image: url('chrome-extension://__MSG_@@extension_id__/Aurora/grok-4.webp'); }
-#aurora-welcome-overlay .preview.blue { background-color: #3b82f6; }
-
-#aurora-welcome-overlay .pill-group { display: flex; gap: 8px; background: rgba(0,0,0,0.2); border-radius: 99px; padding: 4px; }
-html.cgpt-light-mode #aurora-welcome-overlay .pill-group { background: rgba(0,0,0,0.1); }
-#aurora-welcome-overlay .pill-btn {
-  flex-grow: 1; border: none; background: transparent; color: var(--theme-text-secondary) !important;
-  font-family: inherit; font-size: 14px; padding: 8px 16px; border-radius: 99px; cursor: pointer;
-  transition: all 0.2s ease;
-}
-#aurora-welcome-overlay .pill-btn.active {
-  background: rgba(255, 255, 255, 0.15); color: var(--theme-text-primary) !important;
-  font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-html.cgpt-light-mode #aurora-welcome-overlay .pill-btn.active { background: rgba(255, 255, 255, 0.5); }
-
-/* --- Peek Mode --- */
-.peek-btn {
-  position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
-  border-radius: 50%; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1);
-  color: var(--theme-text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s ease;
-}
-.peek-btn:hover { background: rgba(0,0,0,0.2); color: var(--theme-text-primary); }
-.peek-btn .eye-closed { display: none; }
-.peek-btn .eye-open { display: block; }
-
-#aurora-welcome-overlay.peek-mode {
-  background: transparent;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  cursor: pointer;
-}
-#aurora-welcome-overlay.peek-mode .content-panel {
+/* --- Setup Bar --- */
+.aurora-setup-bar {
+  position: fixed;
+  bottom: 7.5vh;
+  left: 50%;
+  transform: translateX(-50%) translateY(150%);
+  z-index: 100001;
   opacity: 0;
   pointer-events: none;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--composer-bg);
+  border: 1px solid var(--composer-border);
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--composer-shadow);
+  border-radius: 20px;
+  padding: 16px 24px;
+  width: auto;
+  max-width: 90vw;
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
-#aurora-welcome-overlay.peek-mode .peek-btn {
-  opacity: 0;
-  pointer-events: none;
+.aurora-setup-bar.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
 }
-#aurora-welcome-overlay.peek-mode .peek-btn .eye-closed { display: block; }
-#aurora-welcome-overlay.peek-mode .peek-btn .eye-open { display: none; }
-
-html.cgpt-light-mode .peek-btn { border-color: rgba(0,0,0,0.1); background: rgba(255,255,255,0.2); }
-html.cgpt-light-mode .peek-btn:hover { background: rgba(255,255,255,0.4); }
-
-html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover { background: rgba(255, 255, 255, 0.3) !important; }
-
-/*
- * @name Copy Code Button Background Fix
- * @description Makes the copy code button and its wrapper transparent
- *              to blend in with the code block's glass effect.
-*/
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
+html.cgpt-appearance-clear .aurora-setup-bar {
+  background: var(--clear-bg) !important;
+  border: 1px solid var(--clear-border) !important;
+  box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
 }
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover {
-    background: color-mix(in oklab, currentColor 10%, transparent) !important;
+html.cgpt-appearance-clear.cgpt-light-mode .aurora-setup-bar {
+  background: var(--clear-bg-light) !important;
+  border-color: var(--clear-border-light) !important;
+  box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light) !important;
 }
+.aurora-setup-bar .setup-section { 
+  margin-bottom: 0; 
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.aurora-setup-bar .section-label { 
+  margin-bottom: 0; 
+  white-space: nowrap;
+  font-size: 14px; 
+  font-weight: 500; 
+  color: var(--theme-text-primary); 
+  opacity: 0.8; 
+}
+.aurora-setup-bar .preset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.aurora-setup-bar .preset-tile { background: rgba(255, 255, 255, 0.05); border: 2px solid transparent; border-radius: 12px; padding: 8px; cursor: pointer; transition: all 0.2s ease; color: var(--theme-text-secondary); font-family: inherit; font-size: 14px; }
+html.cgpt-light-mode .aurora-setup-bar .preset-tile { background: rgba(0,0,0,0.05); }
+.aurora-setup-bar .preset-tile:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+html.cgpt-light-mode .aurora-setup-bar .preset-tile:hover { background: rgba(0,0,0,0.1); }
+.aurora-setup-bar .preset-tile.active { border-color: #4f8cff; background: rgba(79, 140, 255, 0.2); color: var(--theme-text-primary); }
+.aurora-setup-bar .preset-tile .preview { width: 100%; height: 40px; border-radius: 8px; margin-bottom: 8px; background-size: cover; background-position: center; }
+.aurora-setup-bar .preview.default { background-image: url('https://persistent.oaistatic.com/burrito-nux/640.webp'); }
+.aurora-setup-bar .preview.animated { background: linear-gradient(45deg, #ff99c8, #a9d6ff, #fcf6bd); }
+.aurora-setup-bar .preview.grok { background-image: url('chrome-extension://__MSG_@@extension_id__/Aurora/grok-4.webp'); }
+.aurora-setup-bar .preview.blue { background-color: #3b82f6; }
+.aurora-setup-bar .pill-group { display: flex; gap: 8px; background: rgba(0,0,0,0.2); border-radius: 99px; padding: 4px; }
+html.cgpt-light-mode .aurora-setup-bar .pill-group { background: rgba(0,0,0,0.1); }
+.aurora-setup-bar .pill-btn { flex-grow: 1; border: none; background: transparent; color: var(--theme-text-secondary) !important; font-family: inherit; font-size: 14px; padding: 8px 16px; border-radius: 99px; cursor: pointer; transition: all 0.2s ease; }
+.aurora-setup-bar .pill-btn.active { background: rgba(255, 255, 255, 0.15); color: var(--theme-text-primary) !important; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+html.cgpt-light-mode .aurora-setup-bar .pill-btn.active { background: rgba(255, 255, 255, 0.5); }
+.aurora-setup-bar .finish-button { width: auto; margin-top: 0; }
 
-/* --- Light Mode Color Overrides --- */
-html.cgpt-ambient-on.cgpt-light-mode body, html.cgpt-ambient-on.cgpt-light-mode [class*="text-token-text-"], html.cgpt-ambient-on.cgpt-light-mode [class*="text-gray-"] { color: var(--theme-text-primary) !important; }
+/* Voice Setup Bar specific styles */
+.aurora-setup-bar .voice-header { display: flex; justify-content: space-between; align-items: baseline; width: 100%;}
+.aurora-setup-bar .voice-header .listen-text { font-size: 14px; color: var(--theme-text-secondary); }
+.aurora-setup-bar .voice-controls { display: flex; justify-content: space-between; align-items: center; width: 100%;}
+.aurora-setup-bar .voice-pill { padding: 4px; }
+.aurora-setup-bar .voice-pill .qs-color-dot { width: 24px; height: 24px; border-radius: 50%; display: block; border: 1px solid rgba(255,255,255,0.1); }
+html.cgpt-light-mode .aurora-setup-bar .voice-pill .qs-color-dot { border-color: rgba(0,0,0,0.1); }
+.aurora-setup-bar .cute-ui-control { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--theme-text-primary); }
+.aurora-setup-bar .switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+.aurora-setup-bar .switch input { display: none; }
+.aurora-setup-bar .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(0,0,0,0.3); transition: background .2s ease; }
+html.cgpt-light-mode .aurora-setup-bar .track { background: rgba(0,0,0,0.2); }
+.aurora-setup-bar input:checked + .track { background: #4f8cff; }
+.aurora-setup-bar .thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
+.aurora-setup-bar input:checked + .track .thumb { transform: translateX(18px); }
+#aurora-voice-bar { flex-direction: column; align-items: flex-start; gap: 12px; min-width: 420px; }

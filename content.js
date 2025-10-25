@@ -16,19 +16,6 @@
   let defaultModelApplyPromise = null;
   let applyingDefaultModel = false;
 
-  const MODEL_LABEL_HINTS = {
-    'gpt-5': ['auto', 'gpt-5'],
-    'gpt-5-thinking': ['gpt-5 thinking', 'thinking'],
-    'gpt-5-thinking-mini': ['thinking mini', 'mini'],
-    'gpt-5-thinking-instant': ['instant'],
-    'gpt-4o': ['gpt-4o', '4o'],
-    'gpt-4.1': ['gpt-4.1', 'gpt 4.1'],
-    o3: ['o3'],
-    'o4-mini': ['o4 mini', 'o4-mini']
-  };
-
-  const LEGACY_MODEL_SLUGS = new Set(['gpt-4o', 'gpt-4.1', 'o3', 'o4-mini']);
-
   const LOCAL_BG_KEY = 'customBgData';
   const HIDE_LIMIT_CLASS = 'cgpt-hide-gpt5-limit';
   const HIDE_UPGRADE_CLASS = 'cgpt-hide-upgrade';
@@ -41,7 +28,7 @@
   const GROK_HORIZON_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
 
   // Group DOM selectors for easier maintenance. Fragile selectors are noted.
-  const SELECTORS = {
+const SELECTORS = {
     GPT5_LIMIT_POPUP: 'div[class*="text-token-text-primary"]',
     UPGRADE_MENU_ITEM: 'a.__menu-item', // In user profile menu
     UPGRADE_TOP_BUTTON_CONTAINER: '.start-1\\/2.absolute', // Fragile: top-center button on free plan
@@ -49,10 +36,24 @@
     UPGRADE_SIDEBAR_BUTTON: 'div.gap-1\\.5.__menu-item.group', // Fragile: sidebar button
     UPGRADE_TINY_SIDEBAR_ICON: '#stage-sidebar-tiny-bar > div:nth-of-type(4)', // Fragile: depends on element order
     UPGRADE_SETTINGS_ROW_CONTAINER: 'div.py-2.border-b', // Container for settings row
+    UPGRADE_BOTTOM_BANNER: 'div[role="button"]', // Bottom "Upgrade your plan" banner
     SORA_BUTTON_ID: 'sora', // Use with getElementById
     GPTS_BUTTON: 'a[href="/gpts"]',
     PROFILE_BUTTON: '[data-testid="accounts-profile-button"]',
   };
+
+  const MODEL_LABEL_HINTS = {
+    'gpt-5': ['auto', 'gpt-5'],
+    'gpt-5-thinking': ['gpt-5 thinking', 'thinking'],
+    'gpt-5-thinking-mini': ['thinking mini', 'mini'],
+    'gpt-5-thinking-instant': ['instant'],
+    'gpt-4o': ['gpt-4o', '4o'],
+    'gpt-4.1': ['gpt-4.1', 'gpt 4.1'],
+    o3: ['o3'],
+    'o4-mini': ['o4 mini', 'o4-mini']
+  };
+
+  const LEGACY_MODEL_SLUGS = new Set(['gpt-4o', 'gpt-4.1', 'o3', 'o4-mini']);
 
   const debounce = (func, wait) => {
     let timeout;
@@ -119,7 +120,7 @@
     }
   }
 
-  function manageUpgradeButtons() {
+function manageUpgradeButtons() {
     const upgradeElements = [];
 
     const panelButton = Array.from(document.querySelectorAll(SELECTORS.UPGRADE_MENU_ITEM)).find(el => el.textContent.toLowerCase().includes('upgrade'));
@@ -137,17 +138,23 @@
     const tinySidebarUpgradeIcon = document.querySelector(SELECTORS.UPGRADE_TINY_SIDEBAR_ICON);
     upgradeElements.push(tinySidebarUpgradeIcon);
 
-    let accountUpgradeSection = null;
+    const bottomBannerUpgrade = Array.from(document.querySelectorAll(SELECTORS.UPGRADE_BOTTOM_BANNER))
+      .find(el => el.textContent?.toLowerCase().includes('upgrade your plan'));
+    if (bottomBannerUpgrade) {
+      // The element to hide is the parent container of the button.
+      upgradeElements.push(bottomBannerUpgrade.parentElement);
+    }
+
     const allSettingRows = document.querySelectorAll(SELECTORS.UPGRADE_SETTINGS_ROW_CONTAINER);
     for (const row of allSettingRows) {
-        const hasTitle = Array.from(row.querySelectorAll('div')).some(d => d.textContent.trim() === 'Get ChatGPT Plus');
-        const hasButton = row.querySelector('button')?.textContent.trim() === 'Upgrade';
-        if (hasTitle && hasButton) {
-            accountUpgradeSection = row;
-            break;
+        const rowText = row.textContent || '';
+        const hasUpgradeTitle = rowText.includes('Get ChatGPT Plus') || rowText.includes('Get ChatGPT Go');
+        const hasUpgradeButton = Array.from(row.querySelectorAll('button')).some(btn => btn.textContent.trim() === 'Upgrade');
+
+        if (hasUpgradeTitle && hasUpgradeButton) {
+            upgradeElements.push(row);
         }
     }
-    upgradeElements.push(accountUpgradeSection);
 
     toggleClassForElements(upgradeElements, HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
   }
@@ -433,7 +440,7 @@
       panel.id = QS_PANEL_ID;
       document.body.appendChild(panel);
 
-      // --- NEW STATE-DRIVEN ANIMATION LOGIC ---
+      // --- NEW: STATE-DRIVEN ANIMATION LOGIC ---
       panel.setAttribute('data-state', 'closed');
       const openPanel = () => panel.setAttribute('data-state', 'open');
       const closePanel = () => panel.setAttribute('data-state', 'closing');
@@ -841,6 +848,7 @@
     const debouncedOtherChecks = debounce(() => {
       manageGpt5LimitPopup();
       manageSidebarButtons();
+      maybeApplyDefaultModel();
     }, 150);
 
     // This observer handles all dynamic UI changes.
@@ -850,7 +858,6 @@
       
       // Run the less-critical checks on a debounce timer.
       debouncedOtherChecks();
-      maybeApplyDefaultModel();
     });
     
     domObserver.observe(document.body, { childList: true, subtree: true });
@@ -859,66 +866,76 @@
     themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   }
 
+  function applyWelcomePreviewSettings(changedKey) {
+    if (changedKey === 'customBgUrl') {
+      updateBackgroundImage();
+    }
+    applyRootFlags();
+  }
+
   const getWelcomeScreenHTML = () => `
     <div id="aurora-welcome-overlay">
         <div class="welcome-container">
             <!-- Screen 1: Introduction -->
             <div id="screen-1" class="screen active">
                 <div class="content-panel">
-                    <button id="aurora-peek-btn-1" class="peek-btn" title="Preview Theme">
-                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9 9 0 0 1 12 3c7 0 10 7 10 7a13.2 13.2 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" x2="22" y1="2" y2="22"></line></svg>
-                    </button>
                     <div class="logo">✨</div>
-                    <h1>Welcome to Aurora</h1>
-                    <p>A beautiful, customizable interface for ChatGPT, designed to enhance your experience with ambient backgrounds, glass effects, and more.</p>
-                    <button id="get-started-btn" class="welcome-btn primary">Get Started</button>
+                    <h1>${getMessage('welcomeTitle')}</h1>
+                    <p>${getMessage('welcomeDescription')}</p>
+                    <button id="get-started-btn" class="welcome-btn primary">${getMessage('welcomeBtnGetStarted')}</button>
                 </div>
             </div>
+        </div>
 
-            <!-- Screen 2: Setup -->
-            <div id="screen-2" class="screen">
-                <div class="content-panel">
-                    <button id="aurora-peek-btn-2" class="peek-btn" title="Preview Theme">
-                        <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.24A9 9 0 0 1 12 3c7 0 10 7 10 7a13.2 13.2 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" x2="22" y1="2" y2="22"></line></svg>
+        <!-- Bar 1: Style Setup -->
+        <div id="aurora-style-bar" class="aurora-setup-bar">
+            <div class="setup-section">
+                <label class="section-label">${getMessage('welcomeLabelBgPreset')}</label>
+                <div class="preset-grid">
+                    <button class="preset-tile" data-bg-url="default">
+                        <div class="preview default"></div>
+                        <span>${getMessage('welcomePresetDefault')}</span>
                     </button>
-                    <h2>Choose Your Look</h2>
-                    <p class="subtitle">Select a background and style to personalize your experience. You can always change this later.</p>
-
-                    <div class="setup-section">
-                        <label class="section-label">Background Preset</label>
-                        <div class="preset-grid">
-                            <button class="preset-tile" data-bg-url="default">
-                                <div class="preview default"></div>
-                                <span>Default</span>
-                            </button>
-                            <button class="preset-tile" data-bg-url="__gpt5_animated__">
-                                <div class="preview animated"></div>
-                                <span>Animated</span>
-                            </button>
-                            <button class="preset-tile" data-bg-url="grokHorizon">
-                                <div class="preview grok"></div>
-                                <span>Horizon</span>
-                            </button>
-                            <button class="preset-tile" data-bg-url="blue">
-                                <div class="preview blue"></div>
-                                <span>Blue</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="setup-section">
-                        <label class="section-label">Glass Style</label>
-                        <div class="pill-group">
-                            <button class="pill-btn" data-appearance="clear">Clear</button>
-                            <button class="pill-btn" data-appearance="dimmed">Dimmed</button>
-                        </div>
-                    </div>
-
-                    <button id="finish-btn" class="welcome-btn primary">Finish Setup</button>
+                    <button class="preset-tile" data-bg-url="__gpt5_animated__">
+                        <div class="preview animated"></div>
+                        <span>${getMessage('welcomePresetAnimated')}</span>
+                    </button>
+                    <button class="preset-tile" data-bg-url="grokHorizon">
+                        <div class="preview grok"></div>
+                        <span>${getMessage('welcomePresetHorizon')}</span>
+                    </button>
+                    <button class="preset-tile" data-bg-url="blue">
+                        <div class="preview blue"></div>
+                        <span>${getMessage('welcomePresetBlue')}</span>
+                    </button>
                 </div>
             </div>
+            <div class="setup-section">
+                <label class="section-label">${getMessage('welcomeLabelGlassStyle')}</label>
+                <div class="pill-group">
+                    <button class="pill-btn" data-appearance="clear">${getMessage('welcomeGlassClear')}</button>
+                    <button class="pill-btn" data-appearance="dimmed">${getMessage('welcomeGlassDimmed')}</button>
+                </div>
+            </div>
+            <button id="next-btn" class="welcome-btn primary finish-button">${getMessage('welcomeBtnNext')}</button>
+        </div>
+
+        <!-- Bar 2: Voice Setup -->
+        <div id="aurora-voice-bar" class="aurora-setup-bar">
+            <div class="setup-section voice-header">
+                <label class="section-label">${getMessage('welcomeLabelVoice')}</label>
+                <span class="listen-text">${getMessage('welcomeBtnListen')}</span>
+            </div>
+            <div class="setup-section voice-controls">
+                <div class="pill-group" id="voice-color-pills">
+                    <!-- Voice color pills will be injected here -->
+                </div>
+                <div class="cute-ui-control">
+                    <label>${getMessage('labelCuteVoice')}</label>
+                    <label class="switch"><input type="checkbox" id="welcome-cuteVoiceUI"><span class="track"><span class="thumb"></span></span></label>
+                </div>
+            </div>
+            <button id="finish-btn" class="welcome-btn primary finish-button">${getMessage('welcomeBtnFinish')}</button>
         </div>
     </div>
   `;
@@ -930,28 +947,93 @@
       document.body.appendChild(welcomeNode.firstElementChild);
     }
 
-    const screen1 = document.getElementById('screen-1');
-    const screen2 = document.getElementById('screen-2');
+    // Get all elements at once
     const getStartedBtn = document.getElementById('get-started-btn');
+    const nextBtn = document.getElementById('next-btn');
     const finishBtn = document.getElementById('finish-btn');
     const welcomeOverlay = document.getElementById('aurora-welcome-overlay');
+    const welcomeContainer = document.querySelector('.welcome-container');
+    const styleBar = document.getElementById('aurora-style-bar');
+    const voiceBar = document.getElementById('aurora-voice-bar');
+    const welcomeCuteVoiceUIToggle = document.getElementById('welcome-cuteVoiceUI');
     
     let tempSettings = { ...settings }; // Clone settings for preview
 
     // --- Event Listeners ---
     if (getStartedBtn) {
       getStartedBtn.addEventListener('click', () => {
-          screen1.classList.remove('active');
-          screen2.classList.add('active');
+          if (welcomeOverlay) {
+            welcomeOverlay.classList.add('setup-active');
+          }
+
+          if (welcomeContainer) {
+              // Fade out the main modal, then show the first setup bar
+              setTimeout(() => {
+                  welcomeContainer.style.display = 'none';
+                  if (styleBar) styleBar.classList.add('active');
+              }, 400); 
+          } else {
+            if (styleBar) styleBar.classList.add('active');
+          }
+
           // Initialize with defaults visually
-          document.querySelector('.preset-tile[data-bg-url="default"]').classList.add('active');
-          document.querySelector('.pill-btn[data-appearance="clear"]').classList.add('active');
+          document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="default"]').classList.add('active');
+          document.querySelector('#aurora-style-bar .pill-btn[data-appearance="clear"]').classList.add('active');
       });
     }
 
-    document.querySelectorAll('.preset-tile').forEach(tile => {
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (styleBar) styleBar.classList.remove('active');
+            // This click reveals the voice UI on the main page for live preview
+            document.querySelector('[data-testid="composer-speech-button"]')?.click();
+
+            setTimeout(() => {
+                if(voiceBar) voiceBar.classList.add('active');
+            }, 500); 
+        });
+    }
+
+    // --- Dynamic Voice Color Pills ---
+    const voiceColorOptions = [
+        { value: 'default', color: '#8EBBFF' }, { value: 'orange', color: '#FF9900' },
+        { value: 'yellow', color: '#FFD700' }, { value: 'pink', color: '#FF69B4' },
+        { value: 'green', color: '#32CD32' }, { value: 'dark', color: '#555555' }
+    ];
+    const voicePillsContainer = document.getElementById('voice-color-pills');
+    if (voicePillsContainer) {
+        voiceColorOptions.forEach(opt => {
+            const pill = document.createElement('button');
+            pill.className = 'pill-btn voice-pill';
+            pill.dataset.value = opt.value;
+            pill.innerHTML = `<span class="qs-color-dot" style="background-color: ${opt.color};"></span>`;
+            
+            pill.addEventListener('click', () => {
+                voicePillsContainer.querySelectorAll('.voice-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                tempSettings.voiceColor = opt.value;
+                settings.voiceColor = opt.value; // for live preview
+                applyAllSettings(); // Use full apply for robust preview
+            });
+            voicePillsContainer.appendChild(pill);
+        });
+        // Set default active pill
+        const defaultVoicePill = voicePillsContainer.querySelector('.voice-pill[data-value="default"]');
+        if (defaultVoicePill) defaultVoicePill.classList.add('active');
+    }
+    
+    if (welcomeCuteVoiceUIToggle) {
+        welcomeCuteVoiceUIToggle.addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            tempSettings.cuteVoiceUI = isChecked;
+            settings.cuteVoiceUI = isChecked; // for live preview
+            applyAllSettings(); // Use full apply for robust preview
+        });
+    }
+
+    document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(tile => {
         tile.addEventListener('click', () => {
-            document.querySelectorAll('.preset-tile').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(t => t.classList.remove('active'));
             tile.classList.add('active');
             const bgChoice = tile.dataset.bgUrl;
             let newUrl = '';
@@ -965,9 +1047,9 @@
         });
     });
 
-    document.querySelectorAll('.pill-btn').forEach(pill => {
+    document.querySelectorAll('#aurora-style-bar .pill-btn').forEach(pill => {
         pill.addEventListener('click', () => {
-            document.querySelectorAll('.pill-btn').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('#aurora-style-bar .pill-btn').forEach(p => p.classList.remove('active'));
             pill.classList.add('active');
             const appearanceChoice = pill.dataset.appearance;
             tempSettings.appearance = appearanceChoice;
@@ -984,28 +1066,8 @@
                   console.error("Aurora Extension Error (Welcome Finish):", chrome.runtime.lastError.message);
                   return;
               }
-              const overlay = document.getElementById('aurora-welcome-overlay');
-              if (overlay) overlay.remove();
+              if (welcomeOverlay) welcomeOverlay.remove();
           });
-      });
-    }
-
-    // --- Peek Mode Logic ---
-    document.querySelectorAll('.peek-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent this click from being caught by the overlay's listener
-        if (welcomeOverlay) {
-          welcomeOverlay.classList.add('peek-mode');
-        }
-      });
-    });
-
-    if (welcomeOverlay) {
-      welcomeOverlay.addEventListener('click', () => {
-        // If in peek mode, any click on the overlay will deactivate it.
-        if (welcomeOverlay.classList.contains('peek-mode')) {
-          welcomeOverlay.classList.remove('peek-mode');
-        }
       });
     }
   }
@@ -1014,54 +1076,29 @@
   if (chrome?.runtime?.sendMessage) {
     // This function will be our single point of entry for processing settings updates.
     let welcomeScreenChecked = false;
-    let settingsRetryAttempts = 0;
-    let settingsRetryTimer = null;
-    const MAX_SETTINGS_RETRIES = 5;
 
-    function scheduleSettingsRetry(message) {
-      if (settingsRetryAttempts >= MAX_SETTINGS_RETRIES) {
-        console.error("Aurora Extension Error: Could not refresh settings after multiple attempts.", message);
-        return;
+
+const refreshSettingsAndApply = () => {
+  chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
+    if (chrome.runtime.lastError) {
+      console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
+      return;
+    }
+    
+    // Check if the welcome screen should be shown, but only once.
+    if (!welcomeScreenChecked) {
+      if (!freshSettings.hasSeenWelcomeScreen) {
+        showWelcomeScreen();
       }
-      const delay = Math.min(200 * (settingsRetryAttempts + 1), 2000);
-      settingsRetryAttempts += 1;
-      clearTimeout(settingsRetryTimer);
-      console.info("Aurora Extension Notice: Retrying settings fetch...", { attempt: settingsRetryAttempts, delay, message });
-      settingsRetryTimer = setTimeout(() => refreshSettingsAndApply(true), delay);
+      welcomeScreenChecked = true; // Mark as checked for this session.
     }
 
-    function refreshSettingsAndApply(fromRetry = false) {
-      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
-        if (chrome.runtime.lastError) {
-          const errorMessage = chrome.runtime.lastError.message || '';
-          const shouldRetry =
-            !chrome.runtime?.id ||
-            errorMessage.includes('Receiving end does not exist') ||
-            errorMessage.includes('Could not establish connection') ||
-            errorMessage.includes('The message port closed before a response was received');
-          if (shouldRetry) {
-            scheduleSettingsRetry(errorMessage);
-            return;
-          }
-          console.error("Aurora Extension Error: Could not refresh settings.", errorMessage);
-          return;
-        }
-
-        settingsRetryAttempts = 0;
-        clearTimeout(settingsRetryTimer);
-
-        if (!welcomeScreenChecked) {
-          if (!freshSettings.hasSeenWelcomeScreen) {
-            showWelcomeScreen();
-          }
-          welcomeScreenChecked = true;
-        }
-
-        settings = freshSettings;
-        maybeApplyDefaultModel(true);
-        applyAllSettings();
-      });
-    }
+    // Update the global settings object with the fresh, authoritative state.
+    settings = freshSettings;
+    // Apply all visual changes based on the new settings.
+    applyAllSettings();
+  });
+};
 
     // Initial load when the script first runs.
     if (document.readyState === 'loading') {
@@ -1074,12 +1111,38 @@
       startObservers();
     }
 
-    // New, robust listener. Whenever any sync or relevant local setting changes,
-    // we re-fetch the entire settings object to ensure perfect state consistency.
     chrome.storage.onChanged.addListener((changes, area) => {
-      if (area === 'sync' || (area === 'local' && changes[LOCAL_BG_KEY])) {
+      if (area === 'sync') {
+        const changedKeys = Object.keys(changes);
+        const backgroundKeys = ['customBgUrl', 'backgroundBlur', 'backgroundScaling'];
+        const isOnlyNonBackgroundChange = changedKeys.every(key => !backgroundKeys.includes(key));
+
+        if (isOnlyNonBackgroundChange && changedKeys.length > 0) {
+          // Lightweight update for non-background settings
+          chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
+            if (chrome.runtime.lastError) {
+              console.error("Aurora Extension Error: Could not refresh settings for lightweight update.", chrome.runtime.lastError.message);
+              return;
+            }
+            settings = freshSettings;
+            
+            // Apply only the necessary, non-background updates
+            applyRootFlags();
+            manageGpt5LimitPopup();
+            manageUpgradeButtons();
+            manageSidebarButtons();
+            if (shouldShow() && !settings.hideQuickSettings) {
+                manageQuickSettingsUI();
+            }
+            maybeApplyDefaultModel();
+          });
+        } else {
+          // Full refresh for background changes or mixed changes
+          refreshSettingsAndApply();
+        }
+      } else if (area === 'local' && changes[LOCAL_BG_KEY]) {
         refreshSettingsAndApply();
       }
     });
   }
-})();
+})()

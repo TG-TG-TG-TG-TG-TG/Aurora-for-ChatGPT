@@ -56,15 +56,20 @@ html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
   right: 16px;
   z-index: 99997;
   width: 260px;
-  background: rgba(44, 44, 51, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  backdrop-filter: blur(40px) saturate(180%);
+  /* --- NEW: Dynamic Glass Style (Dimmed by default) --- */
+  background: var(--composer-bg);
+  border: 1px solid var(--composer-border);
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--composer-shadow);
+  /* --- End of New Style --- */
   border-radius: 14px;
-  box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.07), 0 16px 40px rgba(0,0,0,0.35);
   padding: 8px;
   transform-origin: bottom right;
   color: #fff;
+  /* Add transitions for smooth style changes */
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, 
+              backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
   /* Panel is hidden by default through its data-state */
 }
 
@@ -73,6 +78,21 @@ html.cgpt-light-mode #cgpt-qs-panel {
     border-color: rgba(0,0,0,0.1);
     box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.7), 0 16px 40px rgba(0,0,0,0.15);
     color: #000;
+}
+
+/* --- NEW: Clear Appearance Override --- */
+html.cgpt-appearance-clear #cgpt-qs-panel {
+  background: var(--clear-bg);
+  border: 1px solid var(--clear-border);
+  box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow);
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode #cgpt-qs-panel {
+  background: var(--clear-bg-light);
+  border-color: var(--clear-border-light);
+  box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light);
 }
 
 /* State-based animation styling */
@@ -196,12 +216,15 @@ html:not(.cgpt-light-mode) .qs-color-dot {
   list-style: none;
   padding: 6px;
   margin: 0;
-  background: rgba(36, 36, 41, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  backdrop-filter: blur(40px) saturate(180%);
+  /* --- NEW: Dynamic Glass Style (Dimmed by default) --- */
+  background: var(--composer-bg);
+  border: 1px solid var(--composer-border);
+  box-shadow: var(--composer-shadow);
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
+  /* --- End of New Style --- */
   border-radius: 12px;
-  box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.1), 0 16px 40px rgba(0,0,0,0.35);
   max-height: 200px;
   overflow-y: auto;
 }
@@ -209,10 +232,24 @@ html:not(.cgpt-light-mode) .qs-color-dot {
   display: none;
 }
 html.cgpt-light-mode .qs-select-options {
-  background: rgba(242, 242, 247, 0.85);
-  border-color: rgba(0,0,0,0.1);
-  box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.7), 0 16px 40px rgba(0,0,0,0.15);
+  /* This rule is now empty as variables handle light mode */
 }
+
+/* --- NEW: Clear Appearance Override for Dropdown --- */
+html.cgpt-appearance-clear .qs-select-options {
+  background: var(--clear-bg);
+  border: 1px solid var(--clear-border);
+  box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow);
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode .qs-select-options {
+  background: var(--clear-bg-light);
+  border-color: var(--clear-border-light);
+  box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light);
+}
+
 .qs-select-option {
   display: flex;
   align-items: center;

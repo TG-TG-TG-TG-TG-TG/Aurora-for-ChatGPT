@@ -4,7 +4,7 @@ const LOCAL_BG_KEY = 'customBgData';
 const BLUE_WALLPAPER_URL = 'https://img.freepik.com/free-photo/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner_1258-54581.jpg?semt=ais_hybrid&w=740&q=80';
 const GROK_HORIZON_URL = chrome?.runtime?.getURL
   ? chrome.runtime.getURL('Aurora/grok-4.webp')
-  : 'Aurora/grok-4.webp'; // Add this line
+  : 'Aurora/grok-4.webp';
 const MAX_FILE_SIZE_MB = 15;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
