@@ -31,14 +31,17 @@
         "https://chatgpt.com/*",
         "https://openai.com/*"
       ],
-      "js": ["content.js"],
+      "js": ["i18n-loader.js", "content.js"],
       "css": ["styles.css", "sidebar.css", "quick-settings.css"],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["Aurora/grok-4.webp"],
+      "resources": [
+        "Aurora/grok-4.webp",
+        "_locales/*/messages.json"
+      ],
       "matches": [
         "https://chat.openai.com/*",
         "https://chatgpt.com/*",

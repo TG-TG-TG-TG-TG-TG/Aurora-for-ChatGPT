@@ -73,10 +73,18 @@ const SELECTORS = {
     });
   };
 
-  const getMessage = (key) => {
+  // Use AuroraI18n for language detection (ChatGPT language priority)
+  const getMessage = (key, substitutions) => {
     try {
+      // Try AuroraI18n first (supports ChatGPT language detection)
+      if (window.AuroraI18n?.getMessage) {
+        const text = window.AuroraI18n.getMessage(key, substitutions);
+        if (text && text !== key) return text;
+      }
+      
+      // Fallback to Chrome's built-in i18n
       if (chrome?.i18n?.getMessage && chrome.runtime?.id) {
-        const text = chrome.i18n.getMessage(key);
+        const text = chrome.i18n.getMessage(key, substitutions);
         if (text) return text;
       }
     } catch (e) {
@@ -1099,6 +1107,19 @@ const refreshSettingsAndApply = () => {
     applyAllSettings();
   });
 };
+
+// Initialize i18n system with ChatGPT language detection
+(async () => {
+  try {
+    if (window.AuroraI18n?.initialize) {
+      await window.AuroraI18n.initialize();
+      const detectedLocale = window.AuroraI18n.getDetectedLocale();
+      console.log(`Aurora: Language system initialized with locale: ${detectedLocale}`);
+    }
+  } catch (e) {
+    console.warn('Aurora: Could not initialize i18n system, using browser default:', e);
+  }
+})();
 
     // Initial load when the script first runs.
     if (document.readyState === 'loading') {
