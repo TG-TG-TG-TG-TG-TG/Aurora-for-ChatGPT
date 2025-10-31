@@ -35,8 +35,30 @@ Clone the repo **OR** Download/Extract the zip $\rightarrow$ Navigate to `chrome
 * 👁️ **Chat visibility toggle** — hide/show the chat panel instantly
 * 📝 **Legacy composer option** — switch back to the classic `<textarea>` input instead of the new Lexical composer
 * 🌗 **Light mode** — optional light themed variant with quick toggle
+* 🌍 **Multi-language support** — Automatically detects your ChatGPT language (English, Spanish, Russian, French, Chinese)
 * 🪄 **Seamless integration** — blends into the UI without breaking layouts or controls
-* 🔒 **Private** — no network calls, no analytics; settings sync via Chrome’s `storage.sync`
+* 🔒 **Private** — no network calls, no analytics; settings sync via Chrome's `storage.sync`
+
+---
+
+## 🌍 Multi-Language Support
+
+Aurora for ChatGPT now supports **5 languages** with intelligent language detection:
+
+| Language | Code | Status |
+|----------|------|--------|
+| 🇬🇧 English | `en` | ✅ Full support |
+| 🇪🇸 Español | `es` | ✅ Full support |
+| 🇷🇺 Русский | `ru` | ✅ Full support |
+| 🇫🇷 Français | `fr` | ✅ Full support |
+| 🇨🇳 简体中文 | `zh_CN` | ✅ Full support |
+
+**How it works:**
+1. 🎯 **ChatGPT language priority** — Extension automatically detects and uses your ChatGPT interface language
+2. 🌐 **Browser language fallback** — If ChatGPT language is not set, uses your browser's language
+3. 📖 **Complete localization** — All UI elements, welcome screen, settings, and messages are translated
+
+For more details, see [LOCALIZATION.md](./LOCALIZATION.md)
 
 ---
 
