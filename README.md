@@ -1,7 +1,30 @@
-# Aurora-for-ChatGPT V1.5.5
+# Aurora-for-ChatGPT V1.5.6
+
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT/blob/main/LICENSE)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Coming_Soon-lightgrey.svg)](https://github.com/TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT/pulls)
 
 Bring a **soft, ambient, blurred glow** behind the ChatGPT UI — plus a **chat visibility toggle** and a **legacy composer** option.
 Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
+
+### Quick Install Guide
+
+Clone the repo **OR** Download/Extract the zip $\rightarrow$ Navigate to `chrome://extensions` $\rightarrow$ Enable **Developer mode** $\rightarrow$ Click **Load unpacked** and select the *unpacked* project folder $\rightarrow$ Pin the extension from the puzzle icon.
+
+---
+
+<table align="center">
+<tr>
+<td width="50%">
+  <img src="https://github.com/user-attachments/assets/8c67ef7c-a3e3-449c-b62d-2760f56df9c9" width="100%">
+</td>
+<td width="50%">
+  <video src="https://github.com/user-attachments/assets/a62f3cb9-581f-4625-8c4b-103857338e23" autoplay loop muted width="100%"></video>
+</td>
+</tr>
+</table>
+
+
 
 ---
 
@@ -12,8 +35,30 @@ Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
 * 👁️ **Chat visibility toggle** — hide/show the chat panel instantly
 * 📝 **Legacy composer option** — switch back to the classic `<textarea>` input instead of the new Lexical composer
 * 🌗 **Light mode** — optional light themed variant with quick toggle
+* 🌍 **Multi-language support** — Automatically detects your ChatGPT language (English, Spanish, Russian, French, Chinese)
 * 🪄 **Seamless integration** — blends into the UI without breaking layouts or controls
 * 🔒 **Private** — no network calls, no analytics; settings sync via Chrome’s `storage.sync`
+
+---
+
+## 🌍 Multi-Language Support
+
+Aurora for ChatGPT now supports **5 languages** with intelligent language detection:
+
+| Language | Code | Status |
+|----------|------|--------|
+| 🇬🇧 English | `en` | ✅ Full support |
+| 🇪🇸 Español | `es` | ✅ Full support |
+| 🇷🇺 Русский | `ru` | ✅ Full support |
+| 🇫🇷 Français | `fr` | ✅ Full support |
+| 🇨🇳 简体中文 | `zh_CN` | ✅ Full support |
+
+**How it works:**
+1. 🎯 **ChatGPT language priority** — Extension automatically detects and uses your ChatGPT interface language
+2. 🌐 **Browser language fallback** — If ChatGPT language is not set, uses your browser's language
+3. 📖 **Complete localization** — All UI elements, welcome screen, settings, and messages are translated
+
+For more details, see [LOCALIZATION.md](./LOCALIZATION.md)
 
 ---
 
@@ -55,16 +100,12 @@ This section will be updated once the extension is published on the Chrome Web S
 ---
 
 ## Permissions
-
-```json
 "permissions": ["storage"],
 "host_permissions": [
   "https://chatgpt.com/*",
-  "https://chat.openai.com/*"
+  "https://chat.openai.com/*",
   "https://openai.com/*"
 ]
-```
-
 * **storage** — to remember your Aurora, chat toggle, and composer settings
 * **host\_permissions** — to run only on ChatGPT pages
 
@@ -79,6 +120,16 @@ No data leaves your machine.
 * Legacy composer mode swaps out the Lexical `contenteditable` for a `<textarea>` fallback — with proper event hooks for sending messages.
 * All toggles update instantly with minimal DOM mutation for performance safety.
 
+## Star History
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT&type=Date" width="500" />
+  </picture>
+</p>
+
 ---
 
 ## License
@@ -92,5 +143,3 @@ Branding & icons © 2025 **test\_tm7873**. All rights reserved.
 
 Made by **@test\_tm7873** on X.
 Thanks to everyone who likes their AI chats… just a bit more magical. ✨
-
----

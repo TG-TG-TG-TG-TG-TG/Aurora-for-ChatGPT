@@ -3,7 +3,7 @@
 const DEFAULTS = {
   legacyComposer: false,
   theme: 'auto',
-  appearance: 'dimmed',
+  appearance: 'clear',
   hideGpt5Limit: false,
   hideUpgradeButtons: false,
   disableAnimations: false,
@@ -17,15 +17,28 @@ const DEFAULTS = {
   hideSoraButton: false,
   voiceColor: 'default',
   cuteVoiceUI: false,
-  showInNewChatsOnly: false
+  showInNewChatsOnly: false,
+  hasSeenWelcomeScreen: false,
+  defaultModel: ''
 };
 
-// On install or update, ensure all settings have a value.
-// This is crucial for adding new settings in future updates.
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.get(DEFAULTS, (settings) => {
-    chrome.storage.sync.set(settings);
-  });
+chrome.runtime.onInstalled.addListener((details) => {
+  // --- NEW LOGIC ---
+  if (details.reason === 'install') {
+    // This is a fresh installation.
+    // Set the defaults directly, ignoring anything that might be in storage.
+    chrome.storage.sync.set(DEFAULTS, () => {
+      console.log('Aurora Extension: First install, defaults set.');
+    });
+  } else if (details.reason === 'update') {
+    // This is an update.
+    // Merge existing settings with any new defaults that have been added.
+    chrome.storage.sync.get(DEFAULTS, (settings) => {
+      chrome.storage.sync.set(settings, () => {
+        console.log('Aurora Extension: Updated, settings preserved and merged.');
+      });
+    });
+  }
 });
 
 // Listen for requests from other parts of the extension (popup, content script).
