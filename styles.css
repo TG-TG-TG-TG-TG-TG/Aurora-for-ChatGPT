@@ -322,6 +322,9 @@ html.cgpt-focus-mode-on main .flex.h-full.flex-col { padding-top: 1.25rem; }
 /* --- Misc & Animations --- */
 .cgpt-hide-gpt5-limit, .cgpt-hide-upgrade, .cgpt-hide-sora, .cgpt-hide-gpts { display: none !important; }
 .bg-red-500.text-white.border-red-500 { display: none !important; }
+
+/* --- FIX: Hide Duplicated Header (Perplexity Comet) --- */
+div.draggable.h-header-height.bg-token-bg-primary { display: none !important; }
 @keyframes aurora-menu-open { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 @keyframes aurora-menu-close { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
 html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled) :is(.popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="open"], .popover[role="dialog"][class*="md:max-w-"][data-state="open"]) { animation: aurora-menu-open 300ms cubic-bezier(0.16, 1, 0.3, 1); }
