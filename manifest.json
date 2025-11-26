@@ -31,8 +31,8 @@
         "https://chatgpt.com/*",
         "https://openai.com/*"
       ],
-      "js": ["i18n-loader.js", "content.js"],
-      "css": ["styles.css", "sidebar.css", "quick-settings.css"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
       "run_at": "document_start"
     }
   ],

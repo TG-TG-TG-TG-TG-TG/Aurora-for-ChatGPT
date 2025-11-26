@@ -129,47 +129,47 @@ const SELECTORS = {
   }
 
 function manageUpgradeButtons() {
-    const upgradeElements = [];
+    const upgradeElements = [
+        getCachedElement('upgradePanelButton', () => Array.from(document.querySelectorAll(SELECTORS.UPGRADE_MENU_ITEM)).find(el => el.textContent.toLowerCase().includes('upgrade'))),
+        getCachedElement('upgradeTopButtonContainer', () => document.querySelector(SELECTORS.UPGRADE_TOP_BUTTON_CONTAINER)),
+        getCachedElement('upgradeProfileButton', () => document.querySelector(SELECTORS.UPGRADE_PROFILE_BUTTON_TRAILING_ICON)),
+        getCachedElement('upgradeNewSidebarButton', () => Array.from(document.querySelectorAll(SELECTORS.UPGRADE_SIDEBAR_BUTTON)).find(el => el.textContent.toLowerCase().includes('upgrade'))),
+        getCachedElement('upgradeTinySidebarIcon', () => document.querySelector(SELECTORS.UPGRADE_TINY_SIDEBAR_ICON)),
+        getCachedElement('upgradeBottomBanner', () => {
+            const banner = Array.from(document.querySelectorAll(SELECTORS.UPGRADE_BOTTOM_BANNER))
+              .find(el => el.textContent?.toLowerCase().includes('upgrade your plan'));
+            return banner ? banner.parentElement : null;
+        }),
+        getCachedElement('upgradeAccountSection', () => {
+            const allSettingRows = document.querySelectorAll(SELECTORS.UPGRADE_SETTINGS_ROW_CONTAINER);
+            for (const row of allSettingRows) {
+                const rowText = row.textContent || '';
+                const hasUpgradeTitle = rowText.includes('Get ChatGPT Plus') || rowText.includes('Get ChatGPT Go');
+                const hasUpgradeButton = Array.from(row.querySelectorAll('button')).some(btn => btn.textContent.trim() === 'Upgrade');
+                if (hasUpgradeTitle && hasUpgradeButton) {
+                    return row;
+                }
+            }
+            return null;
+        }),
+        getCachedElement('upgradeGoHeaderButton', () => document.querySelector('.inline-flex.items-center.gap-1.rounded-full.dark\\:bg-\\[\\#373669\\]'))
+    ];
 
-    const panelButton = Array.from(document.querySelectorAll(SELECTORS.UPGRADE_MENU_ITEM)).find(el => el.textContent.toLowerCase().includes('upgrade'));
-    upgradeElements.push(panelButton);
-
-    const topButtonContainer = document.querySelector(SELECTORS.UPGRADE_TOP_BUTTON_CONTAINER);
-    upgradeElements.push(topButtonContainer);
-
-    const profileButtonUpgrade = document.querySelector(SELECTORS.UPGRADE_PROFILE_BUTTON_TRAILING_ICON);
-    upgradeElements.push(profileButtonUpgrade);
-    
-    const newSidebarUpgradeButton = Array.from(document.querySelectorAll(SELECTORS.UPGRADE_SIDEBAR_BUTTON)).find(el => el.textContent.toLowerCase().includes('upgrade'));
-    upgradeElements.push(newSidebarUpgradeButton);
-    
-    const tinySidebarUpgradeIcon = document.querySelector(SELECTORS.UPGRADE_TINY_SIDEBAR_ICON);
-    upgradeElements.push(tinySidebarUpgradeIcon);
-
-    const bottomBannerUpgrade = Array.from(document.querySelectorAll(SELECTORS.UPGRADE_BOTTOM_BANNER))
-      .find(el => el.textContent?.toLowerCase().includes('upgrade your plan'));
-    if (bottomBannerUpgrade) {
-      // The element to hide is the parent container of the button.
-      upgradeElements.push(bottomBannerUpgrade.parentElement);
-    }
-
-    const allSettingRows = document.querySelectorAll(SELECTORS.UPGRADE_SETTINGS_ROW_CONTAINER);
-    for (const row of allSettingRows) {
-        const rowText = row.textContent || '';
-        const hasUpgradeTitle = rowText.includes('Get ChatGPT Plus') || rowText.includes('Get ChatGPT Go');
-        const hasUpgradeButton = Array.from(row.querySelectorAll('button')).some(btn => btn.textContent.trim() === 'Upgrade');
-
-        if (hasUpgradeTitle && hasUpgradeButton) {
-            upgradeElements.push(row);
-        }
-    }
-
-    toggleClassForElements(upgradeElements, HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
+    // The .filter(Boolean) step removes any null/undefined values from the array,
+    // preventing errors if an element is not found on the page.
+    toggleClassForElements(upgradeElements.filter(Boolean), HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
   }
 
   function manageSidebarButtons() {
-    toggleClassForElements([document.getElementById(SELECTORS.SORA_BUTTON_ID)], HIDE_SORA_CLASS, settings.hideSoraButton);
-    toggleClassForElements([document.querySelector(SELECTORS.GPTS_BUTTON)], HIDE_GPTS_CLASS, settings.hideGptsButton);
+    const soraButton = getCachedElement('soraButton', () => document.getElementById(SELECTORS.SORA_BUTTON_ID));
+    if (soraButton) {
+        soraButton.classList.toggle(HIDE_SORA_CLASS, settings.hideSoraButton);
+    }
+
+    const gptsButton = getCachedElement('gptsButton', () => document.querySelector(SELECTORS.GPTS_BUTTON));
+    if (gptsButton) {
+        gptsButton.classList.toggle(HIDE_GPTS_CLASS, settings.hideGptsButton);
+    }
   }
 
   const isChatPage = () => location.pathname.startsWith('/c/');
@@ -410,7 +410,7 @@ function manageUpgradeButtons() {
     };
 
     const updateSelectorState = (value) => {
-      const selectedOption = voiceColorOptions.find(opt => opt.value === value) || voiceColorOptions[0];
+      const selectedOption = voiceColorOptions.find(opt => opt.value === value) || voiceColorOptions;
       triggerDot.style.backgroundColor = selectedOption.color;
       triggerLabel.textContent = resolveVoiceLabel(selectedOption);
       renderVoiceOptions(value);
@@ -784,6 +784,51 @@ function manageUpgradeButtons() {
     });
   }
 
+  // NEW: Selectors for the Unified Glass Engine
+  const GLASS_SELECTORS = [
+    /* Popups, Menus, Dialogs */
+    '.popover.bg-token-main-surface-primary[data-radix-menu-content]',
+    '.popover.bg-token-main-surface-primary[role="dialog"]',
+    'div[role="dialog"][class*="shadow-long"]',
+    '.popover.bg-token-main-surface-primary.max-w-xs',
+    'div.sticky.top-14.bg-token-main-surface-primary',
+    'div[role="dialog"]:has(input#search[placeholder="Search GPTs"])',
+    'textarea.bg-token-main-surface-primary.border-token-border-default',
+    '.bg-token-main-surface-primary.sticky.top-\\[-1px\\]',
+    /* Composer & Code Blocks */
+    'form[data-type="unified-composer"] > div > div',
+    'div[data-message-author-role="assistant"] pre > div[class*="bg-"]',
+    /* Buttons & UI Elements */
+    '#cgpt-qs-panel',
+    'div.bg-token-bg-primary.w-full.block:has(ul.divide-y)',
+    '.py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary',
+    '.divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1',
+    '.active\\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn',
+    '.shrink-0.btn-secondary.relative.btn',
+    '.shrink-0.btn-danger-outline.relative.btn',
+    '.justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn',
+    '.hover\\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary',
+    '.p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary',
+    '.p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary',
+    '.p-3.border.rounded-\\[10px\\].w-full.btn-secondary',
+    '[role="tooltip"]'
+  ];
+
+  // A single, combined selector that efficiently finds only untagged elements.
+  const UNTAGGED_GLASS_SELECTOR = GLASS_SELECTORS.map(s => `${s}:not([data-aurora-glass="true"])`).join(',');
+
+  /**
+   * Applies a data-attribute to elements that should have a glass effect.
+   * This is more robust and maintainable than a massive CSS :is() selector.
+   * It only queries for and processes elements that have not already been tagged.
+   */
+  function applyGlassEffects() {
+    const elements = document.querySelectorAll(UNTAGGED_GLASS_SELECTOR);
+    for (const el of elements) {
+      el.dataset.auroraGlass = 'true';
+    }
+  }
+
   function applyAllSettings() {
     if (shouldShow()) {
       showBg();
@@ -806,6 +851,7 @@ function manageUpgradeButtons() {
     manageGpt5LimitPopup();
     manageUpgradeButtons();
     manageSidebarButtons();
+    applyGlassEffects();
     maybeApplyDefaultModel();
   }
 
@@ -863,6 +909,7 @@ function manageUpgradeButtons() {
     const domObserver = new MutationObserver(() => {
       // Run the upgrade button check immediately on every DOM change to prevent the menu item from flickering.
       manageUpgradeButtons();
+      applyGlassEffects(); // Efficiently tag newly added elements for glass effect
       
       // Run the less-critical checks on a debounce timer.
       debouncedOtherChecks();
@@ -975,11 +1022,18 @@ function manageUpgradeButtons() {
           }
 
           if (welcomeContainer) {
-              // Fade out the main modal, then show the first setup bar
+              // Animate the center screen out (downwards)
+              welcomeContainer.classList.add('exiting');
+              
+              // Trigger the bottom bar entrance slightly earlier for a seamless crossover
+              setTimeout(() => {
+                  if (styleBar) styleBar.classList.add('active');
+              }, 150);
+
+              // Remove the center screen after animation completes
               setTimeout(() => {
                   welcomeContainer.style.display = 'none';
-                  if (styleBar) styleBar.classList.add('active');
-              }, 400); 
+              }, 500); 
           } else {
             if (styleBar) styleBar.classList.add('active');
           }
@@ -1084,6 +1138,25 @@ function manageUpgradeButtons() {
   if (chrome?.runtime?.sendMessage) {
     // This function will be our single point of entry for processing settings updates.
     let welcomeScreenChecked = false;
+
+const uiCache = {}; // Global cache for frequently accessed UI elements
+
+  /**
+   * A helper function to get an element from the cache or query the DOM if it's not present/valid.
+   * @param {string} key - The key to use for caching the element.
+   * @param {function(): HTMLElement | null} queryFn - A function that queries the DOM for the element.
+   * @returns {HTMLElement | null} The cached or newly queried element.
+   */
+  function getCachedElement(key, queryFn) {
+    // Return the cached element if it exists and is still connected to the DOM
+    if (uiCache[key] && uiCache[key].isConnected) {
+      return uiCache[key];
+    }
+    // Otherwise, query for the element, cache it, and return it
+    const element = queryFn();
+    uiCache[key] = element;
+    return element;
+  }
 
 
 const refreshSettingsAndApply = () => {

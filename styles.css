@@ -122,68 +122,18 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(.popover[data-radix-menu-con
 
 /* --- UNIFIED GLASS ENGINE --- */
 /* This is the master selector for ALL elements that receive a glass effect. */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(
-  /* Popups, Menus, Dialogs */
-  .popover.bg-token-main-surface-primary[data-radix-menu-content],
-  .popover.bg-token-main-surface-primary[role="dialog"],
-  div[role="dialog"][class*="shadow-long"],
-  .popover.bg-token-main-surface-primary.max-w-xs,
-  div.sticky.top-14.bg-token-main-surface-primary,
-  div[role="dialog"]:has(input#search[placeholder="Search GPTs"]),
-  textarea.bg-token-main-surface-primary.border-token-border-default,
-  .bg-token-main-surface-primary.sticky.top-\[-1px\],
-  /* Composer & Code Blocks */
-  form[data-type="unified-composer"] > div > div,
-  div[data-message-author-role="assistant"] pre > div[class*="bg-"],
-  /* Buttons & UI Elements */
-  #cgpt-qs-panel,
-  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary,
-  .py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary,
-  .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1,
-  .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn,
-  .shrink-0.btn-secondary.relative.btn,
-  .shrink-0.btn-danger-outline.relative.btn,
-  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
-  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary,
-  .p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary,
-  .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary,
-  .p-3.border.rounded-\[10px\].w-full.btn-secondary
-) {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [data-aurora-glass="true"] {
   /* Default: "Dimmed" Glass Style */
   background: var(--composer-bg) !important;
   border: 1px solid var(--composer-border) !important;
   box-shadow: var(--composer-shadow) !important;
   -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
   backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
-  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Override for "Clear" Glass Style */
-html.cgpt-ambient-on.cgpt-appearance-clear:not(.cgpt-legacy-composer) :is(
-  /* The same master selector */
-  .popover.bg-token-main-surface-primary[data-radix-menu-content],
-  .popover.bg-token-main-surface-primary[role="dialog"],
-  div[role="dialog"][class*="shadow-long"],
-  .popover.bg-token-main-surface-primary.max-w-xs,
-  div.sticky.top-14.bg-token-main-surface-primary,
-  div[role="dialog"]:has(input#search[placeholder="Search GPTs"]),
-  textarea.bg-token-main-surface-primary.border-token-border-default,
-  .bg-token-main-surface-primary.sticky.top-\[-1px\],
-  form[data-type="unified-composer"] > div > div,
-  div[data-message-author-role="assistant"] pre > div[class*="bg-"],
-  #cgpt-qs-panel,
-  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary,
-  .py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary,
-  .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1,
-  .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn,
-  .shrink-0.btn-secondary.relative.btn,
-  .shrink-0.btn-danger-outline.relative.btn,
-  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
-  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary,
-  .p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary,
-  .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary,
-  .p-3.border.rounded-\[10px\].w-full.btn-secondary
-) {
+html.cgpt-ambient-on.cgpt-appearance-clear:not(.cgpt-legacy-composer) [data-aurora-glass="true"] {
   background: var(--clear-bg) !important;
   border: 1px solid var(--clear-border) !important;
   box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow) !important;
@@ -192,31 +142,7 @@ html.cgpt-ambient-on.cgpt-appearance-clear:not(.cgpt-legacy-composer) :is(
 }
 
 /* Light Mode Override for "Clear" Glass Style */
-html.cgpt-ambient-on.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) :is(
-  /* The same master selector */
-  .popover.bg-token-main-surface-primary[data-radix-menu-content],
-  .popover.bg-token-main-surface-primary[role="dialog"],
-  div[role="dialog"][class*="shadow-long"],
-  .popover.bg-token-main-surface-primary.max-w-xs,
-  div.sticky.top-14.bg-token-main-surface-primary,
-  div[role="dialog"]:has(input#search[placeholder="Search GPTs"]),
-  textarea.bg-token-main-surface-primary.border-token-border-default,
-  .bg-token-main-surface-primary.sticky.top-\[-1px\],
-  form[data-type="unified-composer"] > div > div,
-  div[data-message-author-role="assistant"] pre > div[class*="bg-"],
-  #cgpt-qs-panel,
-  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary,
-  .py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary,
-  .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1,
-  .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn,
-  .shrink-0.btn-secondary.relative.btn,
-  .shrink-0.btn-danger-outline.relative.btn,
-  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
-  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary,
-  .p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary,
-  .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary,
-  .p-3.border.rounded-\[10px\].w-full.btn-secondary
-) {
+html.cgpt-ambient-on.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) [data-aurora-glass="true"] {
   background: var(--clear-bg-light) !important;
   border-color: var(--clear-border-light) !important;
   box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light) !important;
@@ -245,20 +171,20 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) .shrink-0.btn-danger-outline.rel
  * @description Makes the inner buttons of suggestion lists transparent
  *              to reveal the parent's glass effect.
 */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"][class*="flex-col"] button {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"] button {
   background-color: transparent !important;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"][class*="flex-col"] button:hover {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"] button:hover {
   background: var(--menu-item-hover) !important;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"][class*="flex-col"][class*="bg-token-bg-primary"] {
-  /* Smaller radius on top, larger radius on the bottom to match the composer */
+/* Updated to target the wrapper div which now holds the background */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-aurora-glass="true"]:has(> ul[class*="divide-y"]) {
+  /* Add padding and rounded corners for better appearance */
   border-radius: var(--glass-radius) !important;
-  
-  /* A small margin to visually separate it from the composer */
-  margin-top: 2px !important;
+  margin-top: 4px !important;
+  /* Ensure the container doesn't have extra background layers */
 }
 
 /* Code Blocks & Children */
@@ -290,11 +216,59 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="as
     background: color-mix(in oklab, currentColor 10%, transparent) !important;
 }
 
+/* --- Tooltip Polishing --- */
+/* Hide the solid arrow to create a floating glass effect */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="tooltip"] [data-radix-popper-arrow] {
+  display: none !important;
+}
+
+/* 1. Apply Glass to the Tooltip Container (Base & Root .bg-black override) */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="tooltip"],
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="tooltip"].bg-black {
+  background: var(--composer-bg) !important;
+  background-color: var(--composer-bg) !important; /* Explicitly override color */
+  border: 1px solid var(--composer-border) !important;
+  box-shadow: var(--composer-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+/* 2. AGGRESSIVE Child Cleanup (The "Nuclear" Fix) */
+/* Forces ANY child element (div, span, etc.) inside the tooltip to be transparent.
+   This overrides nested .bg-black, .bg-gray-900, .bg-token-*, etc. */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="tooltip"] * {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Clear Appearance Override (Root) */
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) [role="tooltip"],
+html.cgpt-appearance-clear:not(.cgpt-legacy-composer) [role="tooltip"].bg-black {
+  background: var(--clear-bg) !important;
+  background-color: var(--clear-bg) !important;
+  border: 1px solid var(--clear-border) !important;
+  box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+}
+
+/* Clear + Light Mode Override (Root) */
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) [role="tooltip"],
+html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) [role="tooltip"].bg-black {
+  background: var(--clear-bg-light) !important;
+  background-color: var(--clear-bg-light) !important;
+  border-color: var(--clear-border-light) !important;
+  box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light) !important;
+}
+
 /* --- Light Mode Color Overrides --- */
 html.cgpt-ambient-on.cgpt-light-mode body, html.cgpt-ambient-on.cgpt-light-mode [class*="text-token-text-"], html.cgpt-ambient-on.cgpt-light-mode [class*="text-gray-"] { color: var(--theme-text-primary) !important; }
 html.cgpt-ambient-on.cgpt-light-mode svg { color: var(--theme-text-primary) !important; }
 html.cgpt-ambient-on.cgpt-light-mode ::placeholder { color: var(--theme-text-primary) !important; opacity: 0.7; }
-html.cgpt-ambient-on.cgpt-light-mode button { background: transparent !important; border-color: rgba(0, 0, 0, 0.1) !important; color: var(--theme-text-primary) !important; }
+html.cgpt-ambient-on.cgpt-light-mode button:not(#aurora-welcome-overlay *) { background: transparent !important; border-color: rgba(0, 0, 0, 0.1) !important; color: var(--theme-text-primary) !important; }
 html.cgpt-ambient-on.cgpt-light-mode button[role="switch"][data-state="unchecked"] { background-color: rgba(0, 0, 0, 0.15) !important; }
 html.cgpt-ambient-on.cgpt-light-mode button[role="switch"][data-state="checked"] { background-color: #4f8cff !important; }
 html.cgpt-ambient-on.cgpt-light-mode .bg-token-main-surface-primary { background: rgba(255, 255, 255, 0.3) !important; border-color: rgba(0, 0, 0, 0.1) !important; }
@@ -335,8 +309,8 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) div.sticky.content-fade-top:has(
   /* Add padding and rounded corners for better appearance */
   padding: 8px 12px;
   border-radius: var(--glass-radius);
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
 }
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
   background: rgba(18, 18, 18, 0.5) !important;
@@ -407,7 +381,7 @@ html.cgpt-appearance-clear #aurora-welcome-overlay .content-panel {
 #aurora-welcome-overlay h1 { color: var(--theme-text-primary); font-size: 32px; font-weight: 600; margin: 0 0 12px 0; }
 #aurora-welcome-overlay p { font-size: 16px; color: var(--theme-text-secondary); line-height: 1.6; margin: 0 0 24px 0; }
 #aurora-welcome-overlay .welcome-btn { font-family: inherit; font-size: 16px; font-weight: 500; padding: 12px 24px; border-radius: 12px; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease; width: 100%; margin-top: 16px; }
-#aurora-welcome-overlay .welcome-btn.primary { background-color: #4f8cff; color: white !important; }
+#aurora-welcome-overlay .welcome-btn.primary { background-color: #4f8cff !important; color: white !important; }
 #aurora-welcome-overlay .welcome-btn:hover { transform: scale(1.02); }
 
 /* --- Setup Bar --- */
@@ -475,9 +449,9 @@ html.cgpt-light-mode .aurora-setup-bar .preset-tile:hover { background: rgba(0,0
 .aurora-setup-bar .preview.animated { background: linear-gradient(45deg, #ff99c8, #a9d6ff, #fcf6bd); }
 .aurora-setup-bar .preview.grok { background-image: url('chrome-extension://__MSG_@@extension_id__/Aurora/grok-4.webp'); }
 .aurora-setup-bar .preview.blue { background-color: #3b82f6; }
-.aurora-setup-bar .pill-group { display: flex; gap: 8px; background: rgba(0,0,0,0.2); border-radius: 99px; padding: 4px; }
+.aurora-setup-bar .pill-group { display: flex; gap: 8px; background: rgba(0,0,0,0.2); border-radius: 999px; padding: 4px; }
 html.cgpt-light-mode .aurora-setup-bar .pill-group { background: rgba(0,0,0,0.1); }
-.aurora-setup-bar .pill-btn { flex-grow: 1; border: none; background: transparent; color: var(--theme-text-secondary) !important; font-family: inherit; font-size: 14px; padding: 8px 16px; border-radius: 99px; cursor: pointer; transition: all 0.2s ease; }
+.aurora-setup-bar .pill-btn { flex-grow: 1; border: none; background: transparent; color: var(--theme-text-secondary) !important; font-family: inherit; font-size: 14px; padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: all 0.2s ease; }
 .aurora-setup-bar .pill-btn.active { background: rgba(255, 255, 255, 0.15); color: var(--theme-text-primary) !important; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 html.cgpt-light-mode .aurora-setup-bar .pill-btn.active { background: rgba(255, 255, 255, 0.5); }
 .aurora-setup-bar .finish-button { width: auto; margin-top: 0; }
@@ -498,3 +472,514 @@ html.cgpt-light-mode .aurora-setup-bar .track { background: rgba(0,0,0,0.2); }
 .aurora-setup-bar .thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
 .aurora-setup-bar input:checked + .track .thumb { transform: translateX(18px); }
 #aurora-voice-bar { flex-direction: column; align-items: flex-start; gap: 12px; min-width: 420px; }
+
+/* --- Sidebar Styles --- */
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
+  position: relative;
+  background: transparent !important;
+  border-radius: var(--glass-radius);
+  overflow: hidden;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .bg-token-bg-elevated-secondary,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-bg-"]:not([class*="bg-token-bg-elevated-secondary"]),
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-surface"] {
+  background-color: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--sidebar-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  box-shadow: inset -1px 0 0 var(--sidebar-glass-stroke), var(--sidebar-glass-shadow);
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky {
+  position: sticky;
+  isolation: isolate;
+  background: transparent !important;
+  border-radius: var(--glass-radius);
+  contain: paint;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--sidebar-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  box-shadow: 0 1px 0 var(--sidebar-sticky-highlight) inset, var(--sidebar-glass-shadow);
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky > *,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .hover\:bg-token-surface-hover:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .focus-visible\:bg-token-surface-hover:focus-visible {
+  background-color: color-mix(in oklab, currentColor 7%, transparent) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--sidebar-gradient-overlay);
+}
+
+/* --- Activity Flyout Glass Treatment --- */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .bg-token-sidebar-surface-primary:has(section[data-testid="screen-threadFlyOut"]) {
+  background-color: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] {
+  position: relative;
+  border-radius: var(--activity-glass-radius, var(--glass-radius, 18px));
+  isolation: isolate;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-inline-start-color: var(--activity-glass-stroke, var(--sidebar-glass-stroke));
+  border-inline-start-style: solid;
+  background-color: var(--activity-glass-bg, var(--sidebar-glass-bg)) !important;
+  background-image: var(--activity-gradient-overlay, var(--sidebar-gradient-overlay));
+  background-repeat: no-repeat;
+  background-origin: border-box;
+  -webkit-backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  box-shadow: inset -1px 0 0 var(--activity-glass-stroke, var(--sidebar-glass-stroke)), var(--activity-glass-shadow, var(--sidebar-glass-shadow));
+  --activity-header-divider: color-mix(in srgb, var(--activity-glass-stroke, rgba(255,255,255,0.2)) 65%, transparent);
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] :is(.bg-token-bg-elevated-secondary, [class*="bg-token-bg-"], [class*="bg-token-surface"], [class*="bg-token-main-surface"], .bg-primary) {
+  background-color: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] :is(.border-token-border-sharp, .dark\:border-token-main-surface-secondary) {
+  border-color: var(--activity-header-divider, var(--activity-glass-stroke, rgba(255,255,255,0.16))) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .tall\:sticky {
+  position: sticky;
+  isolation: isolate;
+  background: transparent !important;
+  border-radius: var(--activity-glass-radius, var(--glass-radius, 18px));
+  contain: paint;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky::before,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .tall\:sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--activity-glass-bg, var(--sidebar-glass-bg));
+  -webkit-backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  box-shadow: 0 1px 0 var(--sidebar-sticky-highlight) inset, var(--activity-glass-shadow, var(--sidebar-glass-shadow));
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky > *,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .tall\:sticky > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .hover\:bg-token-surface-hover:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .focus-visible\:bg-token-surface-hover:focus-visible {
+  background-color: color-mix(in oklab, currentColor 7%, transparent) !important;
+}
+
+/* --- Clear Glass (Liquid Effect) Override for Sidebar --- */
+html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
+  --sidebar-glass-radius: 18px; /* Slightly more rounded */
+  --sidebar-glass-blur: 28px;
+  --sidebar-glass-sat: 180%;
+  --sidebar-glass-bg: rgba(18, 18, 18, 0.15);
+  --sidebar-glass-stroke: rgba(255, 255, 255, 0.2);
+  --sidebar-glass-shadow: 0 16px 70px rgba(0, 0, 0, 0.55);
+}
+
+html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before {
+  box-shadow: inset 0 0 2px 0 rgba(255,255,255,0.08), var(--sidebar-glass-shadow);
+  transition: background 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Light mode overrides for clear/liquid sidebar */
+html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
+  --sidebar-glass-bg: rgba(255, 255, 255, 0.3);
+  --sidebar-glass-stroke: rgba(0, 0, 0, 0.15);
+  --sidebar-glass-shadow: 0 16px 60px rgba(0, 0, 0, 0.25);
+}
+html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before {
+  box-shadow: inset 0 0 2px 0 rgba(255,255,255,0.25), var(--sidebar-glass-shadow);
+}
+
+/* --- Clear Glass Override for Activity Flyout --- */
+html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] {
+  --activity-glass-radius: 18px;
+  --activity-glass-blur: 28px;
+  --activity-glass-sat: 180%;
+  --activity-glass-bg: rgba(18, 18, 18, 0.15);
+  --activity-glass-stroke: rgba(255, 255, 255, 0.2);
+  --activity-glass-shadow: 0 16px 70px rgba(0, 0, 0, 0.55);
+  transition: background-color 0.4s ease, background-image 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, box-shadow 0.4s ease;
+}
+
+html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] {
+  --activity-glass-bg: rgba(255, 255, 255, 0.3);
+  --activity-glass-stroke: rgba(0, 0, 0, 0.15);
+  --activity-glass-shadow: 0 16px 60px rgba(0, 0, 0, 0.25);
+}
+
+/* --- Quick Settings Styles --- */
+
+#cgpt-qs-btn {
+  position: fixed;
+  bottom: 12px;
+  right: 16px;
+  z-index: 99998;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(30, 30, 30, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+#cgpt-qs-btn:hover { transform: scale(1.08); }
+#cgpt-qs-btn svg { width: 20px; height: 20px; color: white; opacity: 0.9; }
+html.cgpt-light-mode #cgpt-qs-btn {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(0,0,0,0.1);
+}
+html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
+
+/* Keyframe animations for the panel */
+@keyframes qs-panel-open {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes qs-panel-close {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+#cgpt-qs-panel {
+  position: fixed;
+  bottom: 60px;
+  right: 16px;
+  z-index: 99997;
+  width: 260px;
+  /* Dynamic Glass Style (Dimmed by default) */
+  background: var(--composer-bg);
+  border: 1px solid var(--composer-border);
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--composer-shadow);
+  /* End of New Style */
+  border-radius: 14px;
+  padding: 8px;
+  transform-origin: bottom right;
+  color: #fff;
+  /* Add transitions for smooth style changes */
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, 
+              backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
+  /* Panel is hidden by default through its data-state */
+}
+
+html.cgpt-light-mode #cgpt-qs-panel {
+    background: rgba(242, 242, 247, 0.8);
+    border-color: rgba(0,0,0,0.1);
+    box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.7), 0 16px 40px rgba(0,0,0,0.15);
+    color: #000;
+}
+
+/* Clear Appearance Override */
+html.cgpt-appearance-clear #cgpt-qs-panel {
+  background: var(--clear-bg);
+  border: 1px solid var(--clear-border);
+  box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow);
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode #cgpt-qs-panel {
+  background: var(--clear-bg-light);
+  border-color: var(--clear-border-light);
+  box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light);
+}
+
+/* State-based animation styling */
+#cgpt-qs-panel[data-state="closed"] {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+#cgpt-qs-panel[data-state="open"] {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+  visibility: visible;
+  animation: qs-panel-open 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#cgpt-qs-panel[data-state="closing"] {
+  pointer-events: none;
+  visibility: visible;
+  /* `forwards` will hold the `to` state of the animation */
+  animation: qs-panel-close 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.qs-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  opacity: 0.6;
+  padding: 8px 8px 4px;
+}
+.qs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+.qs-row:hover { background: rgba(255, 255, 255, 0.08); }
+html.cgpt-light-mode .qs-row:hover { background: rgba(0,0,0,0.06); }
+.qs-row > label { font-size: 13px; opacity: 0.95; }
+
+.qs-row .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
+.qs-row .switch input { display: none; }
+.qs-row .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(0,0,0,0.3); transition: background .2s ease; }
+html.cgpt-light-mode .qs-row .track { background: rgba(0,0,0,0.2); }
+.qs-row input:checked + .track { background: #4f8cff; }
+.qs-row .thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
+.qs-row input:checked + .track .thumb { transform: translateX(18px); }
+
+.qs-custom-select {
+  position: relative;
+  max-width: 150px;
+  width: 100%;
+}
+.qs-select-trigger {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  gap: 8px;
+  transition: background-color 0.2s ease, transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+html.cgpt-light-mode .qs-select-trigger {
+  border-color: rgba(0, 0, 0, 0.08);
+  background-color: rgba(0, 0, 0, 0.03);
+}
+.qs-select-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.02);
+}
+html.cgpt-light-mode .qs-select-trigger:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+.qs-select-trigger > .qs-select-label {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qs-select-trigger svg {
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+.qs-select-trigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.qs-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+html:not(.cgpt-light-mode) .qs-color-dot {
+  border-color: rgba(255,255,255,0.1);
+}
+.qs-select-options {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  z-index: 99999;
+  min-width: 170px;
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  /* Dynamic Glass Style (Dimmed by default) */
+  background: var(--composer-bg);
+  border: 1px solid var(--composer-border);
+  box-shadow: var(--composer-shadow);
+  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
+  /* End of New Style */
+  border-radius: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.qs-select-options::-webkit-scrollbar {
+  display: none;
+}
+html.cgpt-light-mode .qs-select-options {
+  /* This rule is now empty as variables handle light mode */
+}
+
+/* Clear Appearance Override for Dropdown */
+html.cgpt-appearance-clear .qs-select-options {
+  background: var(--clear-bg);
+  border: 1px solid var(--clear-border);
+  box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow);
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode .qs-select-options {
+  background: var(--clear-bg-light);
+  border-color: var(--clear-border-light);
+  box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light);
+}
+
+.qs-select-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+.qs-select-option:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+html.cgpt-light-mode .qs-select-option:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.qs-select-option[aria-selected="true"] {
+  font-weight: 500;
+}
+.qs-select-option .qs-checkmark {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  opacity: 0;
+}
+.qs-select-option[aria-selected="true"] .qs-checkmark {
+  opacity: 1;
+}
+
+.qs-pill-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+}
+html.cgpt-light-mode .qs-pill-group {
+  border-color: rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.05);
+}
+.qs-pill {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 250ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, box-shadow;
+}
+.qs-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+html.cgpt-light-mode .qs-pill:hover {
+  background: rgba(0,0,0,0.08);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.qs-pill.active {
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+}
+html.cgpt-light-mode .qs-pill.active {
+  background: rgba(0,0,0,0.12);
+}
