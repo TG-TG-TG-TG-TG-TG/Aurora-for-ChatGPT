@@ -19,8 +19,13 @@ const DEFAULTS = {
   cuteVoiceUI: false,
   showInNewChatsOnly: false,
   hasSeenWelcomeScreen: false,
-  defaultModel: ''
+  defaultModel: '',
+  customFont: 'system',
+  showTokenCounter: false,
+  blurChatHistory: false,
+  blurAvatar: false
 };
+
 
 chrome.runtime.onInstalled.addListener((details) => {
   // --- NEW LOGIC ---
