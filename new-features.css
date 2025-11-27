@@ -1,0 +1,123 @@
+/* === Aurora Extension - New Features CSS === */
+
+/* Custom Fonts Support */
+html.cgpt-ambient-on[data-custom-font="inter"] * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+html.cgpt-ambient-on[data-custom-font="roboto"] * {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+html.cgpt-ambient-on[data-custom-font="montserrat"] * {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+html.cgpt-ambient-on[data-custom-font="opensans"] * {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+html.cgpt-ambient-on[data-custom-font="poppins"] * {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ===== STREAMER MODE - BLUR EFFECTS ===== */
+
+/* Blur Chat History */
+html.cgpt-ambient-on.cgpt-blur-chat-history .flex-shrink-0[class*="bg-token-sidebar-surface-primary"] nav,
+html.cgpt-ambient-on.cgpt-blur-chat-history #stage-slideover-sidebar nav {
+    filter: blur(10px);
+    transition: filter 0.3s ease;
+}
+
+html.cgpt-ambient-on.cgpt-blur-chat-history .flex-shrink-0[class*="bg-token-sidebar-surface-primary"] nav:hover,
+html.cgpt-ambient-on.cgpt-blur-chat-history #stage-slideover-sidebar nav:hover {
+    filter: blur(0px);
+}
+
+/* Blur Avatar */
+html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"] img,
+html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"] [class*="avatar"],
+html.cgpt-ambient-on.cgpt-blur-avatar [class*="profile"] img {
+    filter: blur(12px);
+    transition: filter 0.3s ease;
+}
+
+html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"]:hover img,
+html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"]:hover [class*="avatar"] {
+    filter: blur(0px);
+}
+
+/* ===== TOKEN/WORD COUNTER ===== */
+#aurora-token-counter {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    z-index: 99996;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: var(--composer-bg);
+    border: 1px solid var(--composer-border);
+    box-shadow: var(--composer-shadow);
+    -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+    color: var(--theme-text-primary);
+    font-size: 12px;
+    font-weight: 500;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+#aurora-token-counter.visible {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+html.cgpt-light-mode #aurora-token-counter {
+    background: rgba(242, 242, 247, 0.85);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #000;
+}
+
+html.cgpt-appearance-clear #aurora-token-counter {
+    background: var(--clear-bg);
+    border: 1px solid var(--clear-border);
+    box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow);
+    -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+    backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+}
+
+.token-counter-label {
+    opacity: 0.7;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.token-counter-value {
+    font-weight: 600;
+    font-size: 13px;
+    color: #4f8cff;
+}
+
+html.cgpt-light-mode .token-counter-value {
+    color: #3b7ce8;
+}
+
+.token-counter-separator {
+    width: 1px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+html.cgpt-light-mode .token-counter-separator {
+    background: rgba(0, 0, 0, 0.15);
+}
