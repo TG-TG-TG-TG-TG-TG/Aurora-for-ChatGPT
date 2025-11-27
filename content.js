@@ -1272,6 +1272,9 @@
               manageQuickSettingsUI();
             }
             maybeApplyDefaultModel();
+            if (window.AuroraTokenCounter) {
+              window.AuroraTokenCounter.manage(!!settings.showTokenCounter);
+            }
           });
         } else {
           // Full refresh for background changes or mixed changes
