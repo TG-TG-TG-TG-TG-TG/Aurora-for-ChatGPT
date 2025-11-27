@@ -4,6 +4,9 @@
 let tokenCounterElement = null;
 let textareaObserver = null;
 let currentTextarea = null;
+let currentTextareaListener = null;
+let retryTimeoutId = null;
+let isTokenCounterEnabled = false;
 
 /**
  * Count words in text
@@ -44,6 +47,8 @@ function getOrCreateTokenCounter() {
  * Update counter display
  */
 function updateTokenCounter(text) {
+    if (!isTokenCounterEnabled) return;
+
     const counter = getOrCreateTokenCounter();
     const wordCount = countWords(text);
     const tokenCount = estimateTokens(wordCount);
@@ -92,36 +97,66 @@ function findComposerTextarea() {
     return null;
 }
 
+function detachTextareaListeners() {
+    if (currentTextarea && currentTextareaListener) {
+        currentTextarea.removeEventListener('input', currentTextareaListener);
+        currentTextarea.removeEventListener('change', currentTextareaListener);
+        currentTextarea.removeEventListener('keyup', currentTextareaListener);
+    }
+    currentTextarea = null;
+    currentTextareaListener = null;
+}
+
+function clearMonitoringArtifacts() {
+    if (retryTimeoutId) {
+        clearTimeout(retryTimeoutId);
+        retryTimeoutId = null;
+    }
+    if (textareaObserver) {
+        textareaObserver.disconnect();
+        textareaObserver = null;
+    }
+    detachTextareaListeners();
+}
+
 /**
  * Setup textarea monitoring
  */
 function setupTextareaMonitoring() {
+    if (!isTokenCounterEnabled) return;
+
     const textarea = findComposerTextarea();
 
     if (!textarea) {
         // Retry after a delay if textarea not found
-        setTimeout(setupTextareaMonitoring, 1000);
+        if (retryTimeoutId) clearTimeout(retryTimeoutId);
+        retryTimeoutId = setTimeout(() => {
+            retryTimeoutId = null;
+            setupTextareaMonitoring();
+        }, 1000);
         return;
     }
 
     // Skip if already monitoring this textarea
     if (currentTextarea === textarea) return;
 
+    detachTextareaListeners();
     currentTextarea = textarea;
     console.log('[Aurora Token Counter] Monitoring textarea');
 
     // Update on input
-    const handleInput = () => {
+    currentTextareaListener = () => {
+        if (!isTokenCounterEnabled) return;
         const text = textarea.value || textarea.textContent || '';
         updateTokenCounter(text);
     };
 
-    textarea.addEventListener('input', handleInput);
-    textarea.addEventListener('change', handleInput);
-    textarea.addEventListener('keyup', handleInput);
+    textarea.addEventListener('input', currentTextareaListener);
+    textarea.addEventListener('change', currentTextareaListener);
+    textarea.addEventListener('keyup', currentTextareaListener);
 
     // Initial update
-    handleInput();
+    currentTextareaListener();
 
     // Watch for textarea replacement (ChatGPT may recreate it)
     if (textareaObserver) {
@@ -129,9 +164,9 @@ function setupTextareaMonitoring() {
     }
 
     textareaObserver = new MutationObserver(() => {
+        if (!isTokenCounterEnabled) return;
         const newTextarea = findComposerTextarea();
         if (newTextarea && newTextarea !== currentTextarea) {
-            currentTextarea = null;
             setupTextareaMonitoring();
         }
     });
@@ -147,24 +182,19 @@ function setupTextareaMonitoring() {
  */
 function manageTokenCounter(enabled) {
     console.log('[Aurora Token Counter] Manage:', enabled);
+    isTokenCounterEnabled = enabled;
 
     if (enabled) {
         setupTextareaMonitoring();
     } else {
+        clearMonitoringArtifacts();
+
         // Remove counter
         if (tokenCounterElement) {
             tokenCounterElement.remove();
             tokenCounterElement = null;
             console.log('[Aurora Token Counter] Removed');
         }
-
-        // Disconnect observer
-        if (textareaObserver) {
-            textareaObserver.disconnect();
-            textareaObserver = null;
-        }
-
-        currentTextarea = null;
     }
 }
 
