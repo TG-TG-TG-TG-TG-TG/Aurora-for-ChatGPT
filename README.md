@@ -11,6 +11,13 @@ Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
 
 Clone the repo **OR** Download/Extract the zip $\rightarrow$ Navigate to `chrome://extensions` $\rightarrow$ Enable **Developer mode** $\rightarrow$ Click **Load unpacked** and select the *unpacked* project folder $\rightarrow$ Pin the extension from the puzzle icon.
 
+## ⚡ Heads Up!
+
+> The ChatGPT website has gone through a lot of updates recently.  
+> we are working on fixing most bugs and change related issue.  
+>
+> In the meantime, you can check out the **dev branch** to get early access to the latest fixes and patches. 
+
 ---
 
 <table align="center">
