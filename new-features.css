@@ -41,13 +41,18 @@ html.cgpt-ambient-on.cgpt-blur-chat-history #stage-slideover-sidebar nav:hover {
 /* Blur Avatar */
 html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"] img,
 html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"] [class*="avatar"],
-html.cgpt-ambient-on.cgpt-blur-avatar [class*="profile"] img {
+html.cgpt-ambient-on.cgpt-blur-avatar [class*="profile"] img,
+html.cgpt-ambient-on.cgpt-blur-chat-history [data-testid="accounts-profile-button"] img,
+html.cgpt-ambient-on.cgpt-blur-chat-history [data-testid="accounts-profile-button"] [class*="avatar"],
+html.cgpt-ambient-on.cgpt-blur-chat-history [class*="profile"] img {
     filter: blur(12px);
     transition: filter 0.3s ease;
 }
 
 html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"]:hover img,
-html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"]:hover [class*="avatar"] {
+html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"]:hover [class*="avatar"],
+html.cgpt-ambient-on.cgpt-blur-chat-history [data-testid="accounts-profile-button"]:hover img,
+html.cgpt-ambient-on.cgpt-blur-chat-history [data-testid="accounts-profile-button"]:hover [class*="avatar"] {
     filter: blur(0px);
 }
 

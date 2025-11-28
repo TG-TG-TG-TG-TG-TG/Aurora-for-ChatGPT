@@ -7,17 +7,13 @@ const DEFAULTS = {
   hideGpt5Limit: false,
   hideUpgradeButtons: false,
   disableAnimations: false,
-  disableBgAnimation: false,
   focusMode: false,
   hideQuickSettings: false,
   customBgUrl: '',
   backgroundBlur: '60',
   backgroundScaling: 'cover',
-  hideGptsButton: false,
-  hideSoraButton: false,
   voiceColor: 'default',
   cuteVoiceUI: false,
-  showInNewChatsOnly: false,
   hasSeenWelcomeScreen: false,
   defaultModel: '',
   customFont: 'system',
@@ -25,7 +21,6 @@ const DEFAULTS = {
   blurChatHistory: false,
   blurAvatar: false
 };
-
 
 chrome.runtime.onInstalled.addListener((details) => {
   // --- NEW LOGIC ---
