@@ -7,6 +7,58 @@ let currentTextarea = null;
 let currentTextareaListener = null;
 let retryTimeoutId = null;
 let isTokenCounterEnabled = false;
+let tiktokenModulePromise = null;
+const encoderPromises = {};
+const encoderCache = {};
+let lastCountedText = '';
+let lastTokenCount = 0;
+let lastTokenApproximate = true;
+let updateSequence = 0;
+
+const DEFAULT_ENCODING = 'o200k_base';
+const SECONDARY_ENCODING = 'cl100k_base';
+const ENCODING_HINTS = [
+    { regex: /(gpt-4o|gpt-4\.1|o4|4\.1|4o|o3|o1|gpt-5)/i, encoding: 'o200k_base' },
+    { regex: /(gpt-4|gpt-3\.5|3\.5|turbo|davinci|curie|babbage|ada)/i, encoding: 'cl100k_base' }
+];
+
+// Model Token Limits - comprehensive mapping of model slugs to their token limits
+const MODEL_TOKEN_LIMITS = {
+    'gpt-5': 400000,
+    'gpt-5-mini': 400000,
+    'gpt-5.1': 400000,
+    'gpt-5.1-codex': 400000,
+    'gpt-5.1-codex-mini': 400000,
+    'gpt-5-pro': 400000,
+    'gpt-5-thinking': 400000,
+    'gpt-5-thinking-mini': 400000,
+    'gpt-5-thinking-instant': 400000,
+    'gpt-4o': 128000,
+    'gpt-4o-mini': 128000,
+    'gpt-4.1': 1000000,
+    'gpt-4.1-mini': 1000000,
+    'gpt-4.1-nano': 1000000,
+    'o3': 200000,
+    'o3-mini': 200000,
+    'o4-mini': 200000,
+    'o1': 200000,
+    'o1-pro': 200000,
+    'o1-mini': 128000,
+    'gpt-4': 8192,
+    'gpt-3.5-turbo': 16385,
+    'default': 128000
+};
+
+function getRuntimeUrl(path) {
+    try {
+        if (chrome?.runtime?.getURL) {
+            return chrome.runtime.getURL(path);
+        }
+    } catch (e) {
+        console.warn('[Aurora Token Counter] Could not get runtime URL:', e);
+    }
+    return null;
+}
 
 /**
  * Count words in text
@@ -24,6 +76,144 @@ function estimateTokens(wordCount) {
     return Math.ceil(wordCount * 1.3);
 }
 
+function detectModelLabel() {
+    const button = document.querySelector('[data-testid="model-switcher-dropdown-button"]');
+    if (!button) return '';
+    return (button.getAttribute('aria-label') || button.textContent || '').trim().toLowerCase();
+}
+
+function resolveEncodingName() {
+    const label = detectModelLabel();
+    for (const hint of ENCODING_HINTS) {
+        if (hint.regex.test(label)) return hint.encoding;
+    }
+    return DEFAULT_ENCODING;
+}
+
+/**
+ * Get token limit for the current model
+ */
+function getModelTokenLimit() {
+    const modelLabel = detectModelLabel();
+
+    // Try to find matching model limit
+    for (const [slug, limit] of Object.entries(MODEL_TOKEN_LIMITS)) {
+        if (slug !== 'default') {
+            const hints = ENCODING_HINTS.find(h => h.encoding && h.regex.test(modelLabel));
+            if (hints || modelLabel.includes(slug.replace(/-/g, ' '))) {
+                return limit;
+            }
+        }
+    }
+
+    // Return default if no match found
+    return MODEL_TOKEN_LIMITS['default'];
+}
+
+/**
+ * Calculate percentage of token usage
+ */
+function calculateTokenPercentage(currentTokens) {
+    const limit = getModelTokenLimit();
+    return Math.min(100, (currentTokens / limit) * 100);
+}
+
+/**
+ * Get color class based on token usage percentage
+ */
+function getTokenColorClass(percentage) {
+    if (percentage >= 90) return 'critical';  // Red
+    if (percentage >= 70) return 'warning';   // Orange
+    return 'normal';  // Green/Blue
+}
+
+async function loadTiktokenModule() {
+    if (!tiktokenModulePromise) {
+        const jsUrl = getRuntimeUrl('vendor/tiktoken-lite/tiktoken.js');
+        const wasmUrl = getRuntimeUrl('vendor/tiktoken-lite/tiktoken_bg.wasm');
+
+        tiktokenModulePromise = import(jsUrl).then(async (module) => {
+            await module.init(wasmUrl);
+            return module;
+        }).catch((err) => {
+            console.error('[Aurora Token Counter] Failed to load tiktoken module', err);
+            tiktokenModulePromise = null;
+            throw err;
+        });
+    }
+    return tiktokenModulePromise;
+}
+
+async function getEncoder(encodingName) {
+    if (encoderCache[encodingName]) return encoderCache[encodingName];
+    if (!encoderPromises[encodingName]) {
+        encoderPromises[encodingName] = (async () => {
+            const [{ Tiktoken }, dataModule] = await Promise.all([
+                loadTiktokenModule(),
+                import(getRuntimeUrl(`vendor/tiktoken-lite/encoders/${encodingName}.js`))
+            ]);
+            const data = dataModule.default || dataModule;
+            const encoder = new Tiktoken(data.bpe_ranks, data.special_tokens, data.pat_str);
+            encoderCache[encodingName] = encoder;
+            return encoder;
+        })().catch((err) => {
+            console.error(`[Aurora Token Counter] Failed to init encoder ${encodingName}`, err);
+            delete encoderPromises[encodingName];
+            throw err;
+        });
+    }
+    return encoderPromises[encodingName];
+}
+
+function disposeEncoders() {
+    Object.values(encoderCache).forEach((encoder) => {
+        try {
+            encoder?.free?.();
+        } catch (e) {
+            /* Ignore cleanup errors */
+        }
+    });
+    Object.keys(encoderCache).forEach((key) => delete encoderCache[key]);
+    Object.keys(encoderPromises).forEach((key) => delete encoderPromises[key]);
+    tiktokenModulePromise = null;
+    lastCountedText = '';
+    lastTokenCount = 0;
+    lastTokenApproximate = true;
+}
+
+async function countTokensWithTiktoken(text) {
+    const preferred = resolveEncodingName();
+    const order = preferred === DEFAULT_ENCODING
+        ? [preferred, SECONDARY_ENCODING]
+        : [preferred, DEFAULT_ENCODING];
+
+    for (const encodingName of order) {
+        try {
+            const encoder = await getEncoder(encodingName);
+            const tokens = encoder.encode_ordinary(text);
+            return { count: tokens.length, approximate: false };
+        } catch (err) {
+            console.warn(`[Aurora Token Counter] Encoder ${encodingName} failed, trying fallback`, err);
+        }
+    }
+
+    return { count: estimateTokens(countWords(text)), approximate: true };
+}
+
+function warmupEncoders() {
+    const preferred = resolveEncodingName();
+    getEncoder(preferred)
+        .catch(() => {
+            if (preferred !== DEFAULT_ENCODING) {
+                return getEncoder(DEFAULT_ENCODING);
+            }
+            return null;
+        })
+        .catch(() => {
+            /* Ignore warmup failures */
+        });
+}
+
 /**
  * Create or get token counter element
  */
@@ -32,15 +222,69 @@ function getOrCreateTokenCounter() {
         tokenCounterElement = document.createElement('div');
         tokenCounterElement.id = 'aurora-token-counter';
         tokenCounterElement.innerHTML = `
-      <span class="token-counter-label">Words:</span>
-      <span class="token-counter-value" id="word-count">0</span>
-      <span class="token-counter-separator"></span>
-      <span class="token-counter-label">Tokens:</span>
-      <span class="token-counter-value" id="token-count">~0</span>
+      <div class="token-counter-top">
+        <span class="token-counter-label">Words:</span>
+        <span class="token-counter-value" id="word-count">0</span>
+        <span class="token-counter-separator"></span>
+        <span class="token-counter-label">Tokens:</span>
+        <span class="token-counter-value" id="token-count">0</span>
+      </div>
+      <div class="token-budget-bar-container">
+        <div class="token-budget-bar" id="token-budget-bar">
+          <div class="token-budget-fill" id="token-budget-fill"></div>
+        </div>
+        <span class="token-budget-text" id="token-budget-text">0%</span>
+      </div>
     `;
         document.body.appendChild(tokenCounterElement);
     }
     return tokenCounterElement;
+}
+
+function setCounterVisibility(wordCount) {
+    if (!tokenCounterElement) return;
+    if (wordCount > 0) {
+        tokenCounterElement.classList.add('visible');
+    } else {
+        tokenCounterElement.classList.remove('visible');
+    }
+}
+
+function renderCounter(wordCount, tokenCount, approximate) {
+    const counter = getOrCreateTokenCounter();
+    const wordElement = counter.querySelector('#word-count');
+    const tokenElement = counter.querySelector('#token-count');
+    const budgetFill = counter.querySelector('#token-budget-fill');
+    const budgetText = counter.querySelector('#token-budget-text');
+
+    if (wordElement) wordElement.textContent = wordCount;
+    if (tokenElement) tokenElement.textContent = approximate ? `~${tokenCount}` : `${tokenCount}`;
+
+    // Update budget bar
+    if (budgetFill && budgetText && tokenCount > 0) {
+        const percentage = calculateTokenPercentage(tokenCount);
+        const limit = getModelTokenLimit();
+        const colorClass = getTokenColorClass(percentage);
+
+        budgetFill.style.width = `${Math.min(percentage, 100)}%`;
+        budgetFill.className = `token-budget-fill ${colorClass}`;
+        budgetText.textContent = `${Math.round(percentage)}% of ${(limit / 1000).toFixed(0)}k`;
+    } else if (budgetFill && budgetText) {
+        budgetFill.style.width = '0%';
+        budgetFill.className = 'token-budget-fill normal';
+        budgetText.textContent = '0%';
+    }
+
+    setCounterVisibility(wordCount);
+}
+
+function renderLoading(wordCount) {
+    const counter = getOrCreateTokenCounter();
+    const wordElement = counter.querySelector('#word-count');
+    const tokenElement = counter.querySelector('#token-count');
+    if (wordElement) wordElement.textContent = wordCount;
+    if (tokenElement) tokenElement.textContent = wordCount > 0 ? '...' : '0';
+    setCounterVisibility(wordCount);
 }
 
 /**
@@ -49,22 +293,42 @@ function getOrCreateTokenCounter() {
 function updateTokenCounter(text) {
     if (!isTokenCounterEnabled) return;
 
-    const counter = getOrCreateTokenCounter();
-    const wordCount = countWords(text);
-    const tokenCount = estimateTokens(wordCount);
+    const normalizedText = typeof text === 'string' ? text : '';
+    const wordCount = countWords(normalizedText);
+    const requestId = ++updateSequence;
 
-    const wordElement = counter.querySelector('#word-count');
-    const tokenElement = counter.querySelector('#token-count');
-
-    if (wordElement) wordElement.textContent = wordCount;
-    if (tokenElement) tokenElement.textContent = `~${tokenCount}`;
-
-    // Show/hide based on content
-    if (wordCount > 0) {
-        counter.classList.add('visible');
-    } else {
-        counter.classList.remove('visible');
+    if (!normalizedText.trim()) {
+        lastCountedText = '';
+        lastTokenCount = 0;
+        lastTokenApproximate = false;
+        renderCounter(0, 0, false);
+        return;
     }
+
+    if (normalizedText === lastCountedText) {
+        renderCounter(wordCount, lastTokenCount, lastTokenApproximate);
+        return;
+    }
+
+    renderLoading(wordCount);
+
+    countTokensWithTiktoken(normalizedText)
+        .then(({ count, approximate }) => {
+            if (!isTokenCounterEnabled || requestId !== updateSequence) return;
+            lastCountedText = normalizedText;
+            lastTokenCount = count;
+            lastTokenApproximate = approximate;
+            renderCounter(wordCount, count, approximate);
+        })
+        .catch((err) => {
+            console.error('[Aurora Token Counter] Counting failed, showing estimate', err);
+            if (!isTokenCounterEnabled || requestId !== updateSequence) return;
+            const fallback = estimateTokens(wordCount);
+            lastCountedText = normalizedText;
+            lastTokenCount = fallback;
+            lastTokenApproximate = true;
+            renderCounter(wordCount, fallback, true);
+        });
 }
 
 /**
@@ -185,9 +449,11 @@ function manageTokenCounter(enabled) {
     isTokenCounterEnabled = enabled;
 
     if (enabled) {
+        warmupEncoders();
         setupTextareaMonitoring();
     } else {
         clearMonitoringArtifacts();
+        disposeEncoders();
 
         // Remove counter
         if (tokenCounterElement) {

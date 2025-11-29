@@ -22,6 +22,7 @@ const DEFAULTS = {
   blurAvatar: false
 };
 
+
 chrome.runtime.onInstalled.addListener((details) => {
   // --- NEW LOGIC ---
   if (details.reason === 'install') {

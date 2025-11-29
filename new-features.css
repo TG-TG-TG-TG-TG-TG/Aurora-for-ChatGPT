@@ -24,18 +24,40 @@ html.cgpt-ambient-on[data-custom-font="poppins"] * {
 /* Google Fonts Import */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
-/* ===== STREAMER MODE - BLUR EFFECTS ===== */
+/* ===== STREAMER MODE - IMPROVED BLUR EFFECTS ===== */
 
-/* Blur Chat History */
+/* Blur chat history - sidebar will be blurred by default */
 html.cgpt-ambient-on.cgpt-blur-chat-history .flex-shrink-0[class*="bg-token-sidebar-surface-primary"] nav,
 html.cgpt-ambient-on.cgpt-blur-chat-history #stage-slideover-sidebar nav {
-    filter: blur(10px);
-    transition: filter 0.3s ease;
+    filter: blur(12px);
+    transition: filter 0.2s ease;
 }
 
-html.cgpt-ambient-on.cgpt-blur-chat-history .flex-shrink-0[class*="bg-token-sidebar-surface-primary"] nav:hover,
-html.cgpt-ambient-on.cgpt-blur-chat-history #stage-slideover-sidebar nav:hover {
+/* Remove blur completely when hovering over sidebar */
+html.cgpt-ambient-on.cgpt-blur-chat-history .flex-shrink-0[class*="bg-token-sidebar-surface-primary"]:hover nav,
+html.cgpt-ambient-on.cgpt-blur-chat-history #stage-slideover-sidebar:hover nav {
     filter: blur(0px);
+}
+
+/* Spotlight effect - show only area under cursor (advanced implementation) */
+html.cgpt-ambient-on.cgpt-blur-chat-history .flex-shrink-0[class*="bg-token-sidebar-surface-primary"] nav>*,
+html.cgpt-ambient-on.cgpt-blur-chat-history #stage-slideover-sidebar nav>* {
+    position: relative;
+}
+
+/* Blur individual chat items */
+html.cgpt-ambient-on.cgpt-blur-chat-history nav a,
+html.cgpt-ambient-on.cgpt-blur-chat-history nav [role="listitem"],
+html.cgpt-ambient-on.cgpt-blur-chat-history nav li {
+    filter: blur(8px);
+    transition: filter 0.15s ease;
+}
+
+/* Clear blur on hover for individual items */
+html.cgpt-ambient-on.cgpt-blur-chat-history nav a:hover,
+html.cgpt-ambient-on.cgpt-blur-chat-history nav li:hover,
+html.cgpt-ambient-on.cgpt-blur-chat-history nav [role="listitem"]:hover {
+    filter: blur(0px) !important;
 }
 
 /* Blur Avatar */
@@ -62,7 +84,7 @@ html.cgpt-ambient-on.cgpt-blur-chat-history [data-testid="accounts-profile-butto
     bottom: 80px;
     right: 20px;
     z-index: 99996;
-    padding: 8px 14px;
+    padding: 10px 14px;
     border-radius: 12px;
     background: var(--composer-bg);
     border: 1px solid var(--composer-border);
@@ -73,11 +95,17 @@ html.cgpt-ambient-on.cgpt-blur-chat-history [data-testid="accounts-profile-butto
     font-size: 12px;
     font-weight: 500;
     display: none;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    gap: 10px;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     opacity: 0;
     transform: translateY(10px);
+}
+
+.token-counter-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 #aurora-token-counter.visible {
@@ -125,4 +153,92 @@ html.cgpt-light-mode .token-counter-value {
 
 html.cgpt-light-mode .token-counter-separator {
     background: rgba(0, 0, 0, 0.15);
+}
+
+/* ===== TOKEN BUDGET BAR ===== */
+.token-budget-bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.token-budget-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+html.cgpt-light-mode .token-budget-bar {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.token-budget-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.token-budget-fill.has-usage {
+    min-width: 6px;
+}
+
+/* Animated gradient effect */
+.token-budget-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+/* Color states for budget bar */
+.token-budget-fill.normal {
+    background: linear-gradient(90deg, #4f8cff 0%, #3b7ce8 100%);
+}
+
+.token-budget-fill.warning {
+    background: linear-gradient(90deg, #ff9500 0%, #ff7700 100%);
+}
+
+.token-budget-fill.critical {
+    background: linear-gradient(90deg, #ff453a 0%, #ff3b30 100%);
+}
+
+html.cgpt-light-mode .token-budget-fill.normal {
+    background: linear-gradient(90deg, #007aff 0%, #0051d5 100%);
+}
+
+html.cgpt-light-mode .token-budget-fill.warning {
+    background: linear-gradient(90deg, #ff9500 0%, #e68000 100%);
+}
+
+html.cgpt-light-mode .token-budget-fill.critical {
+    background: linear-gradient(90deg, #ff3b30 0%, #d70015 100%);
+}
+
+.token-budget-text {
+    font-size: 10px;
+    opacity: 0.8;
+    text-align: center;
+    font-weight: 500;
+    letter-spacing: 0.3px;
 }

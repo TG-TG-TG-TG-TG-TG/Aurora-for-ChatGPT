@@ -48,7 +48,9 @@
     {
       "resources": [
         "Aurora/grok-4.webp",
-        "_locales/*/messages.json"
+        "_locales/*/messages.json",
+        "vendor/tiktoken-lite/*",
+        "vendor/tiktoken-lite/encoders/*"
       ],
       "matches": [
         "https://chat.openai.com/*",
