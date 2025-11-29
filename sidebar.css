@@ -1,0 +1,186 @@
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
+  position: relative;
+  background: transparent !important;
+  border-radius: var(--glass-radius);
+  overflow: hidden;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .bg-token-bg-elevated-secondary,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-bg-"]:not([class*="bg-token-bg-elevated-secondary"]),
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-surface"] {
+  background-color: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--sidebar-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  box-shadow: inset -1px 0 0 var(--sidebar-glass-stroke), var(--sidebar-glass-shadow);
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky {
+  position: sticky;
+  isolation: isolate;
+  background: transparent !important;
+  border-radius: var(--glass-radius);
+  contain: paint;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--sidebar-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  box-shadow: 0 1px 0 var(--sidebar-sticky-highlight) inset, var(--sidebar-glass-shadow);
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky > *,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .hover\:bg-token-surface-hover:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .focus-visible\:bg-token-surface-hover:focus-visible {
+  background-color: color-mix(in oklab, currentColor 7%, transparent) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--sidebar-gradient-overlay);
+}
+
+/* --- Activity Flyout Glass Treatment --- */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .bg-token-sidebar-surface-primary:has(section[data-testid="screen-threadFlyOut"]) {
+  background-color: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] {
+  position: relative;
+  border-radius: var(--activity-glass-radius, var(--glass-radius, 18px));
+  isolation: isolate;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-inline-start-color: var(--activity-glass-stroke, var(--sidebar-glass-stroke));
+  border-inline-start-style: solid;
+  background-color: var(--activity-glass-bg, var(--sidebar-glass-bg)) !important;
+  background-image: var(--activity-gradient-overlay, var(--sidebar-gradient-overlay));
+  background-repeat: no-repeat;
+  background-origin: border-box;
+  -webkit-backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  box-shadow: inset 1px 0 0 var(--activity-glass-stroke, var(--sidebar-glass-stroke)), var(--activity-glass-shadow, var(--sidebar-glass-shadow));
+  --activity-header-divider: color-mix(in srgb, var(--activity-glass-stroke, rgba(255,255,255,0.2)) 65%, transparent);
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] :is(.bg-token-bg-elevated-secondary, [class*="bg-token-bg-"], [class*="bg-token-surface"], [class*="bg-token-main-surface"], .bg-primary) {
+  background-color: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] :is(.border-token-border-sharp, .dark\:border-token-main-surface-secondary) {
+  border-color: var(--activity-header-divider, var(--activity-glass-stroke, rgba(255,255,255,0.16))) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .tall\:sticky {
+  position: sticky;
+  isolation: isolate;
+  background: transparent !important;
+  border-radius: var(--activity-glass-radius, var(--glass-radius, 18px));
+  contain: paint;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky::before,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .tall\:sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--activity-glass-bg, var(--sidebar-glass-bg));
+  -webkit-backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  box-shadow: 0 1px 0 var(--sidebar-sticky-highlight) inset, var(--activity-glass-shadow, var(--sidebar-glass-shadow));
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky > *,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .tall\:sticky > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .hover\:bg-token-surface-hover:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .focus-visible\:bg-token-surface-hover:focus-visible {
+  background-color: color-mix(in oklab, currentColor 7%, transparent) !important;
+}
+
+/* --- Clear Glass (Liquid Effect) Override for Sidebar --- */
+html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
+  --sidebar-glass-radius: 18px; /* Slightly more rounded */
+  --sidebar-glass-blur: 28px;
+  --sidebar-glass-sat: 180%;
+  --sidebar-glass-bg: rgba(18, 18, 18, 0.15);
+  --sidebar-glass-stroke: rgba(255, 255, 255, 0.2);
+  --sidebar-glass-shadow: 0 16px 70px rgba(0, 0, 0, 0.55);
+}
+
+html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before {
+  box-shadow: inset 0 0 2px 0 rgba(255,255,255,0.08), var(--sidebar-glass-shadow);
+  transition: background 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Light mode overrides for clear/liquid sidebar */
+html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
+  --sidebar-glass-bg: rgba(255, 255, 255, 0.3);
+  --sidebar-glass-stroke: rgba(0, 0, 0, 0.15);
+  --sidebar-glass-shadow: 0 16px 60px rgba(0, 0, 0, 0.25);
+}
+html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before {
+  box-shadow: inset 0 0 2px 0 rgba(255,255,255,0.25), var(--sidebar-glass-shadow);
+}
+
+/* --- Clear Glass Override for Activity Flyout --- */
+html.cgpt-appearance-clear.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] {
+  --activity-glass-radius: 18px;
+  --activity-glass-blur: 28px;
+  --activity-glass-sat: 180%;
+  --activity-glass-bg: rgba(18, 18, 18, 0.15);
+  --activity-glass-stroke: rgba(255, 255, 255, 0.2);
+  --activity-glass-shadow: 0 16px 70px rgba(0, 0, 0, 0.55);
+  transition: background-color 0.4s ease, background-image 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, box-shadow 0.4s ease;
+}
+
+html.cgpt-appearance-clear.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] {
+  --activity-glass-bg: rgba(255, 255, 255, 0.3);
+  --activity-glass-stroke: rgba(0, 0, 0, 0.15);
+  --activity-glass-shadow: 0 16px 60px rgba(0, 0, 0, 0.25);
+}

@@ -8,6 +8,7 @@
   const LEGACY_CLASS = 'cgpt-legacy-composer';
   const LIGHT_CLASS = 'cgpt-light-mode';
   const ANIMATIONS_DISABLED_CLASS = 'cgpt-animations-disabled';
+  const BG_ANIM_DISABLED_CLASS = 'cgpt-bg-anim-disabled';
   const CLEAR_APPEARANCE_CLASS = 'cgpt-appearance-clear';
   let settings = {};
   let lastDefaultModelApplied = null;
@@ -18,6 +19,8 @@
   const LOCAL_BG_KEY = 'customBgData';
   const HIDE_LIMIT_CLASS = 'cgpt-hide-gpt5-limit';
   const HIDE_UPGRADE_CLASS = 'cgpt-hide-upgrade';
+  const HIDE_SORA_CLASS = 'cgpt-hide-sora';
+  const HIDE_GPTS_CLASS = 'cgpt-hide-gpts';
   const TIMESTAMP_KEY = 'gpt5LimitHitTimestamp';
   const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
@@ -25,7 +28,7 @@
   const GROK_HORIZON_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
 
   // Group DOM selectors for easier maintenance. Fragile selectors are noted.
-const SELECTORS = {
+  const SELECTORS = {
     GPT5_LIMIT_POPUP: 'div[class*="text-token-text-primary"]',
     UPGRADE_MENU_ITEM: 'a.__menu-item', // In user profile menu
     UPGRADE_TOP_BUTTON_CONTAINER: '.start-1\\/2.absolute', // Fragile: top-center button on free plan
@@ -34,6 +37,8 @@ const SELECTORS = {
     UPGRADE_TINY_SIDEBAR_ICON: '#stage-sidebar-tiny-bar > div:nth-of-type(4)', // Fragile: depends on element order
     UPGRADE_SETTINGS_ROW_CONTAINER: 'div.py-2.border-b', // Container for settings row
     UPGRADE_BOTTOM_BANNER: 'div[role="button"]', // Bottom "Upgrade your plan" banner
+    SORA_BUTTON_ID: 'sora', // Use with getElementById
+    GPTS_BUTTON: 'a[href="/gpts"]',
     PROFILE_BUTTON: '[data-testid="accounts-profile-button"]',
   };
 
@@ -76,7 +81,7 @@ const SELECTORS = {
         const text = window.AuroraI18n.getMessage(key, substitutions);
         if (text && text !== key) return text;
       }
-      
+
       // Fallback to Chrome's built-in i18n
       if (chrome?.i18n?.getMessage && chrome.runtime?.id) {
         const text = chrome.i18n.getMessage(key, substitutions);
@@ -132,36 +137,48 @@ const SELECTORS = {
     }
   }
 
-function manageUpgradeButtons() {
+  function manageUpgradeButtons() {
     const upgradeElements = [
-        getCachedElement('upgradePanelButton', () => Array.from(document.querySelectorAll(SELECTORS.UPGRADE_MENU_ITEM)).find(el => el.textContent.toLowerCase().includes('upgrade'))),
-        getCachedElement('upgradeTopButtonContainer', () => document.querySelector(SELECTORS.UPGRADE_TOP_BUTTON_CONTAINER)),
-        getCachedElement('upgradeProfileButton', () => document.querySelector(SELECTORS.UPGRADE_PROFILE_BUTTON_TRAILING_ICON)),
-        getCachedElement('upgradeNewSidebarButton', () => Array.from(document.querySelectorAll(SELECTORS.UPGRADE_SIDEBAR_BUTTON)).find(el => el.textContent.toLowerCase().includes('upgrade'))),
-        getCachedElement('upgradeTinySidebarIcon', () => document.querySelector(SELECTORS.UPGRADE_TINY_SIDEBAR_ICON)),
-        getCachedElement('upgradeBottomBanner', () => {
-            const banner = Array.from(document.querySelectorAll(SELECTORS.UPGRADE_BOTTOM_BANNER))
-              .find(el => el.textContent?.toLowerCase().includes('upgrade your plan'));
-            return banner ? banner.parentElement : null;
-        }),
-        getCachedElement('upgradeAccountSection', () => {
-            const allSettingRows = document.querySelectorAll(SELECTORS.UPGRADE_SETTINGS_ROW_CONTAINER);
-            for (const row of allSettingRows) {
-                const rowText = row.textContent || '';
-                const hasUpgradeTitle = rowText.includes('Get ChatGPT Plus') || rowText.includes('Get ChatGPT Go');
-                const hasUpgradeButton = Array.from(row.querySelectorAll('button')).some(btn => btn.textContent.trim() === 'Upgrade');
-                if (hasUpgradeTitle && hasUpgradeButton) {
-                    return row;
-                }
-            }
-            return null;
-        }),
-        getCachedElement('upgradeGoHeaderButton', () => document.querySelector('.inline-flex.items-center.gap-1.rounded-full.dark\\:bg-\\[\\#373669\\]'))
+      getCachedElement('upgradePanelButton', () => Array.from(document.querySelectorAll(SELECTORS.UPGRADE_MENU_ITEM)).find(el => el.textContent.toLowerCase().includes('upgrade'))),
+      getCachedElement('upgradeTopButtonContainer', () => document.querySelector(SELECTORS.UPGRADE_TOP_BUTTON_CONTAINER)),
+      getCachedElement('upgradeProfileButton', () => document.querySelector(SELECTORS.UPGRADE_PROFILE_BUTTON_TRAILING_ICON)),
+      getCachedElement('upgradeNewSidebarButton', () => Array.from(document.querySelectorAll(SELECTORS.UPGRADE_SIDEBAR_BUTTON)).find(el => el.textContent.toLowerCase().includes('upgrade'))),
+      getCachedElement('upgradeTinySidebarIcon', () => document.querySelector(SELECTORS.UPGRADE_TINY_SIDEBAR_ICON)),
+      getCachedElement('upgradeBottomBanner', () => {
+        const banner = Array.from(document.querySelectorAll(SELECTORS.UPGRADE_BOTTOM_BANNER))
+          .find(el => el.textContent?.toLowerCase().includes('upgrade your plan'));
+        return banner ? banner.parentElement : null;
+      }),
+      getCachedElement('upgradeAccountSection', () => {
+        const allSettingRows = document.querySelectorAll(SELECTORS.UPGRADE_SETTINGS_ROW_CONTAINER);
+        for (const row of allSettingRows) {
+          const rowText = row.textContent || '';
+          const hasUpgradeTitle = rowText.includes('Get ChatGPT Plus') || rowText.includes('Get ChatGPT Go');
+          const hasUpgradeButton = Array.from(row.querySelectorAll('button')).some(btn => btn.textContent.trim() === 'Upgrade');
+          if (hasUpgradeTitle && hasUpgradeButton) {
+            return row;
+          }
+        }
+        return null;
+      }),
+      getCachedElement('upgradeGoHeaderButton', () => document.querySelector('.inline-flex.items-center.gap-1.rounded-full.dark\\:bg-\\[\\#373669\\]'))
     ];
 
     // The .filter(Boolean) step removes any null/undefined values from the array,
     // preventing errors if an element is not found on the page.
     toggleClassForElements(upgradeElements.filter(Boolean), HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
+  }
+
+  function manageSidebarButtons() {
+    const soraButton = getCachedElement('soraButton', () => document.getElementById(SELECTORS.SORA_BUTTON_ID));
+    if (soraButton) {
+      soraButton.classList.toggle(HIDE_SORA_CLASS, settings.hideSoraButton);
+    }
+
+    const gptsButton = getCachedElement('gptsButton', () => document.querySelector(SELECTORS.GPTS_BUTTON));
+    if (gptsButton) {
+      gptsButton.classList.toggle(HIDE_GPTS_CLASS, settings.hideGptsButton);
+    }
   }
 
   const isChatPage = () => location.pathname.startsWith('/c/');
@@ -199,7 +216,7 @@ function manageUpgradeButtons() {
     `;
     return wrap;
   }
-  
+
   let activeLayerId = 'a';
   let isTransitioning = false;
 
@@ -261,7 +278,7 @@ function manageUpgradeButtons() {
       if (isVideo) {
         inactiveVideo.src = mediaUrl;
         inactiveVideo.load();
-        inactiveVideo.play().catch(e => {}); // Autoplay might be blocked by browser
+        inactiveVideo.play().catch(e => { }); // Autoplay might be blocked by browser
         inactiveImg.src = ''; inactiveImg.srcset = ''; inactiveSource.srcset = '';
       } else {
         inactiveImg.src = mediaUrl; inactiveImg.srcset = ''; inactiveSource.srcset = '';
@@ -331,6 +348,9 @@ function manageUpgradeButtons() {
         #${ID}.bg-visible {
           opacity: 1;
         }
+        .${BG_ANIM_DISABLED_CLASS} #${ID} {
+            transition: none !important;
+        }
       `;
     };
     if (!document.head && !document.body) {
@@ -346,7 +366,7 @@ function manageUpgradeButtons() {
     const toggleConfig = [
       { id: 'qs-focusMode', key: 'focusMode' },
       { id: 'qs-hideUpgradeButtons', key: 'hideUpgradeButtons' },
-      { id: 'qs-cuteVoiceUI', key: 'cuteVoiceUI' },
+      { id: 'qs-hideGptsButton', key: 'hideGptsButton' },
     ];
 
     toggleConfig.forEach(({ id, key }) => {
@@ -360,61 +380,7 @@ function manageUpgradeButtons() {
     });
   }
 
-  function setupQuickSettingsVoiceSelector(settings) {
-    const voiceColorOptions = [
-      { value: 'default', labelKey: 'voiceColorOptionDefault', color: '#8EBBFF' },
-      { value: 'orange', labelKey: 'voiceColorOptionOrange', color: '#FF9900' },
-      { value: 'yellow', labelKey: 'voiceColorOptionYellow', color: '#FFD700' },
-      { value: 'pink', labelKey: 'voiceColorOptionPink', color: '#FF69B4' },
-      { value: 'green', labelKey: 'voiceColorOptionGreen', color: '#32CD32' },
-      { value: 'dark', labelKey: 'voiceColorOptionDark', color: '#555555' }
-    ];
-    const selectContainer = document.getElementById('qs-voice-color-select');
-    if (!selectContainer) return;
 
-    const trigger = selectContainer.querySelector('.qs-select-trigger');
-    const optionsContainer = selectContainer.querySelector('.qs-select-options');
-    if (!trigger || !optionsContainer) return;
-
-    const triggerDot = trigger.querySelector('.qs-color-dot');
-    const triggerLabel = trigger.querySelector('.qs-select-label');
-
-    const resolveVoiceLabel = (option) => getMessage(option.labelKey);
-
-    const renderVoiceOptions = (selectedValue) => {
-      optionsContainer.innerHTML = voiceColorOptions.map(option => `
-        <div class="qs-select-option" role="option" data-value="${option.value}" aria-selected="${option.value === selectedValue}">
-            <span class="qs-color-dot" style="background-color: ${option.color};"></span>
-            <span class="qs-select-label">${resolveVoiceLabel(option)}</span>
-            <svg class="qs-checkmark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </div>
-      `).join('');
-      optionsContainer.querySelectorAll('.qs-select-option').forEach(optionEl => {
-        optionEl.addEventListener('click', () => {
-          const newValue = optionEl.dataset.value;
-          chrome.storage.sync.set({ voiceColor: newValue });
-          trigger.setAttribute('aria-expanded', 'false');
-          optionsContainer.style.display = 'none';
-        });
-      });
-    };
-
-    const updateSelectorState = (value) => {
-      const selectedOption = voiceColorOptions.find(opt => opt.value === value) || voiceColorOptions;
-      if (triggerDot) triggerDot.style.backgroundColor = selectedOption.color;
-      if (triggerLabel) triggerLabel.textContent = resolveVoiceLabel(selectedOption);
-      renderVoiceOptions(value);
-    };
-
-    updateSelectorState(settings.voiceColor);
-
-    trigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
-      trigger.setAttribute('aria-expanded', String(!isExpanded));
-      optionsContainer.style.display = isExpanded ? 'none' : 'block';
-    });
-  }
 
   function manageQuickSettingsUI() {
     if (!document.body) {
@@ -438,6 +404,7 @@ function manageUpgradeButtons() {
       panel.id = QS_PANEL_ID;
       document.body.appendChild(panel);
 
+      // --- NEW: STATE-DRIVEN ANIMATION LOGIC ---
       panel.setAttribute('data-state', 'closed');
       const openPanel = () => panel.setAttribute('data-state', 'open');
       const closePanel = () => panel.setAttribute('data-state', 'closing');
@@ -464,12 +431,12 @@ function manageUpgradeButtons() {
         }
         const selectContainer = document.getElementById('qs-voice-color-select');
         if (selectContainer && !selectContainer.contains(e.target)) {
-            const selectTrigger = selectContainer.querySelector('.qs-select-trigger');
-            if (selectTrigger && selectTrigger.getAttribute('aria-expanded') === 'true') {
-                const selectOptions = selectContainer.querySelector('.qs-select-options');
-                selectTrigger.setAttribute('aria-expanded', 'false');
-                if (selectOptions) selectOptions.style.display = 'none';
-            }
+          const selectTrigger = selectContainer.querySelector('.qs-select-trigger');
+          if (selectTrigger && selectTrigger.getAttribute('aria-expanded') === 'true') {
+            const selectOptions = selectContainer.querySelector('.qs-select-options');
+            selectTrigger.setAttribute('aria-expanded', 'false');
+            if (selectOptions) selectOptions.style.display = 'none';
+          }
         }
       });
     }
@@ -484,6 +451,14 @@ function manageUpgradeButtons() {
           <label>${getMessage('quickSettingsLabelHideUpgradeButtons')}</label>
           <label class="switch"><input type="checkbox" id="qs-hideUpgradeButtons"><span class="track"><span class="thumb"></span></span></label>
       </div>
+      <div class="qs-row" data-setting="hideGptsButton">
+          <label>${getMessage('quickSettingsLabelHideGptsButton')}</label>
+          <label class="switch"><input type="checkbox" id="qs-hideGptsButton"><span class="track"><span class="thumb"></span></span></label>
+      </div>
+      <div class="qs-row" data-setting="disableBgAnimation">
+        <label>${getMessage('quickSettingsLabelDisableBgAnimation')}</label>
+        <label class="switch"><input type="checkbox" id="qs-disableBgAnimation"><span class="track"><span class="thumb"></span></span></label>
+    </div>
     <div class="qs-row" data-setting="blurChatHistory">
         <label>${getMessage('quickSettingsLabelStreamerMode')}</label>
         <label class="switch"><input type="checkbox" id="qs-blurChatHistory"><span class="track"><span class="thumb"></span></span></label>
@@ -496,25 +471,11 @@ function manageUpgradeButtons() {
             <button type="button" class="qs-pill" data-appearance="dimmed">${getMessage('glassAppearanceOptionDimmed')}</button>
           </div>
       </div>
-      <div class="qs-section-title">${getMessage('quickSettingsSectionVoice')}</div>
-      <div class="qs-row" data-setting="voiceColor">
-          <label>${getMessage('quickSettingsLabelVoiceColor')}</label>
-          <div class="qs-custom-select" id="qs-voice-color-select">
-              <button type="button" class="qs-select-trigger" aria-haspopup="listbox" aria-expanded="false">
-                  <span class="qs-color-dot"></span>
-                  <span class="qs-select-label"></span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
-              <div class="qs-select-options" role="listbox" style="display: none;"></div>
-          </div>
-      </div>
-      <div class="qs-row" data-setting="cuteVoiceUI">
-          <label>${getMessage('quickSettingsLabelCuteVoice')}</label>
-          <label class="switch"><input type="checkbox" id="qs-cuteVoiceUI"><span class="track"><span class="thumb"></span></span></label>
-      </div>
+
+
     `;
 
-    const qsToggles = ['focusMode', 'hideUpgradeButtons', 'cuteVoiceUI', 'blurChatHistory'];
+    const qsToggles = ['focusMode', 'hideUpgradeButtons', 'hideGptsButton', 'disableBgAnimation', 'blurChatHistory'];
     qsToggles.forEach((key) => {
       const checkbox = document.getElementById(`qs-${key}`);
       if (checkbox) {
@@ -541,15 +502,17 @@ function manageUpgradeButtons() {
       });
     });
 
-    setupQuickSettingsVoiceSelector(settings);
+
   }
 
   function applyRootFlags() {
-    document.documentElement.classList.toggle(HTML_CLASS, true);
+    const isUiVisible = shouldShow();
+    document.documentElement.classList.toggle(HTML_CLASS, isUiVisible);
     document.documentElement.classList.toggle(LEGACY_CLASS, !!settings.legacyComposer);
     document.documentElement.classList.toggle(ANIMATIONS_DISABLED_CLASS, !!settings.disableAnimations);
+    document.documentElement.classList.toggle(BG_ANIM_DISABLED_CLASS, !!settings.disableBgAnimation);
     document.documentElement.classList.toggle(CLEAR_APPEARANCE_CLASS, settings.appearance === 'clear');
-    document.documentElement.classList.toggle('cgpt-cute-voice-on', !!settings.cuteVoiceUI);
+
     document.documentElement.classList.toggle('cgpt-focus-mode-on', !!settings.focusMode);
 
     // NEW: Custom Font Support
@@ -594,9 +557,23 @@ function manageUpgradeButtons() {
       if (document.body) add();
       else document.addEventListener('DOMContentLoaded', add, { once: true });
     } else {
-        node.classList.add('bg-visible');
-        updateBackgroundImage();
+      node.classList.add('bg-visible');
+      updateBackgroundImage();
     }
+  }
+
+  function hideBg() {
+    const node = document.getElementById(ID);
+    if (node) {
+      node.classList.remove('bg-visible');
+    }
+  }
+
+  function shouldShow() {
+    if (settings.showInNewChatsOnly) {
+      return !isChatPage();
+    }
+    return true;
   }
 
   function normalizeToken(value) {
@@ -666,8 +643,8 @@ function manageUpgradeButtons() {
     if (!legacyTrigger) return currentMenu;
 
     const pointerInit = { bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true };
-    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerover', pointerInit)); } catch (e) {}
-    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerenter', pointerInit)); } catch (e) {}
+    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerover', pointerInit)); } catch (e) { }
+    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerenter', pointerInit)); } catch (e) { }
     legacyTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
     legacyTrigger.focus();
     legacyTrigger.click();
@@ -788,8 +765,7 @@ function manageUpgradeButtons() {
     '.bg-token-main-surface-primary.sticky.top-\\[-1px\\]',
     /* Composer & Code Blocks */
     'form[data-type="unified-composer"] > div > div',
-    'div[data-message-author-role="assistant"] pre',
-    '.agent-turn pre',
+    'div[data-message-author-role="assistant"] pre > div[class*="bg-"]',
     /* Buttons & UI Elements */
     '#cgpt-qs-panel',
     'div.bg-token-bg-primary.w-full.block:has(ul.divide-y)',
@@ -822,9 +798,13 @@ function manageUpgradeButtons() {
   }
 
   function applyAllSettings() {
-    showBg();
+    if (shouldShow()) {
+      showBg();
+    } else {
+      hideBg();
+    }
 
-    if (!settings.hideQuickSettings) {
+    if (shouldShow() && !settings.hideQuickSettings) {
       manageQuickSettingsUI();
     } else {
       const btn = document.getElementById(QS_BUTTON_ID);
@@ -838,6 +818,7 @@ function manageUpgradeButtons() {
     updateBackgroundImage();
     manageGpt5LimitPopup();
     manageUpgradeButtons();
+    manageSidebarButtons();
     applyGlassEffects();
     maybeApplyDefaultModel();
 
@@ -851,13 +832,13 @@ function manageUpgradeButtons() {
   function startObservers() {
     if (observersStarted) return;
     observersStarted = true;
-    
+
     // Performance: Pause animations and video when tab is not visible.
     document.addEventListener('visibilitychange', () => {
       const bgNode = document.getElementById(ID);
       document.documentElement.classList.toggle('cgpt-tab-hidden', document.hidden);
       if (!bgNode) return;
-      
+
       const videos = bgNode.querySelectorAll('video');
       videos.forEach(video => {
         if (document.hidden) {
@@ -893,6 +874,7 @@ function manageUpgradeButtons() {
     // For performance, debounce less-critical UI checks that don't cause flicker.
     const debouncedOtherChecks = debounce(() => {
       manageGpt5LimitPopup();
+      manageSidebarButtons();
       maybeApplyDefaultModel();
     }, 150);
 
@@ -963,28 +945,11 @@ function manageUpgradeButtons() {
                     <button class="pill-btn" data-appearance="dimmed">${getMessage('welcomeGlassDimmed')}</button>
                 </div>
             </div>
-            <button id="next-btn" class="welcome-btn primary finish-button">${getMessage('welcomeBtnNext')}</button>
-        </div>
-
-        <!-- Bar 2: Voice Setup -->
-        <div id="aurora-voice-bar" class="aurora-setup-bar">
-            <div class="setup-section voice-header">
-                <label class="section-label">${getMessage('welcomeLabelVoice')}</label>
-                <span class="listen-text">${getMessage('welcomeBtnListen')}</span>
-            </div>
-            <div class="setup-section voice-controls">
-                <div class="pill-group" id="voice-color-pills">
-                    <!-- Voice color pills will be injected here -->
-                </div>
-                <div class="cute-ui-control">
-                    <label>${getMessage('labelCuteVoice')}</label>
-                    <label class="switch"><input type="checkbox" id="welcome-cuteVoiceUI"><span class="track"><span class="thumb"></span></span></label>
-                </div>
-            </div>
             <button id="finish-btn" class="welcome-btn primary finish-button">${getMessage('welcomeBtnFinish')}</button>
         </div>
     </div>
   `;
+
 
   function showWelcomeScreen() {
     const welcomeNode = document.createElement('div');
@@ -995,132 +960,83 @@ function manageUpgradeButtons() {
 
     // Get all elements at once
     const getStartedBtn = document.getElementById('get-started-btn');
-    const nextBtn = document.getElementById('next-btn');
+
     const finishBtn = document.getElementById('finish-btn');
     const welcomeOverlay = document.getElementById('aurora-welcome-overlay');
     const welcomeContainer = document.querySelector('.welcome-container');
     const styleBar = document.getElementById('aurora-style-bar');
-    const voiceBar = document.getElementById('aurora-voice-bar');
-    const welcomeCuteVoiceUIToggle = document.getElementById('welcome-cuteVoiceUI');
-    
+
     let tempSettings = { ...settings }; // Clone settings for preview
 
     // --- Event Listeners ---
     if (getStartedBtn) {
       getStartedBtn.addEventListener('click', () => {
-          if (welcomeOverlay) {
-            welcomeOverlay.classList.add('setup-active');
-          }
+        if (welcomeOverlay) {
+          welcomeOverlay.classList.add('setup-active');
+        }
 
-          if (welcomeContainer) {
-              // Animate the center screen out (downwards)
-              welcomeContainer.classList.add('exiting');
-              
-              // Trigger the bottom bar entrance slightly earlier for a seamless crossover
-              setTimeout(() => {
-                  if (styleBar) styleBar.classList.add('active');
-              }, 150);
+        if (welcomeContainer) {
+          // Animate the center screen out (downwards)
+          welcomeContainer.classList.add('exiting');
 
-              // Remove the center screen after animation completes
-              setTimeout(() => {
-                  welcomeContainer.style.display = 'none';
-              }, 500); 
-          } else {
+          // Trigger the bottom bar entrance slightly earlier for a seamless crossover
+          setTimeout(() => {
             if (styleBar) styleBar.classList.add('active');
-          }
+          }, 150);
 
-          // Initialize with defaults visually
-          document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="default"]').classList.add('active');
-          document.querySelector('#aurora-style-bar .pill-btn[data-appearance="clear"]').classList.add('active');
+          // Remove the center screen after animation completes
+          setTimeout(() => {
+            welcomeContainer.style.display = 'none';
+          }, 500);
+        } else {
+          if (styleBar) styleBar.classList.add('active');
+        }
+
+        // Initialize with defaults visually
+        document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="default"]').classList.add('active');
+        document.querySelector('#aurora-style-bar .pill-btn[data-appearance="clear"]').classList.add('active');
       });
     }
 
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            if (styleBar) styleBar.classList.remove('active');
-            // This click reveals the voice UI on the main page for live preview
-            document.querySelector('[data-testid="composer-speech-button"]')?.click();
 
-            setTimeout(() => {
-                if(voiceBar) voiceBar.classList.add('active');
-            }, 500); 
-        });
-    }
-
-    // --- Dynamic Voice Color Pills ---
-    const voiceColorOptions = [
-      { value: 'default', color: '#8EBBFF' }, { value: 'orange', color: '#FF9900' },
-      { value: 'yellow', color: '#FFD700' }, { value: 'pink', color: '#FF69B4' },
-      { value: 'green', color: '#32CD32' }, { value: 'dark', color: '#555555' }
-    ];
-    const voicePillsContainer = document.getElementById('voice-color-pills');
-    if (voicePillsContainer) {
-        voiceColorOptions.forEach(opt => {
-            const pill = document.createElement('button');
-            pill.className = 'pill-btn voice-pill';
-            pill.dataset.value = opt.value;
-            pill.innerHTML = `<span class="qs-color-dot" style="background-color: ${opt.color};"></span>`;
-            
-            pill.addEventListener('click', () => {
-                voicePillsContainer.querySelectorAll('.voice-pill').forEach(p => p.classList.remove('active'));
-                pill.classList.add('active');
-                tempSettings.voiceColor = opt.value;
-                settings.voiceColor = opt.value; // for live preview
-                applyAllSettings(); // Use full apply for robust preview
-            });
-            voicePillsContainer.appendChild(pill);
-        });
-        // Set default active pill
-        const defaultVoicePill = voicePillsContainer.querySelector('.voice-pill[data-value="default"]');
-        if (defaultVoicePill) defaultVoicePill.classList.add('active');
-    }
-    
-    if (welcomeCuteVoiceUIToggle) {
-        welcomeCuteVoiceUIToggle.addEventListener('change', (e) => {
-            const isChecked = e.target.checked;
-            tempSettings.cuteVoiceUI = isChecked;
-            settings.cuteVoiceUI = isChecked; // for live preview
-            applyAllSettings(); // Use full apply for robust preview
-        });
-    }
 
     document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(tile => {
-        tile.addEventListener('click', () => {
-            document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(t => t.classList.remove('active'));
-            tile.classList.add('active');
-            const bgChoice = tile.dataset.bgUrl;
-            let newUrl = '';
-            if (bgChoice === 'blue') newUrl = BLUE_WALLPAPER_URL;
-            else if (bgChoice === 'grokHorizon') newUrl = GROK_HORIZON_URL;
-            else if (bgChoice === '__gpt5_animated__') newUrl = '__gpt5_animated__';
-            
-            tempSettings.customBgUrl = newUrl;
-            settings.customBgUrl = newUrl; // Mutate global settings for live preview
-            applyAllSettings();
-        });
+      tile.addEventListener('click', () => {
+        document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(t => t.classList.remove('active'));
+        tile.classList.add('active');
+        const bgChoice = tile.dataset.bgUrl;
+        let newUrl = '';
+        if (bgChoice === 'blue') newUrl = BLUE_WALLPAPER_URL;
+        else if (bgChoice === 'grokHorizon') newUrl = GROK_HORIZON_URL;
+        else if (bgChoice === '__gpt5_animated__') newUrl = '__gpt5_animated__';
+
+        tempSettings.customBgUrl = newUrl;
+        settings.customBgUrl = newUrl; // Mutate global settings for live preview
+        applyAllSettings();
+      });
     });
 
     document.querySelectorAll('#aurora-style-bar .pill-btn').forEach(pill => {
-        pill.addEventListener('click', () => {
-            document.querySelectorAll('#aurora-style-bar .pill-btn').forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-            const appearanceChoice = pill.dataset.appearance;
-            tempSettings.appearance = appearanceChoice;
-            settings.appearance = appearanceChoice; // Mutate for live preview
-            applyAllSettings();
-        });
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('#aurora-style-bar .pill-btn').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const appearanceChoice = pill.dataset.appearance;
+        tempSettings.appearance = appearanceChoice;
+        settings.appearance = appearanceChoice; // Mutate for live preview
+        applyAllSettings();
+      });
     });
 
     if (finishBtn) {
       finishBtn.addEventListener('click', () => {
-          tempSettings.hasSeenWelcomeScreen = true;
-          chrome.storage.sync.set(tempSettings, () => {
-              if (chrome.runtime.lastError) {
-                  console.error("Aurora Extension Error (Welcome Finish):", chrome.runtime.lastError.message);
-                  return;
-              }
-              if (welcomeOverlay) welcomeOverlay.remove();
-          });
+        tempSettings.hasSeenWelcomeScreen = true;
+        chrome.storage.sync.set(tempSettings, () => {
+          if (chrome.runtime.lastError) {
+            console.error("Aurora Extension Error (Welcome Finish):", chrome.runtime.lastError.message);
+            return;
+          }
+          if (welcomeOverlay) welcomeOverlay.remove();
+        });
       });
     }
   }
@@ -1130,60 +1046,60 @@ function manageUpgradeButtons() {
     // This function will be our single point of entry for processing settings updates.
     let welcomeScreenChecked = false;
 
-const uiCache = {}; // Global cache for frequently accessed UI elements
+    const uiCache = {}; // Global cache for frequently accessed UI elements
 
-  /**
-   * A helper function to get an element from the cache or query the DOM if it's not present/valid.
-   * @param {string} key - The key to use for caching the element.
-   * @param {function(): HTMLElement | null} queryFn - A function that queries the DOM for the element.
-   * @returns {HTMLElement | null} The cached or newly queried element.
-   */
-  function getCachedElement(key, queryFn) {
-    // Return the cached element if it exists and is still connected to the DOM
-    if (uiCache[key] && uiCache[key].isConnected) {
-      return uiCache[key];
-    }
-    // Otherwise, query for the element, cache it, and return it
-    const element = queryFn();
-    uiCache[key] = element;
-    return element;
-  }
-
-
-const refreshSettingsAndApply = () => {
-  chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
-    if (chrome.runtime.lastError) {
-      console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
-      return;
-    }
-    
-    // Check if the welcome screen should be shown, but only once.
-    if (!welcomeScreenChecked) {
-      if (!freshSettings.hasSeenWelcomeScreen) {
-        showWelcomeScreen();
+    /**
+     * A helper function to get an element from the cache or query the DOM if it's not present/valid.
+     * @param {string} key - The key to use for caching the element.
+     * @param {function(): HTMLElement | null} queryFn - A function that queries the DOM for the element.
+     * @returns {HTMLElement | null} The cached or newly queried element.
+     */
+    function getCachedElement(key, queryFn) {
+      // Return the cached element if it exists and is still connected to the DOM
+      if (uiCache[key] && uiCache[key].isConnected) {
+        return uiCache[key];
       }
-      welcomeScreenChecked = true; // Mark as checked for this session.
+      // Otherwise, query for the element, cache it, and return it
+      const element = queryFn();
+      uiCache[key] = element;
+      return element;
     }
 
-    // Update the global settings object with the fresh, authoritative state.
-    settings = freshSettings;
-    // Apply all visual changes based on the new settings.
-    applyAllSettings();
-  });
-};
 
-// Initialize i18n system with ChatGPT language detection
-(async () => {
-  try {
-    if (window.AuroraI18n?.initialize) {
-      await window.AuroraI18n.initialize();
-      const detectedLocale = window.AuroraI18n.getDetectedLocale();
-      console.log(`Aurora: Language system initialized with locale: ${detectedLocale}`);
-    }
-  } catch (e) {
-    console.warn('Aurora: Could not initialize i18n system, using browser default:', e);
-  }
-})();
+    const refreshSettingsAndApply = () => {
+      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
+        if (chrome.runtime.lastError) {
+          console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
+          return;
+        }
+
+        // Check if the welcome screen should be shown, but only once.
+        if (!welcomeScreenChecked) {
+          if (!freshSettings.hasSeenWelcomeScreen) {
+            showWelcomeScreen();
+          }
+          welcomeScreenChecked = true; // Mark as checked for this session.
+        }
+
+        // Update the global settings object with the fresh, authoritative state.
+        settings = freshSettings;
+        // Apply all visual changes based on the new settings.
+        applyAllSettings();
+      });
+    };
+
+    // Initialize i18n system with ChatGPT language detection
+    (async () => {
+      try {
+        if (window.AuroraI18n?.initialize) {
+          await window.AuroraI18n.initialize();
+          const detectedLocale = window.AuroraI18n.getDetectedLocale();
+          console.log(`Aurora: Language system initialized with locale: ${detectedLocale} `);
+        }
+      } catch (e) {
+        console.warn('Aurora: Could not initialize i18n system, using browser default:', e);
+      }
+    })();
 
     // Initial load when the script first runs.
     if (document.readyState === 'loading') {
@@ -1210,13 +1126,14 @@ const refreshSettingsAndApply = () => {
               return;
             }
             settings = freshSettings;
-            
+
             // Apply only the necessary, non-background updates
             applyRootFlags();
             manageGpt5LimitPopup();
             manageUpgradeButtons();
-            if (!settings.hideQuickSettings) {
-                manageQuickSettingsUI();
+            manageSidebarButtons();
+            if (shouldShow() && !settings.hideQuickSettings) {
+              manageQuickSettingsUI();
             }
             maybeApplyDefaultModel();
             if (window.AuroraTokenCounter) {
