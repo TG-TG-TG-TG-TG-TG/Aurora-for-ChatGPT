@@ -1,5 +1,9 @@
 /* Aurora for ChatGPT - Main Stylesheet */
 
+/* Import Google Fonts for custom font support */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+
 :root {
   /* Base Colors & Background */
   --theme-bg-color: #000;
@@ -613,62 +617,10 @@ html.cgpt-ambient-on.cgpt-light-mode .composer-submit-btn {
   background: rgba(255, 255, 255, 0.3) !important;
 }
 
-/* --- Voice UI & Cat Ears --- */
-html.cgpt-ambient-on[data-voice-color]:not([data-voice-color="default"]) .min-h-bloop>canvas {
-  filter: var(--voice-filter) !important;
-}
 
-html.cgpt-ambient-on[data-voice-color="orange"] {
-  --voice-filter: hue-rotate(180deg) saturate(1.5);
-}
 
-html.cgpt-ambient-on[data-voice-color="yellow"] {
-  --voice-filter: hue-rotate(180deg) saturate(2.5) brightness(1.1);
-}
 
-html.cgpt-ambient-on[data-voice-color="pink"] {
-  --voice-filter: hue-rotate(80deg) saturate(1.8) brightness(1.1);
-}
 
-html.cgpt-ambient-on[data-voice-color="green"] {
-  --voice-filter: hue-rotate(-120deg) saturate(1.2) brightness(0.9);
-}
-
-html.cgpt-ambient-on[data-voice-color="dark"] {
-  --voice-filter: grayscale(1) brightness(0.4) contrast(1.5);
-}
-
-html.cgpt-cute-voice-on .min-h-bloop {
-  position: relative;
-}
-
-html.cgpt-cute-voice-on .min-h-bloop::before,
-html.cgpt-cute-voice-on .min-h-bloop::after {
-  content: "";
-  position: absolute;
-  width: 48px;
-  height: 65px;
-  background: #8EBBFF;
-  filter: var(--voice-filter);
-  border-radius: 50% 50% 50% / 60% 60% 40% 40%;
-  top: -15px;
-  z-index: 0;
-}
-
-html.cgpt-cute-voice-on .min-h-bloop::before {
-  left: 45px;
-  transform: rotate(-35deg);
-}
-
-html.cgpt-cute-voice-on .min-h-bloop::after {
-  right: 45px;
-  transform: rotate(35deg);
-}
-
-html.cgpt-cute-voice-on .min-h-bloop>canvas {
-  position: relative;
-  z-index: 1;
-}
 
 /* --- Focus Mode Rules --- */
 html.cgpt-focus-mode-on .flex-shrink-0[class*="bg-token-sidebar-surface-primary"],
@@ -1045,99 +997,7 @@ html.cgpt-light-mode .aurora-setup-bar .pill-btn.active {
   margin-top: 0;
 }
 
-/* Voice Setup Bar specific styles */
-.aurora-setup-bar .voice-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  width: 100%;
-}
 
-.aurora-setup-bar .voice-header .listen-text {
-  font-size: 14px;
-  color: var(--theme-text-secondary);
-}
-
-.aurora-setup-bar .voice-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.aurora-setup-bar .voice-pill {
-  padding: 4px;
-}
-
-.aurora-setup-bar .voice-pill .qs-color-dot {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: block;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-html.cgpt-light-mode .aurora-setup-bar .voice-pill .qs-color-dot {
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-.aurora-setup-bar .cute-ui-control {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: var(--theme-text-primary);
-}
-
-.aurora-setup-bar .switch {
-  position: relative;
-  width: 42px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-.aurora-setup-bar .switch input {
-  display: none;
-}
-
-.aurora-setup-bar .track {
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.3);
-  transition: background .2s ease;
-}
-
-html.cgpt-light-mode .aurora-setup-bar .track {
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.aurora-setup-bar input:checked+.track {
-  background: #4f8cff;
-}
-
-.aurora-setup-bar .thumb {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
-  transition: transform .2s ease;
-}
-
-.aurora-setup-bar input:checked+.track .thumb {
-  transform: translateX(18px);
-}
-
-#aurora-voice-bar {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  min-width: 420px;
-}
 
 /* --- Sidebar Styles --- */
 
@@ -1598,17 +1458,7 @@ html.cgpt-light-mode .qs-select-trigger:hover {
   transform: rotate(180deg);
 }
 
-.qs-color-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
 
-html:not(.cgpt-light-mode) .qs-color-dot {
-  border-color: rgba(255, 255, 255, 0.1);
-}
 
 .qs-select-options {
   position: absolute;
@@ -1748,6 +1598,44 @@ html.cgpt-light-mode .qs-pill:hover {
   box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
   transform: translateY(0);
 }
+
+/* --- Custom Font Support --- */
+/* Apply custom fonts to all ChatGPT elements when selected */
+html[data-custom-font="inter"],
+html[data-custom-font="inter"] body,
+html[data-custom-font="inter"] * {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+html[data-custom-font="roboto"],
+html[data-custom-font="roboto"] body,
+html[data-custom-font="roboto"] * {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+html[data-custom-font="montserrat"],
+html[data-custom-font="montserrat"] body,
+html[data-custom-font="montserrat"] * {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+html[data-custom-font="opensans"],
+html[data-custom-font="opensans"] body,
+html[data-custom-font="opensans"] * {
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+html[data-custom-font="poppins"],
+html[data-custom-font="poppins"] body,
+html[data-custom-font="poppins"] * {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+/* System font - no changes needed */
+html[data-custom-font="system"] {
+  /* Use default system fonts */
+}
+
 
 html.cgpt-light-mode .qs-pill.active {
   background: linear-gradient(135deg, #4f8cff 0%, #3b7ce8 100%);

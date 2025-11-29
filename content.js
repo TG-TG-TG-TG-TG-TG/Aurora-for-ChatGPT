@@ -367,7 +367,6 @@
       { id: 'qs-focusMode', key: 'focusMode' },
       { id: 'qs-hideUpgradeButtons', key: 'hideUpgradeButtons' },
       { id: 'qs-hideGptsButton', key: 'hideGptsButton' },
-      { id: 'qs-cuteVoiceUI', key: 'cuteVoiceUI' },
     ];
 
     toggleConfig.forEach(({ id, key }) => {
@@ -381,61 +380,7 @@
     });
   }
 
-  function setupQuickSettingsVoiceSelector(settings) {
-    const voiceColorOptions = [
-      { value: 'default', labelKey: 'voiceColorOptionDefault', color: '#8EBBFF' },
-      { value: 'orange', labelKey: 'voiceColorOptionOrange', color: '#FF9900' },
-      { value: 'yellow', labelKey: 'voiceColorOptionYellow', color: '#FFD700' },
-      { value: 'pink', labelKey: 'voiceColorOptionPink', color: '#FF69B4' },
-      { value: 'green', labelKey: 'voiceColorOptionGreen', color: '#32CD32' },
-      { value: 'dark', labelKey: 'voiceColorOptionDark', color: '#555555' }
-    ];
-    const selectContainer = document.getElementById('qs-voice-color-select');
-    if (!selectContainer) return;
 
-    const trigger = selectContainer.querySelector('.qs-select-trigger');
-    const optionsContainer = selectContainer.querySelector('.qs-select-options');
-    if (!trigger || !optionsContainer) return;
-
-    const triggerDot = trigger.querySelector('.qs-color-dot');
-    const triggerLabel = trigger.querySelector('.qs-select-label');
-
-    const resolveVoiceLabel = (option) => getMessage(option.labelKey);
-
-    const renderVoiceOptions = (selectedValue) => {
-      optionsContainer.innerHTML = voiceColorOptions.map(option => `
-        <div class="qs-select-option" role="option" data-value="${option.value}" aria-selected="${option.value === selectedValue}">
-            <span class="qs-color-dot" style="background-color: ${option.color};"></span>
-            <span class="qs-select-label">${resolveVoiceLabel(option)}</span>
-            <svg class="qs-checkmark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </div>
-      `).join('');
-      optionsContainer.querySelectorAll('.qs-select-option').forEach(optionEl => {
-        optionEl.addEventListener('click', () => {
-          const newValue = optionEl.dataset.value;
-          chrome.storage.sync.set({ voiceColor: newValue });
-          trigger.setAttribute('aria-expanded', 'false');
-          optionsContainer.style.display = 'none';
-        });
-      });
-    };
-
-    const updateSelectorState = (value) => {
-      const selectedOption = voiceColorOptions.find(opt => opt.value === value) || voiceColorOptions;
-      if (triggerDot) triggerDot.style.backgroundColor = selectedOption.color;
-      if (triggerLabel) triggerLabel.textContent = resolveVoiceLabel(selectedOption);
-      renderVoiceOptions(value);
-    };
-
-    updateSelectorState(settings.voiceColor);
-
-    trigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
-      trigger.setAttribute('aria-expanded', String(!isExpanded));
-      optionsContainer.style.display = isExpanded ? 'none' : 'block';
-    });
-  }
 
   function manageQuickSettingsUI() {
     if (!document.body) {
@@ -526,25 +471,11 @@
             <button type="button" class="qs-pill" data-appearance="dimmed">${getMessage('glassAppearanceOptionDimmed')}</button>
           </div>
       </div>
-      <div class="qs-section-title">${getMessage('quickSettingsSectionVoice')}</div>
-      <div class="qs-row" data-setting="voiceColor">
-          <label>${getMessage('quickSettingsLabelVoiceColor')}</label>
-          <div class="qs-custom-select" id="qs-voice-color-select">
-              <button type="button" class="qs-select-trigger" aria-haspopup="listbox" aria-expanded="false">
-                  <span class="qs-color-dot"></span>
-                  <span class="qs-select-label"></span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
-              <div class="qs-select-options" role="listbox" style="display: none;"></div>
-          </div>
-      </div>
-      <div class="qs-row" data-setting="cuteVoiceUI">
-          <label>${getMessage('quickSettingsLabelCuteVoice')}</label>
-          <label class="switch"><input type="checkbox" id="qs-cuteVoiceUI"><span class="track"><span class="thumb"></span></span></label>
-      </div>
+
+
     `;
 
-    const qsToggles = ['focusMode', 'hideUpgradeButtons', 'hideGptsButton', 'cuteVoiceUI', 'disableBgAnimation', 'blurChatHistory'];
+    const qsToggles = ['focusMode', 'hideUpgradeButtons', 'hideGptsButton', 'disableBgAnimation', 'blurChatHistory'];
     qsToggles.forEach((key) => {
       const checkbox = document.getElementById(`qs-${key}`);
       if (checkbox) {
@@ -571,8 +502,7 @@
       });
     });
 
-    // Voice selector will be initialized separately via setupQuickSettingsVoiceSelector
-    setupQuickSettingsVoiceSelector(settings);
+
   }
 
   function applyRootFlags() {
@@ -582,7 +512,7 @@
     document.documentElement.classList.toggle(ANIMATIONS_DISABLED_CLASS, !!settings.disableAnimations);
     document.documentElement.classList.toggle(BG_ANIM_DISABLED_CLASS, !!settings.disableBgAnimation);
     document.documentElement.classList.toggle(CLEAR_APPEARANCE_CLASS, settings.appearance === 'clear');
-    document.documentElement.classList.toggle('cgpt-cute-voice-on', !!settings.cuteVoiceUI);
+
     document.documentElement.classList.toggle('cgpt-focus-mode-on', !!settings.focusMode);
 
     // NEW: Custom Font Support
@@ -610,7 +540,7 @@
       }
     }
 
-    document.documentElement.setAttribute('data-voice-color', settings.voiceColor || 'default');
+
   }
 
   function showBg() {
@@ -1015,28 +945,11 @@
                     <button class="pill-btn" data-appearance="dimmed">${getMessage('welcomeGlassDimmed')}</button>
                 </div>
             </div>
-            <button id="next-btn" class="welcome-btn primary finish-button">${getMessage('welcomeBtnNext')}</button>
-        </div>
-
-        <!-- Bar 2: Voice Setup -->
-        <div id="aurora-voice-bar" class="aurora-setup-bar">
-            <div class="setup-section voice-header">
-                <label class="section-label">${getMessage('welcomeLabelVoice')}</label>
-                <span class="listen-text">${getMessage('welcomeBtnListen')}</span>
-            </div>
-            <div class="setup-section voice-controls">
-                <div class="pill-group" id="voice-color-pills">
-                    <!-- Voice color pills will be injected here -->
-                </div>
-                <div class="cute-ui-control">
-                    <label>${getMessage('labelCuteVoice')}</label>
-                    <label class="switch"><input type="checkbox" id="welcome-cuteVoiceUI"><span class="track"><span class="thumb"></span></span></label>
-                </div>
-            </div>
             <button id="finish-btn" class="welcome-btn primary finish-button">${getMessage('welcomeBtnFinish')}</button>
         </div>
     </div>
   `;
+
 
   function showWelcomeScreen() {
     const welcomeNode = document.createElement('div');
@@ -1047,13 +960,11 @@
 
     // Get all elements at once
     const getStartedBtn = document.getElementById('get-started-btn');
-    const nextBtn = document.getElementById('next-btn');
+
     const finishBtn = document.getElementById('finish-btn');
     const welcomeOverlay = document.getElementById('aurora-welcome-overlay');
     const welcomeContainer = document.querySelector('.welcome-container');
     const styleBar = document.getElementById('aurora-style-bar');
-    const voiceBar = document.getElementById('aurora-voice-bar');
-    const welcomeCuteVoiceUIToggle = document.getElementById('welcome-cuteVoiceUI');
 
     let tempSettings = { ...settings }; // Clone settings for preview
 
@@ -1087,54 +998,7 @@
       });
     }
 
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        if (styleBar) styleBar.classList.remove('active');
-        // This click reveals the voice UI on the main page for live preview
-        document.querySelector('[data-testid="composer-speech-button"]')?.click();
 
-        setTimeout(() => {
-          if (voiceBar) voiceBar.classList.add('active');
-        }, 500);
-      });
-    }
-
-    // --- Dynamic Voice Color Pills ---
-    const voiceColorOptions = [
-      { value: 'default', color: '#8EBBFF' }, { value: 'orange', color: '#FF9900' },
-      { value: 'yellow', color: '#FFD700' }, { value: 'pink', color: '#FF69B4' },
-      { value: 'green', color: '#32CD32' }, { value: 'dark', color: '#555555' }
-    ];
-    const voicePillsContainer = document.getElementById('voice-color-pills');
-    if (voicePillsContainer) {
-      voiceColorOptions.forEach(opt => {
-        const pill = document.createElement('button');
-        pill.className = 'pill-btn voice-pill';
-        pill.dataset.value = opt.value;
-        pill.innerHTML = `<span class="qs-color-dot" style="background-color: ${opt.color};"></span>`;
-
-        pill.addEventListener('click', () => {
-          voicePillsContainer.querySelectorAll('.voice-pill').forEach(p => p.classList.remove('active'));
-          pill.classList.add('active');
-          tempSettings.voiceColor = opt.value;
-          settings.voiceColor = opt.value; // for live preview
-          applyAllSettings(); // Use full apply for robust preview
-        });
-        voicePillsContainer.appendChild(pill);
-      });
-      // Set default active pill
-      const defaultVoicePill = voicePillsContainer.querySelector('.voice-pill[data-value="default"]');
-      if (defaultVoicePill) defaultVoicePill.classList.add('active');
-    }
-
-    if (welcomeCuteVoiceUIToggle) {
-      welcomeCuteVoiceUIToggle.addEventListener('change', (e) => {
-        const isChecked = e.target.checked;
-        tempSettings.cuteVoiceUI = isChecked;
-        settings.cuteVoiceUI = isChecked; // for live preview
-        applyAllSettings(); // Use full apply for robust preview
-      });
-    }
 
     document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(tile => {
       tile.addEventListener('click', () => {
@@ -1230,7 +1094,7 @@
         if (window.AuroraI18n?.initialize) {
           await window.AuroraI18n.initialize();
           const detectedLocale = window.AuroraI18n.getDetectedLocale();
-          console.log(`Aurora: Language system initialized with locale: ${detectedLocale}`);
+          console.log(`Aurora: Language system initialized with locale: ${detectedLocale} `);
         }
       } catch (e) {
         console.warn('Aurora: Could not initialize i18n system, using browser default:', e);

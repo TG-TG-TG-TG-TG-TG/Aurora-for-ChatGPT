@@ -22,15 +22,42 @@ const ENCODING_HINTS = [
     { regex: /(gpt-4|gpt-3\.5|3\.5|turbo|davinci|curie|babbage|ada)/i, encoding: 'cl100k_base' }
 ];
 
+// Model Token Limits - comprehensive mapping of model slugs to their token limits
+const MODEL_TOKEN_LIMITS = {
+    'gpt-5': 400000,
+    'gpt-5-mini': 400000,
+    'gpt-5.1': 400000,
+    'gpt-5.1-codex': 400000,
+    'gpt-5.1-codex-mini': 400000,
+    'gpt-5-pro': 400000,
+    'gpt-5-thinking': 400000,
+    'gpt-5-thinking-mini': 400000,
+    'gpt-5-thinking-instant': 400000,
+    'gpt-4o': 128000,
+    'gpt-4o-mini': 128000,
+    'gpt-4.1': 1000000,
+    'gpt-4.1-mini': 1000000,
+    'gpt-4.1-nano': 1000000,
+    'o3': 200000,
+    'o3-mini': 200000,
+    'o4-mini': 200000,
+    'o1': 200000,
+    'o1-pro': 200000,
+    'o1-mini': 128000,
+    'gpt-4': 8192,
+    'gpt-3.5-turbo': 16385,
+    'default': 128000
+};
+
 function getRuntimeUrl(path) {
     try {
         if (chrome?.runtime?.getURL) {
             return chrome.runtime.getURL(path);
         }
     } catch (e) {
-        /* Ignore, fall through */
+        console.warn('[Aurora Token Counter] Could not get runtime URL:', e);
     }
-    return path;
+    return null;
 }
 
 /**
@@ -63,10 +90,52 @@ function resolveEncodingName() {
     return DEFAULT_ENCODING;
 }
 
+/**
+ * Get token limit for the current model
+ */
+function getModelTokenLimit() {
+    const modelLabel = detectModelLabel();
+
+    // Try to find matching model limit
+    for (const [slug, limit] of Object.entries(MODEL_TOKEN_LIMITS)) {
+        if (slug !== 'default') {
+            const hints = ENCODING_HINTS.find(h => h.encoding && h.regex.test(modelLabel));
+            if (hints || modelLabel.includes(slug.replace(/-/g, ' '))) {
+                return limit;
+            }
+        }
+    }
+
+    // Return default if no match found
+    return MODEL_TOKEN_LIMITS['default'];
+}
+
+/**
+ * Calculate percentage of token usage
+ */
+function calculateTokenPercentage(currentTokens) {
+    const limit = getModelTokenLimit();
+    return Math.min(100, (currentTokens / limit) * 100);
+}
+
+/**
+ * Get color class based on token usage percentage
+ */
+function getTokenColorClass(percentage) {
+    if (percentage >= 90) return 'critical';  // Red
+    if (percentage >= 70) return 'warning';   // Orange
+    return 'normal';  // Green/Blue
+}
+
 async function loadTiktokenModule() {
     if (!tiktokenModulePromise) {
-        const url = getRuntimeUrl('vendor/tiktoken-lite/tiktoken.js');
-        tiktokenModulePromise = import(url).catch((err) => {
+        const jsUrl = getRuntimeUrl('vendor/tiktoken-lite/tiktoken.js');
+        const wasmUrl = getRuntimeUrl('vendor/tiktoken-lite/tiktoken_bg.wasm');
+
+        tiktokenModulePromise = import(jsUrl).then(async (module) => {
+            await module.init(wasmUrl);
+            return module;
+        }).catch((err) => {
             console.error('[Aurora Token Counter] Failed to load tiktoken module', err);
             tiktokenModulePromise = null;
             throw err;
@@ -153,11 +222,19 @@ function getOrCreateTokenCounter() {
         tokenCounterElement = document.createElement('div');
         tokenCounterElement.id = 'aurora-token-counter';
         tokenCounterElement.innerHTML = `
-      <span class="token-counter-label">Words:</span>
-      <span class="token-counter-value" id="word-count">0</span>
-      <span class="token-counter-separator"></span>
-      <span class="token-counter-label">Tokens:</span>
-      <span class="token-counter-value" id="token-count">0</span>
+      <div class="token-counter-top">
+        <span class="token-counter-label">Words:</span>
+        <span class="token-counter-value" id="word-count">0</span>
+        <span class="token-counter-separator"></span>
+        <span class="token-counter-label">Tokens:</span>
+        <span class="token-counter-value" id="token-count">0</span>
+      </div>
+      <div class="token-budget-bar-container">
+        <div class="token-budget-bar" id="token-budget-bar">
+          <div class="token-budget-fill" id="token-budget-fill"></div>
+        </div>
+        <span class="token-budget-text" id="token-budget-text">0%</span>
+      </div>
     `;
         document.body.appendChild(tokenCounterElement);
     }
@@ -177,9 +254,26 @@ function renderCounter(wordCount, tokenCount, approximate) {
     const counter = getOrCreateTokenCounter();
     const wordElement = counter.querySelector('#word-count');
     const tokenElement = counter.querySelector('#token-count');
+    const budgetFill = counter.querySelector('#token-budget-fill');
+    const budgetText = counter.querySelector('#token-budget-text');
 
     if (wordElement) wordElement.textContent = wordCount;
     if (tokenElement) tokenElement.textContent = approximate ? `~${tokenCount}` : `${tokenCount}`;
+
+    // Update budget bar
+    if (budgetFill && budgetText && tokenCount > 0) {
+        const percentage = calculateTokenPercentage(tokenCount);
+        const limit = getModelTokenLimit();
+        const colorClass = getTokenColorClass(percentage);
+
+        budgetFill.style.width = `${Math.min(percentage, 100)}%`;
+        budgetFill.className = `token-budget-fill ${colorClass}`;
+        budgetText.textContent = `${Math.round(percentage)}% of ${(limit / 1000).toFixed(0)}k`;
+    } else if (budgetFill && budgetText) {
+        budgetFill.style.width = '0%';
+        budgetFill.className = 'token-budget-fill normal';
+        budgetText.textContent = '0%';
+    }
 
     setCounterVisibility(wordCount);
 }

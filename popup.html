@@ -51,15 +51,6 @@
       </svg>
       <span data-i18n="tabVisibility">Visibility</span>
     </button>
-    <button class="tab-link" data-tab="voice">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-        <line x1="12" y1="19" x2="12" y2="23"></line>
-      </svg>
-      <span data-i18n="tabVoice">Voice</span>
-    </button>
   </nav>
 
   <main class="tab-content">
@@ -217,6 +208,15 @@
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
+      <div class="section-header" data-i18n="sectionImportExport">Import/Export Settings</div>
+      <div class="row">
+        <button id="exportSettings" style="flex: 1;" data-i18n="buttonExportSettings">Export Settings</button>
+        <button id="importSettings" style="flex: 1;" data-i18n="buttonImportSettings">Import Settings</button>
+      </div>
+      <div class="row" id="importExportTextAreaRow" hidden>
+        <textarea id="settingsJson" placeholder="Paste JSON here or click Export..." rows="5"
+          style="width: 100%; font-family: 'Courier New', monospace; font-size: 11px; padding: 8px; border-radius: 6px; border: 1px solid var(--popup-border); background: var(--popup-input-bg); color: var(--popup-text); resize: vertical;"></textarea>
+      </div>
     </div>
 
     <!-- Visibility Tab -->
@@ -274,33 +274,6 @@
         <div class="label" data-i18n="labelBlurAvatar">Blur user avatar</div>
         <label class="switch" title="__MSG_tooltipBlurAvatar__" data-i18n-title="tooltipBlurAvatar">
           <input type="checkbox" id="blurAvatar">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-    </div>
-
-    <!-- Voice Tab -->
-    <div id="voice" class="tab-pane">
-      <div class="row">
-        <div class="label" data-i18n="labelVoiceColor">__MSG_labelVoiceColor__</div>
-        <div class="custom-select-wrapper">
-          <div class="custom-select" id="voiceColorSelector">
-            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="color-dot"></span>
-              <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
-              </svg>
-            </button>
-            <div class="select-options" role="listbox"></div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelCuteVoice">__MSG_labelCuteVoice__</div>
-        <label class="switch" title="__MSG_tooltipCuteVoice__" data-i18n-title="tooltipCuteVoice">
-          <input type="checkbox" id="cuteVoiceUI">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>

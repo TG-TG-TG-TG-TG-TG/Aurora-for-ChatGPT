@@ -175,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'hideQuickSettings', key: 'hideQuickSettings' },
     { id: 'hideGptsButton', key: 'hideGptsButton' },
     { id: 'hideSoraButton', key: 'hideSoraButton' },
-    { id: 'cuteVoiceUI', key: 'cuteVoiceUI' },
     { id: 'showInNewChatsOnly', key: 'showInNewChatsOnly' },
     { id: 'showTokenCounter', key: 'showTokenCounter' },
     { id: 'blurChatHistory', key: 'blurChatHistory' },
@@ -374,15 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
   const fontSelect = createCustomSelect('fontSelector', fontOptions, 'customFont');
 
-  const voiceColorOptions = [
-    { value: 'default', labelKey: 'voiceColorOptionDefault', color: '#8EBBFF' },
-    { value: 'orange', labelKey: 'voiceColorOptionOrange', color: '#FF9900' },
-    { value: 'yellow', labelKey: 'voiceColorOptionYellow', color: '#FFD700' },
-    { value: 'pink', labelKey: 'voiceColorOptionPink', color: '#FF69B4' },
-    { value: 'green', labelKey: 'voiceColorOptionGreen', color: '#32CD32' },
-    { value: 'dark', labelKey: 'voiceColorOptionDark', color: '#555555' }
-  ];
-  const voiceColorSelect = createCustomSelect('voiceColorSelector', voiceColorOptions, 'voiceColor');
+
 
   const defaultModelOptions = [
     { value: '', labelKey: 'defaultModelOptionNone' },
@@ -515,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
     themeSelect.update(settings.theme);
     appearanceSelect.update(settings.appearance || 'clear'); // Add this line
     fontSelect.update(settings.customFont || 'system');
-    voiceColorSelect.update(settings.voiceColor);
+
     applyDefaultModelUiState(settings.defaultModel || '');
 
     const url = settings.customBgUrl;
@@ -668,4 +659,78 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
+
+  // ===== IMPORT/EXPORT SETTINGS =====
+  const exportBtn = document.getElementById('exportSettings');
+  const importBtn = document.getElementById('importSettings');
+  const jsonTextarea = document.getElementById('settingsJson');
+  const textareaRow = document.getElementById('importExportTextAreaRow');
+
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (settings) => {
+        if (chrome.runtime.lastError) {
+          alert('Error exporting settings');
+          return;
+        }
+
+        const json = JSON.stringify(settings, null, 2);
+        jsonTextarea.value = json;
+        textareaRow.hidden = false;
+
+        // Copy to clipboard
+        navigator.clipboard.writeText(json).then(() => {
+          exportBtn.textContent = '✓ Copied!';
+          setTimeout(() => {
+            exportBtn.textContent = getMessage('buttonExportSettings') || 'Export Settings';
+          }, 2000);
+        }).catch(() => {
+          // Fallback: select text
+          jsonTextarea.select();
+        });
+      });
+    });
+  }
+
+  if (importBtn) {
+    importBtn.addEventListener('click', () => {
+      if (textareaRow.hidden) {
+        textareaRow.hidden = false;
+        jsonTextarea.focus();
+        return;
+      }
+
+      const jsonString = jsonTextarea.value.trim();
+      if (!jsonString) {
+        alert('Please paste settings JSON first');
+        return;
+      }
+
+      try {
+        const importedSettings = JSON.parse(jsonString);
+
+        // Validate: check if it's an object
+        if (typeof importedSettings !== 'object' || Array.isArray(importedSettings)) {
+          throw new Error('Invalid settings format');
+        }
+
+        // Apply imported settings
+        chrome.storage.sync.set(importedSettings, () => {
+          if (chrome.runtime.lastError) {
+            alert('Error importing settings: ' + chrome.runtime.lastError.message);
+            return;
+          }
+
+          importBtn.textContent = '✓ Imported!';
+          setTimeout(() => {
+            importBtn.textContent = getMessage('buttonImportSettings') || 'Import Settings';
+            textareaRow.hidden = true;
+            jsonTextarea.value = '';
+          }, 2000);
+        });
+      } catch (e) {
+        alert('Invalid JSON format: ' + e.message);
+      }
+    });
+  }
 });
