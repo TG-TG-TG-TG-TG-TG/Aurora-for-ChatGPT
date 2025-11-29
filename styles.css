@@ -90,10 +90,6 @@ html.cgpt-ambient-on body {
   transition: opacity 0.5s ease-in-out;
 }
 
-html.cgpt-bg-anim-disabled #cgpt-ambient-bg {
-  transition: none;
-}
-
 #cgpt-ambient-bg.bg-visible {
   opacity: 1;
 }
@@ -451,12 +447,18 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-aurora-glass="true"]:ha
 }
 
 /* Code Blocks & Children */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-sidebar-surface-primary,
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre>div[class*="bg-"]>div[class*="bg-"] {
   background-color: transparent !important;
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre code {
   background: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre {
+  border-radius: var(--glass-radius) !important;
+  overflow: hidden !important;
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button {
@@ -505,6 +507,21 @@ html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-m
 
 html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover {
   background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Inline Code Blur Effect */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .markdown code:not(pre code) {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .markdown code:not(pre code) {
+  background: rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 }
 
 /*
