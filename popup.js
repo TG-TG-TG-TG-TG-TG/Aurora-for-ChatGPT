@@ -17,9 +17,9 @@ const getMessage = (key, substitutions) => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  let settingsCache = {}; // Cache for current settings to enable synchronous checks and quick updates.
-  let DEFAULTS_CACHE = {}; // Add this line
-  let searchableSettings = []; // New: For search functionality
+  let settingsCache = {};
+  let DEFAULTS_CACHE = {}; 
+  let searchableSettings = [];
 
   const applyStaticLocalization = () => {
     document.querySelectorAll('[data-i18n]').forEach((el) => {
@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   applyStaticLocalization();
   
-  // --- New: Tab Switching Logic ---
   const tabs = document.querySelectorAll('.tab-link');
   const panes = document.querySelectorAll('.tab-pane');
   const mainContent = document.querySelector('.tab-content');
@@ -49,17 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const targetPaneId = tab.dataset.tab;
-
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-
       panes.forEach(pane => {
         pane.classList.toggle('active', pane.id === targetPaneId);
       });
     });
   });
 
-  // --- New: Search Functionality ---
   const searchInput = document.getElementById('settingsSearch');
   const clearSearchBtn = document.getElementById('clearSearchBtn');
   let noResultsMessage = null;
@@ -70,12 +66,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const tabId = pane.id;
       const tabTitle = document.querySelector(`.tab-link[data-tab="${tabId}"]`)?.textContent || '';
       pane.querySelectorAll('.row').forEach(row => {
-        const label = row.querySelector('.label')?.getAttribute('data-i18n');
-        const tooltip = row.querySelector('[data-i18n-title]')?.getAttribute('data-i18n-title');
+        const label = row.querySelector('.label')?.getAttribute('data-i18n') || row.querySelector('.label')?.textContent || '';
+        const tooltip = row.querySelector('[data-i18n-title]')?.getAttribute('data-i18n-title') || row.querySelector('[title]')?.getAttribute('title') || '';
 
         let keywords = `${tabTitle} `;
-        if (label) keywords += getMessage(label) + ' ';
-        if (tooltip) keywords += getMessage(tooltip) + ' ';
+        if (label) keywords += (getMessage(label) || label) + ' ';
+        if (tooltip) keywords += (getMessage(tooltip) || tooltip) + ' ';
 
         searchableSettings.push({
           element: row,
@@ -98,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Hide everything first
     panes.forEach(p => p.classList.remove('active'));
     tabs.forEach(t => t.classList.add('is-hidden'));
 
@@ -112,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (matchCount > 0) {
-      // Show tabs that have matches
       tabNav.hidden = false;
       if (noResultsMessage) noResultsMessage.style.display = 'none';
 
@@ -122,18 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
         tab.classList.toggle('is-hidden', !hasMatch);
       });
 
-      // Activate the first tab with a match
       const firstMatchedTab = document.querySelector('.tab-link:not(.is-hidden)');
       if (firstMatchedTab) {
         firstMatchedTab.click();
       }
     } else {
-      // No results found
       tabNav.hidden = true;
       if (!noResultsMessage) {
         noResultsMessage = document.createElement('div');
         noResultsMessage.className = 'no-results-message';
-        noResultsMessage.textContent = getMessage('noResults');
+        noResultsMessage.textContent = getMessage('noResults') || 'No results found';
         mainContent.appendChild(noResultsMessage);
       }
       noResultsMessage.style.display = 'block';
@@ -147,12 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
     searchableSettings.forEach(setting => setting.element.classList.remove('is-hidden'));
     tabs.forEach(tab => tab.classList.remove('is-hidden'));
     
-    // Restore default tab view
     const activeTab = document.querySelector('.tab-link.active');
     if (!activeTab || activeTab.classList.contains('is-hidden')) {
       tabs[0]?.click();
     } else {
-      activeTab.click(); // Re-click to ensure pane is active
+      activeTab.click();
     }
   }
 
@@ -162,9 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
     handleSearch();
     searchInput.focus();
   });
-  // End of Search Functionality
 
-  // --- Data-driven configuration for all toggle switches ---
   const TOGGLE_CONFIG = [
     { id: 'legacyComposer', key: 'legacyComposer' },
     { id: 'hideGpt5Limit', key: 'hideGpt5Limit' },
@@ -175,9 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'showTokenCounter', key: 'showTokenCounter' },
     { id: 'blurChatHistory', key: 'blurChatHistory' },
     { id: 'blurAvatar', key: 'blurAvatar' },
+    { id: 'soundEnabled', key: 'soundEnabled' },
+    { id: 'autoContrast', key: 'autoContrast' },
+    { id: 'smartSelectors', key: 'smartSelectors' },
   ];
 
-  // --- Initialize all toggle switch event listeners from the config ---
   TOGGLE_CONFIG.forEach(({ id, key }) => {
     const element = document.getElementById(id);
     if (element) {
@@ -187,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- Get other UI elements ---
   const tbBgUrl = document.getElementById('bgUrl');
   const fileBg = document.getElementById('bgFile');
   const btnClearBg = document.getElementById('clearBg');
@@ -196,24 +186,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const defaultModelCustomRow = document.getElementById('defaultModelCustomRow');
   const defaultModelCustomInput = document.getElementById('defaultModelCustomInput');
 
-  // --- Rewritten Feature: Blur Slider Logic ---
-  // This new logic uses a single 'input' event for real-time updates and efficient saving.
-  // It completely replaces any old 'input' or 'change' listeners.
   if (blurSlider && blurValue) {
     blurSlider.addEventListener('input', () => {
       const newBlurValue = blurSlider.value;
-      
-      // 1. Instantly update the 'px' value in the UI.
       blurValue.textContent = newBlurValue;
-      
-      // 2. Save the value to storage. This automatically triggers the live
-      // update on the main page via the storage.onChanged listener in content.js.
       chrome.storage.sync.set({ backgroundBlur: newBlurValue });
     });
   }
 
-
-  // --- Reusable Custom Select Functionality ---
   function createCustomSelect(containerId, options, storageKey, onPresetChange, config = {}) {
     const container = document.getElementById(containerId);
     if (!container) return { update: () => {} };
@@ -223,7 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const dotInTrigger = trigger.querySelector('.color-dot');
     const { manualStorage = false, mapValueToOption, formatLabel } = config;
     let currentOptionValue = null;
-    let lastRawValue = null;
 
     const resolveLabel = (option, rawValue) => {
       if (!option) return rawValue || '';
@@ -266,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateSelectorState(value) {
-      lastRawValue = value;
       let mappedValue = value;
       if (typeof mapValueToOption === 'function') {
         mappedValue = mapValueToOption(value);
@@ -313,11 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   document.addEventListener('click', closeAllSelects);
 
-  // --- Initialize Custom Selects ---
   const bgPresetOptions = [
     { value: 'default', labelKey: 'bgPresetOptionDefault' },
     { value: '__gpt5_animated__', labelKey: 'bgPresetOptionGpt5Animated' },
-    { value: 'grokHorizon', labelKey: 'bgPresetOptionGrokHorizon' }, // Add this line
+    { value: 'grokHorizon', labelKey: 'bgPresetOptionGrokHorizon' },
     { value: 'blue', labelKey: 'bgPresetOptionBlue' },
     { value: 'custom', labelKey: 'bgPresetOptionCustom', hidden: true }
   ];
@@ -327,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
       newUrl = BLUE_WALLPAPER_URL;
     } else if (value === '__gpt5_animated__') {
       newUrl = '__gpt5_animated__';
-    } else if (value === 'grokHorizon') { // Add this else-if block
+    } else if (value === 'grokHorizon') {
       newUrl = GROK_HORIZON_URL;
     }
 
@@ -350,13 +327,11 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
   const themeSelect = createCustomSelect('themeSelector', themeOptions, 'theme');
 
-  // ADD THESE LINES
   const appearanceOptions = [
     { value: 'clear', labelKey: 'glassAppearanceOptionClear' },
     { value: 'dimmed', labelKey: 'glassAppearanceOptionDimmed' }
   ];
   const appearanceSelect = createCustomSelect('appearanceSelector', appearanceOptions, 'appearance');
-  // END OF ADDED SECTION
 
   const fontOptions = [
     { value: 'system', labelKey: 'fontOptionSystem' },
@@ -473,7 +448,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- Function to update the UI based on current settings ---
   async function updateUi(settings) {
     let isLightTheme = settings.theme === 'light';
     if (settings.theme === 'auto') {
@@ -481,7 +455,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await new Promise((resolve, reject) => {
           chrome.storage.local.get('detectedTheme', (res) => {
             if (chrome.runtime.lastError) {
-              console.error("Aurora Popup Error (updateUi):", chrome.runtime.lastError.message);
               return reject(chrome.runtime.lastError);
             }
             resolve(res);
@@ -489,7 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         isLightTheme = result.detectedTheme === 'light';
       } catch (e) {
-        // Error is logged, default to dark theme for 'auto' on error.
         isLightTheme = false;
       }
     }
@@ -507,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bgScalingSelect.update(settings.backgroundScaling);
     themeSelect.update(settings.theme);
-    appearanceSelect.update(settings.appearance || 'clear'); // Add this line
+    appearanceSelect.update(settings.appearance || 'clear');
     fontSelect.update(settings.customFont || 'system');
     voiceColorSelect.update(settings.voiceColor);
     applyDefaultModelUiState(settings.defaultModel || '');
@@ -520,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
       bgPresetSelect.update('default');
     } else if (url === BLUE_WALLPAPER_URL) {
       bgPresetSelect.update('blue');
-    } else if (url === GROK_HORIZON_URL) { // Add this else-if block
+    } else if (url === GROK_HORIZON_URL) {
       bgPresetSelect.update('grokHorizon');
     } else if (url === '__gpt5_animated__') {
       bgPresetSelect.update('__gpt5_animated__');
@@ -536,34 +508,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- Initial Load ---
   if (chrome.runtime?.sendMessage) {
-    // Fetch the DEFAULTS object from the background script first
     chrome.runtime.sendMessage({ type: 'GET_DEFAULTS' }, (defaults) => {
-      if (chrome.runtime.lastError) {
-        console.error("Aurora Popup Error (Fetching Defaults):", chrome.runtime.lastError.message);
-        // Fallback to hardcoded values if the message fails
-        DEFAULTS_CACHE = { customBgUrl: '', backgroundBlur: '60', backgroundScaling: 'cover' };
-      } else {
+      if (!chrome.runtime.lastError) {
         DEFAULTS_CACHE = defaults;
       }
-
-      // Now, fetch the user's current settings
       chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (settings) => {
-        if (chrome.runtime.lastError) {
-          console.error("Aurora Popup Error (Initial Load):", chrome.runtime.lastError.message);
-          document.body.innerHTML = `<div style="padding: 20px; text-align: center;">${getMessage('errorLoadingSettings')}</div>`;
-          return;
-        }
+        if (chrome.runtime.lastError) return;
         settingsCache = settings;
         updateUi(settings);
-        buildSearchableData(); // New: Build search index after UI and text is loaded
+        buildSearchableData();
       });
     });
   }
 
-  // --- Event Listeners for Custom Background ---
-  
   tbBgUrl.addEventListener('change', () => {
     const urlValue = tbBgUrl.value.trim();
     const newSettings = { customBgUrl: urlValue };
@@ -594,53 +552,26 @@ document.addEventListener('DOMContentLoaded', () => {
     fileBg.value = '';
   });
 
-  // --- REWRITTEN & STABLE: Reset Button Logic ---
-  // This completely replaces the old reset button logic. It is designed to be
-  // atomic, reliable, and work perfectly with the new robust listener in content.js.
   if (btnClearBg) {
     btnClearBg.addEventListener('click', () => {
-      // 1. Check if the defaults have been loaded. This is a safety measure.
-      if (!DEFAULTS_CACHE || Object.keys(DEFAULTS_CACHE).length === 0) {
-        console.error("Aurora Popup Error: Cannot reset because defaults are not loaded.");
-        return;
-      }
+      if (!DEFAULTS_CACHE || Object.keys(DEFAULTS_CACHE).length === 0) return;
       
-      // 2. Define the complete set of background settings to be reset.
-      // We pull these directly from the DEFAULTS_CACHE, which is our source of truth.
       const settingsToReset = {
         customBgUrl: DEFAULTS_CACHE.customBgUrl,
         backgroundBlur: DEFAULTS_CACHE.backgroundBlur,
         backgroundScaling: DEFAULTS_CACHE.backgroundScaling
       };
 
-      // 3. Execute all storage operations.
-      // The `sync.set` will trigger the robust listener in content.js, causing the
-      // website visuals to update correctly and reliably.
       chrome.storage.sync.set(settingsToReset);
-      
-      // The `local.remove` is a critical cleanup step for any user-provided files.
       chrome.storage.local.remove(LOCAL_BG_KEY);
       
-      // 4. Provide immediate visual feedback in the popup UI.
-      // While the storage.onChanged listener will also do this, updating the UI
-      // manually here makes the reset feel instantaneous to the user.
-      
-      // Update the URL input box.
       tbBgUrl.value = '';
-      
-      // Update the blur slider and its text display.
       blurSlider.value = settingsToReset.backgroundBlur;
       blurValue.textContent = settingsToReset.backgroundBlur;
-
-      // Update the custom dropdowns using their dedicated update functions.
-      // This correctly resets the preset to "Default" and scaling to "Cover".
-      bgPresetSelect.update('default'); // 'default' corresponds to an empty customBgUrl
+      bgPresetSelect.update('default');
       bgScalingSelect.update(settingsToReset.backgroundScaling);
-
-      console.log("Aurora Settings: Background and blur have been reset to defaults.");
     });
   }
-
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'sync') {
@@ -655,7 +586,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUi(settingsCache);
       }
     }
-
     if (area === 'local' && changes.detectedTheme) {
       if (settingsCache.theme === 'auto') {
         document.documentElement.classList.toggle('theme-light', changes.detectedTheme.newValue === 'light');
@@ -663,7 +593,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ===== IMPORT/EXPORT SETTINGS =====
   const exportBtn = document.getElementById('exportSettings');
   const importBtn = document.getElementById('importSettings');
   const jsonTextarea = document.getElementById('settingsJson');
@@ -672,25 +601,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (exportBtn) {
     exportBtn.addEventListener('click', () => {
       chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (settings) => {
-        if (chrome.runtime.lastError) {
-          alert('Error exporting settings');
-          return;
-        }
-
+        if (chrome.runtime.lastError) return;
         const json = JSON.stringify(settings, null, 2);
         jsonTextarea.value = json;
         textareaRow.hidden = false;
-
-        // Copy to clipboard
         navigator.clipboard.writeText(json).then(() => {
           exportBtn.textContent = '✓ Copied!';
-          setTimeout(() => {
-            exportBtn.textContent = getMessage('buttonExportSettings') || 'Export Settings';
-          }, 2000);
-        }).catch(() => {
-          // Fallback: select text
-          jsonTextarea.select();
-        });
+          setTimeout(() => { exportBtn.textContent = getMessage('buttonExportSettings') || 'Export Settings'; }, 2000);
+        }).catch(() => { jsonTextarea.select(); });
       });
     });
   }
@@ -702,28 +620,19 @@ document.addEventListener('DOMContentLoaded', () => {
         jsonTextarea.focus();
         return;
       }
-
       const jsonString = jsonTextarea.value.trim();
       if (!jsonString) {
         alert('Please paste settings JSON first');
         return;
       }
-
       try {
         const importedSettings = JSON.parse(jsonString);
-
-        // Validate: check if it's an object
-        if (typeof importedSettings !== 'object' || Array.isArray(importedSettings)) {
-          throw new Error('Invalid settings format');
-        }
-
-        // Apply imported settings
+        if (typeof importedSettings !== 'object' || Array.isArray(importedSettings)) throw new Error('Invalid settings format');
         chrome.storage.sync.set(importedSettings, () => {
           if (chrome.runtime.lastError) {
-            alert('Error importing settings: ' + chrome.runtime.lastError.message);
+            alert('Error: ' + chrome.runtime.lastError.message);
             return;
           }
-
           importBtn.textContent = '✓ Imported!';
           setTimeout(() => {
             importBtn.textContent = getMessage('buttonImportSettings') || 'Import Settings';

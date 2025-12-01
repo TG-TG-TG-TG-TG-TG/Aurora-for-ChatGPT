@@ -19,7 +19,12 @@ const DEFAULTS = {
   customFont: 'system',
   showTokenCounter: false,
   blurChatHistory: false,
-  blurAvatar: false
+  blurAvatar: false,
+  // --- New Features ---
+  soundEnabled: false,
+  soundVolume: 'low', // low, medium, high
+  autoContrast: false,
+  smartSelectors: true
 };
 
 chrome.runtime.onInstalled.addListener((details) => {
@@ -33,10 +38,20 @@ chrome.runtime.onInstalled.addListener((details) => {
   } else if (details.reason === 'update') {
     // This is an update.
     // Merge existing settings with any new defaults that have been added.
-    chrome.storage.sync.get(DEFAULTS, (settings) => {
-      chrome.storage.sync.set(settings, () => {
-        console.log('Aurora Extension: Updated, settings preserved and merged.');
+    chrome.storage.sync.get((items) => {
+      // Find keys in DEFAULTS that are not in items
+      const newSettings = {};
+      Object.keys(DEFAULTS).forEach((key) => {
+        if (items[key] === undefined) {
+          newSettings[key] = DEFAULTS[key];
+        }
       });
+      
+      if (Object.keys(newSettings).length > 0) {
+        chrome.storage.sync.set(newSettings, () => {
+          console.log('Aurora Extension: Updated settings merged.', newSettings);
+        });
+      }
     });
   }
 });

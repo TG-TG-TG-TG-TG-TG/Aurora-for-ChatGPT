@@ -248,6 +248,7 @@
         transitionToInactive();
         mediaEl.removeEventListener(eventType, onMediaReady);
         mediaEl.removeEventListener('error', onMediaReady); // Also clean up error handler
+        if (settings.autoContrast && !isVideo) ContrastEngine.analyze(inactiveImg);
       };
 
       mediaEl.addEventListener(eventType, onMediaReady, { once: true });
@@ -262,6 +263,10 @@
       } else {
         inactiveImg.src = mediaUrl; inactiveImg.srcset = ''; inactiveSource.srcset = '';
         inactiveVideo.src = '';
+        if (settings.autoContrast) {
+            if (inactiveImg.complete) ContrastEngine.analyze(inactiveImg);
+            else inactiveImg.addEventListener('load', () => ContrastEngine.analyze(inactiveImg), { once: true });
+        }
       }
     };
 
@@ -274,6 +279,7 @@
         transitionToInactive();
         inactiveImg.removeEventListener('load', onMediaReady);
         inactiveImg.removeEventListener('error', onMediaReady);
+        if (settings.autoContrast) ContrastEngine.analyze(inactiveImg);
       };
       inactiveImg.addEventListener('load', onMediaReady, { once: true });
       inactiveImg.addEventListener('error', onMediaReady, { once: true });
@@ -818,7 +824,12 @@
     '[role="tooltip"]',
     /* Toast Notifications */
     '[role="alert"]',
-    '[role="status"]'
+    '[role="status"]',
+    /* Scroll to bottom button */
+    '.absolute.z-30.h-8.w-8.rounded-full.bg-token-main-surface-primary',
+    /* Voice Mode Buttons (Icon & Expanded Pill) */
+    'button.h-9.w-9.rounded-full.bg-black',
+    '.h-9.rounded-full.bg-token-bg-accent-static'
   ];
 
   // A single, combined selector that efficiently finds only untagged elements.
@@ -835,6 +846,186 @@
       el.dataset.auroraGlass = 'true';
     }
   }
+
+  // --- New Feature Implementations ---
+
+  // 1. Audio Engine (Synthesized Haptics)
+  const AudioEngine = {
+    ctx: null,
+    init() {
+      if (!this.ctx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) this.ctx = new AudioContext();
+      }
+    },
+    play(type) {
+      if (!settings.soundEnabled || !this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      const vol = settings.soundVolume === 'high' ? 0.1 : (settings.soundVolume === 'medium' ? 0.05 : 0.02);
+
+      if (type === 'hover') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, t);
+        osc.frequency.exponentialRampToValueAtTime(1200, t + 0.05);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(vol * 0.5, t + 0.01);
+        gain.gain.linearRampToValueAtTime(0, t + 0.05);
+        osc.start(t);
+        osc.stop(t + 0.06);
+      } else if (type === 'click') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, t);
+        osc.frequency.exponentialRampToValueAtTime(50, t + 0.1);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(vol, t + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+        osc.start(t);
+        osc.stop(t + 0.1);
+      } else if (type === 'toggle') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, t);
+        osc.frequency.linearRampToValueAtTime(600, t + 0.1);
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(vol, t + 0.02);
+        gain.gain.linearRampToValueAtTime(0, t + 0.15);
+        osc.start(t);
+        osc.stop(t + 0.15);
+      }
+    },
+    attachListeners() {
+      if (!settings.soundEnabled) return;
+      document.body.addEventListener('mouseenter', (e) => {
+        if (e.target.matches && e.target.matches('button, a, [role="button"], input, .btn')) {
+          this.play('hover');
+        }
+      }, true); // Capture phase to catch all
+      document.body.addEventListener('click', (e) => {
+         this.play('click');
+      }, true);
+    }
+  };
+
+  // 2. Smart DOM Healer
+  const SmartDOM = {
+    cache: {},
+    definitions: {
+      'composer': {
+        selector: '#prompt-textarea',
+        heuristic: () => document.querySelector('textarea[placeholder*="Message"]') || document.querySelector('textarea[data-id]')
+      },
+      'sidebar': {
+        selector: '#stage-slideover-sidebar', // Using ID we expect, but might change
+        heuristic: () => document.querySelector('nav') ? document.querySelector('nav').closest('div[class*="bg-token-sidebar"]') : null
+      }
+    },
+    get(key) {
+      if (!settings.smartSelectors) return document.querySelector(this.definitions[key]?.selector);
+      
+      if (this.cache[key] && document.body.contains(this.cache[key])) {
+        return this.cache[key];
+      }
+      
+      const def = this.definitions[key];
+      if (!def) return null;
+
+      let el = document.querySelector(def.selector);
+      if (!el && def.heuristic) {
+        el = def.heuristic();
+        if (el) console.log(`[Aurora SmartDOM] Healed selector for ${key}`);
+      }
+      
+      if (el) this.cache[key] = el;
+      return el;
+    }
+  };
+
+  // 3. Contrast Engine
+  const ContrastEngine = {
+    analyze(imgElement) {
+      if (!settings.autoContrast) return;
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 50; 
+        canvas.height = 50;
+        
+        // Handle cross-origin if possible (won't work for all external URLs)
+        if (imgElement.src.startsWith('http') && !imgElement.src.includes(location.host)) {
+             imgElement.crossOrigin = "Anonymous";
+        }
+        
+        ctx.drawImage(imgElement, 0, 0, 50, 50);
+        const data = ctx.getImageData(0, 0, 50, 50).data;
+        let r, g, b, avg;
+        let colorSum = 0;
+        
+        for (let x = 0, len = data.length; x < len; x += 4) {
+          r = data[x];
+          g = data[x + 1];
+          b = data[x + 2];
+          avg = Math.floor((r + g + b) / 3);
+          colorSum += avg;
+        }
+        
+        const brightness = Math.floor(colorSum / (50 * 50));
+        // Simple logic: Bright image -> Darker overlay. Dark image -> Lighter overlay.
+        // Base opacity is around 0.58.
+        let newOpacity = 0.58;
+        if (brightness > 200) newOpacity = 0.85; // Very bright bg, darken overlay
+        else if (brightness > 128) newOpacity = 0.70;
+        else if (brightness < 50) newOpacity = 0.40; // Very dark bg, lighten overlay
+        
+        document.documentElement.style.setProperty('--bg-opacity', newOpacity);
+      } catch (e) {
+        // CORS error likely, fail silently and use default
+        document.documentElement.style.removeProperty('--bg-opacity');
+      }
+    }
+  };
+
+  // 4. Snapshot Engine (Visual "Presentation Mode" + Capture)
+  const SnapshotEngine = {
+    isActive: false,
+    toggleMode() {
+      this.isActive = !this.isActive;
+      document.documentElement.classList.toggle('cgpt-snapshot-mode', this.isActive);
+      
+      const btn = document.getElementById('qs-snapshot-btn');
+      if (btn) {
+          btn.classList.toggle('active', this.isActive);
+          btn.title = this.isActive ? "Exit Snapshot Mode" : "Enter Snapshot Mode";
+      }
+    },
+    // Simple DOM-to-Image attempt (Canvas ForeignObject)
+    async capture() {
+        // Simple implementation: Just let the user screenshot in "Snapshot Mode".
+        // A full programmatic screenshot is unstable with external assets.
+        // We will just provide the "Zen Mode" view.
+        if (!this.isActive) this.toggleMode();
+        
+        // Show a temporary toast
+        const toast = document.createElement('div');
+        toast.textContent = "Snapshot Mode Active. Use your screen capture tool now.";
+        Object.assign(toast.style, {
+            position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)',
+            background: 'rgba(0,0,0,0.8)', color: 'white', padding: '12px 24px',
+            borderRadius: '8px', zIndex: '999999', pointerEvents: 'none',
+            fontFamily: 'system-ui', fontSize: '14px', backdropFilter: 'blur(8px)'
+        });
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+  };
+
+  // --- End of New Classes ---
 
   function applyAllSettings() {
     showBg();
@@ -859,6 +1050,22 @@
     // Manage token counter
     if (window.AuroraTokenCounter) {
       window.AuroraTokenCounter.manage(!!settings.showTokenCounter);
+    }
+    
+    // Initialize Audio Engine listeners if enabled
+    if (settings.soundEnabled) {
+        AudioEngine.init();
+    }
+    
+    // Manage Contrast Engine based on flag
+    if (settings.autoContrast) {
+        const bgNode = document.getElementById(ID);
+        if (bgNode) {
+            const activeImg = bgNode.querySelector('.media-layer.active img');
+            if (activeImg && activeImg.complete) ContrastEngine.analyze(activeImg);
+        }
+    } else {
+        document.documentElement.style.removeProperty('--bg-opacity');
     }
   }
 
@@ -889,7 +1096,7 @@
     const uiReadyObserver = new MutationObserver((mutations, obs) => {
       const stableUiElement = document.querySelector(SELECTORS.PROFILE_BUTTON);
       if (stableUiElement) {
-        applyAllSettings();
+        // We rely on refreshSettingsAndApply to call applyAllSettings, which handles initial setup
         obs.disconnect();
       }
     });
@@ -1154,6 +1361,7 @@ const refreshSettingsAndApply = () => {
             if (window.AuroraTokenCounter) {
               window.AuroraTokenCounter.manage(!!settings.showTokenCounter);
             }
+            if (settings.soundEnabled) AudioEngine.attachListeners();
           });
         } else {
           // Full refresh for background changes or mixed changes
@@ -1164,4 +1372,19 @@ const refreshSettingsAndApply = () => {
       }
     });
   }
-})()
+
+  // Add styles for Snapshot Mode
+  const snapshotStyle = document.createElement('style');
+  snapshotStyle.textContent = `
+    html.cgpt-snapshot-mode body > *:not(#__next) { display: none !important; }
+    html.cgpt-snapshot-mode #__next > *:not(main) { display: none !important; }
+    html.cgpt-snapshot-mode #stage-slideover-sidebar { display: none !important; }
+    html.cgpt-snapshot-mode .sticky { position: static !important; }
+    html.cgpt-snapshot-mode form { display: none !important; } /* Hide composer */
+    html.cgpt-snapshot-mode header { display: none !important; }
+    html.cgpt-snapshot-mode main .text-token-text-primary { margin: 0 auto !important; max-width: 800px !important; }
+    html.cgpt-snapshot-mode main { padding-bottom: 50px !important; }
+  `;
+  document.head.appendChild(snapshotStyle);
+
+})();

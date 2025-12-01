@@ -66,6 +66,13 @@
         <span id="blurValue" style="min-width: 3ch; text-align: right;">60</span>px
       </div>
       <div class="row">
+        <div class="label" data-i18n="labelAutoContrast">Auto-Contrast (Images)</div>
+        <label class="switch" title="Automatically adjust overlay darkness based on background brightness">
+          <input type="checkbox" id="autoContrast">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="row">
         <div class="label" data-i18n="labelScaling">__MSG_labelScaling__</div>
         <div class="custom-select-wrapper">
           <div class="custom-select" id="bgScalingSelector">
@@ -122,6 +129,14 @@
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
+      <div class="section-header">Audio</div>
+      <div class="row">
+          <div class="label">UI Haptic Sound</div>
+          <label class="switch" title="Play subtle glass sounds on interaction">
+              <input type="checkbox" id="soundEnabled">
+              <span class="track"><span class="thumb"></span></span>
+          </label>
+      </div>
     </div>
 
     <!-- Behavior Tab -->
@@ -152,6 +167,13 @@
         <div class="label" data-i18n="labelShowTokenCounter">Show token/word counter</div>
         <label class="switch" title="__MSG_tooltipShowTokenCounter__" data-i18n-title="tooltipShowTokenCounter">
           <input type="checkbox" id="showTokenCounter">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="row">
+        <div class="label">Smart Selector Healing</div>
+        <label class="switch" title="Automatically find elements if ChatGPT updates">
+          <input type="checkbox" id="smartSelectors">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
