@@ -180,9 +180,19 @@ html.theme-light .tab-link.active {
 .switch input { display: none; }
 .track {
   position: absolute; inset: 0; border-radius: 11px;
-  background: var(--popup-track-bg); transition: background .2s ease;
+  background-color: rgba(255, 255, 255, 0.1); /* Glassy base */
+  border: 1px solid rgba(255, 255, 255, 0.12); /* Subtle border */
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
-input:checked + .track { background: var(--primary-accent); }
+input:checked + .track {
+  background-color: rgba(79, 140, 255, 0.6); /* Aurora Blue */
+  border-color: rgba(79, 140, 255, 0.8);
+  box-shadow: 0 0 10px rgba(79, 140, 255, 0.4); /* Glow effect */
+}
+html.theme-light .track {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
 .thumb {
   position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
   background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease;

@@ -15,6 +15,17 @@
   let defaultModelApplyPromise = null;
   let applyingDefaultModel = false;
 
+  // --- UI Cache Helpers (Moved to global scope for accessibility) ---
+  const uiCache = {};
+  function getCachedElement(key, queryFn) {
+    if (uiCache[key] && uiCache[key].isConnected) {
+      return uiCache[key];
+    }
+    const element = queryFn();
+    if (element) uiCache[key] = element;
+    return element;
+  }
+
   const LOCAL_BG_KEY = 'customBgData';
   const HIDE_LIMIT_CLASS = 'cgpt-hide-gpt5-limit';
   const HIDE_UPGRADE_CLASS = 'cgpt-hide-upgrade';
@@ -24,16 +35,16 @@
   const BLUE_WALLPAPER_URL = 'https://img.freepik.com/free-photo/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner_1258-54581.jpg?semt=ais_hybrid&w=740&q=80';
   const GROK_HORIZON_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
 
-  // Group DOM selectors for easier maintenance. Fragile selectors are noted.
+  // Group DOM selectors for easier maintenance.
   const SELECTORS = {
     GPT5_LIMIT_POPUP: 'div[class*="text-token-text-primary"]',
-    UPGRADE_MENU_ITEM: 'a.__menu-item', // In user profile menu
-    UPGRADE_TOP_BUTTON_CONTAINER: '.start-1\\/2.absolute', // Fragile: top-center button on free plan
-    UPGRADE_PROFILE_BUTTON_TRAILING_ICON: '[data-testid="accounts-profile-button"] .__menu-item-trailing-btn', // Good selector
-    UPGRADE_SIDEBAR_BUTTON: 'div.gap-1\\.5.__menu-item.group', // Fragile: sidebar button
-    UPGRADE_TINY_SIDEBAR_ICON: '#stage-sidebar-tiny-bar > div:nth-of-type(4)', // Fragile: depends on element order
-    UPGRADE_SETTINGS_ROW_CONTAINER: 'div.py-2.border-b', // Container for settings row
-    UPGRADE_BOTTOM_BANNER: 'div[role="button"]', // Bottom "Upgrade your plan" banner
+    UPGRADE_MENU_ITEM: 'a.__menu-item',
+    UPGRADE_TOP_BUTTON_CONTAINER: '.start-1\\/2.absolute',
+    UPGRADE_PROFILE_BUTTON_TRAILING_ICON: '[data-testid="accounts-profile-button"] .__menu-item-trailing-btn',
+    UPGRADE_SIDEBAR_BUTTON: 'div.gap-1\\.5.__menu-item.group',
+    UPGRADE_TINY_SIDEBAR_ICON: '#stage-sidebar-tiny-bar > div:nth-of-type(4)',
+    UPGRADE_SETTINGS_ROW_CONTAINER: 'div.py-2.border-b',
+    UPGRADE_BOTTOM_BANNER: 'div[role="button"]',
     PROFILE_BUTTON: '[data-testid="accounts-profile-button"]',
   };
 
@@ -71,31 +82,16 @@
   // Use AuroraI18n for language detection (ChatGPT language priority)
   const getMessage = (key, substitutions) => {
     try {
-      // Try AuroraI18n first (supports ChatGPT language detection)
       if (window.AuroraI18n?.getMessage) {
         const text = window.AuroraI18n.getMessage(key, substitutions);
         if (text && text !== key) return text;
       }
-
-      // Fallback to Chrome's built-in i18n
       if (chrome?.i18n?.getMessage && chrome.runtime?.id) {
         const text = chrome.i18n.getMessage(key, substitutions);
-        if (text) {
-          return text;
-        } else {
-          // Log missing translations only once per key
-          if (!window._missingTranslations) window._missingTranslations = new Set();
-          if (!window._missingTranslations.has(key)) {
-            console.warn(`[Aurora] Missing translation for key: ${key}`);
-            window._missingTranslations.add(key);
-          }
-        }
+        if (text) return text;
       }
     } catch (e) {
-      if (!e.message.toLowerCase().includes('extension context invalidated')) {
-        console.error("Aurora Extension Error:", e);
-      }
-      return key; // Fallback to key if context is lost
+      // Suppress extension context errors
     }
     return key;
   };
@@ -109,30 +105,27 @@
     if (!chrome?.runtime?.id) return;
     if (popup) {
       chrome.storage.local.get([TIMESTAMP_KEY], (result) => {
-        if (chrome.runtime.lastError) {
-          console.error("Aurora Extension Error (manageGpt5LimitPopup):", chrome.runtime.lastError.message);
-          return;
-        }
+        if (chrome.runtime.lastError) return;
         if (!result[TIMESTAMP_KEY]) {
-          chrome.storage.local.set({ [TIMESTAMP_KEY]: Date.now() }, () => {
-            if (chrome.runtime.lastError) {
-              console.error("Aurora Extension Error (manageGpt5LimitPopup):", chrome.runtime.lastError.message);
-            }
-          });
+          chrome.storage.local.set({ [TIMESTAMP_KEY]: Date.now() });
         } else if (Date.now() - result[TIMESTAMP_KEY] > FIVE_MINUTES_MS) {
           popup.classList.add(HIDE_LIMIT_CLASS);
         }
       });
     } else {
-      chrome.storage.local.remove([TIMESTAMP_KEY], () => {
-        if (chrome.runtime.lastError) {
-          console.error("Aurora Extension Error (manageGpt5LimitPopup):", chrome.runtime.lastError.message);
-        }
-      });
+      chrome.storage.local.remove([TIMESTAMP_KEY]);
     }
   }
 
   function manageUpgradeButtons() {
+    if (!settings.hideUpgradeButtons) {
+      const hiddenElements = document.getElementsByClassName(HIDE_UPGRADE_CLASS);
+      if (hiddenElements.length > 0) {
+        Array.from(hiddenElements).forEach(el => el.classList.remove(HIDE_UPGRADE_CLASS));
+      }
+      return;
+    }
+
     const upgradeElements = [
       getCachedElement('upgradePanelButton', () => Array.from(document.querySelectorAll(SELECTORS.UPGRADE_MENU_ITEM)).find(el => el.textContent.toLowerCase().includes('upgrade'))),
       getCachedElement('upgradeTopButtonContainer', () => document.querySelector(SELECTORS.UPGRADE_TOP_BUTTON_CONTAINER)),
@@ -156,13 +149,18 @@
         }
         return null;
       }),
-      getCachedElement('upgradeGoHeaderButton', () => document.querySelector('.inline-flex.items-center.gap-1.rounded-full.dark\\:bg-\\[\\#373669\\]'))
+      getCachedElement('upgradeGoHeaderButton', () => document.querySelector('.rounded-full.dark\\:bg-\\[\\#373669\\]')),
+      getCachedElement('upgradeToGoRobust', () => {
+        const allCandidates = Array.from(document.querySelectorAll('button, a, div[role="button"], span'));
+        const textMatch = allCandidates.find(el => el.textContent.includes('Upgrade to Go'));
+        return textMatch ? (textMatch.closest('.rounded-full') || textMatch) : null;
+      })
     ];
 
-    // The .filter(Boolean) step removes any null/undefined values from the array,
-    // preventing errors if an element is not found on the page.
-    toggleClassForElements(upgradeElements.filter(Boolean), HIDE_UPGRADE_CLASS, settings.hideUpgradeButtons);
+    toggleClassForElements(upgradeElements.filter(Boolean), HIDE_UPGRADE_CLASS, true);
   }
+
+  const isChatPage = () => location.pathname.startsWith('/c/');
 
   function ensureAppOnTop() {
     const app = document.getElementById('__next') || document.querySelector('#root') || document.querySelector('main') || document.body.firstElementChild;
@@ -197,7 +195,7 @@
     `;
     return wrap;
   }
-
+  
   let activeLayerId = 'a';
   let isTransitioning = false;
 
@@ -259,7 +257,7 @@
       if (isVideo) {
         inactiveVideo.src = mediaUrl;
         inactiveVideo.load();
-        inactiveVideo.play().catch(e => { }); // Autoplay might be blocked by browser
+        inactiveVideo.play().catch(e => {}); // Autoplay might be blocked by browser
         inactiveImg.src = ''; inactiveImg.srcset = ''; inactiveSource.srcset = '';
       } else {
         inactiveImg.src = mediaUrl; inactiveImg.srcset = ''; inactiveSource.srcset = '';
@@ -414,7 +412,6 @@
     });
   }
 
-
   function manageQuickSettingsUI() {
     if (!document.body) {
       if (!qsInitScheduled) {
@@ -437,7 +434,6 @@
       panel.id = QS_PANEL_ID;
       document.body.appendChild(panel);
 
-      // --- NEW: STATE-DRIVEN ANIMATION LOGIC ---
       panel.setAttribute('data-state', 'closed');
       const openPanel = () => panel.setAttribute('data-state', 'open');
       const closePanel = () => panel.setAttribute('data-state', 'closing');
@@ -464,12 +460,12 @@
         }
         const selectContainer = document.getElementById('qs-voice-color-select');
         if (selectContainer && !selectContainer.contains(e.target)) {
-          const selectTrigger = selectContainer.querySelector('.qs-select-trigger');
-          if (selectTrigger && selectTrigger.getAttribute('aria-expanded') === 'true') {
-            const selectOptions = selectContainer.querySelector('.qs-select-options');
-            selectTrigger.setAttribute('aria-expanded', 'false');
-            if (selectOptions) selectOptions.style.display = 'none';
-          }
+            const selectTrigger = selectContainer.querySelector('.qs-select-trigger');
+            if (selectTrigger && selectTrigger.getAttribute('aria-expanded') === 'true') {
+                const selectOptions = selectContainer.querySelector('.qs-select-options');
+                selectTrigger.setAttribute('aria-expanded', 'false');
+                if (selectOptions) selectOptions.style.display = 'none';
+            }
         }
       });
     }
@@ -491,28 +487,13 @@
     <div class="qs-section-title">${getMessage('sectionAppearance')}</div>
       <div class="qs-row" data-setting="appearance">
           <label>${getMessage('quickSettingsLabelGlassStyle')}</label>
-          <div class="qs-pill-group" role="group" aria-label="${getMessage('quickSettingsLabelGlassStyle')}">
-            <button type="button" class="qs-pill" data-appearance="clear">${getMessage('glassAppearanceOptionClear')}</button>
-            <button type="button" class="qs-pill" data-appearance="dimmed">${getMessage('glassAppearanceOptionDimmed')}</button>
+          <div class="aurora-glass-switch" id="qs-appearance-toggle" data-switch-state="${(settings.appearance === 'dimmed') ? '1' : '0'}">
+            <div class="aurora-switch-glider"></div>
+            <!-- Data-value 0 corresponds to Left state, 1 to Right state -->
+            <button type="button" class="aurora-switch-btn" data-value="0" data-setting-value="clear">${getMessage('glassAppearanceOptionClear')}</button>
+            <button type="button" class="aurora-switch-btn" data-value="1" data-setting-value="dimmed">${getMessage('glassAppearanceOptionDimmed')}</button>
           </div>
       </div>
-      <div class="qs-section-title">${getMessage('quickSettingsSectionVoice')}</div>
-      <div class="qs-row" data-setting="voiceColor">
-          <label>${getMessage('quickSettingsLabelVoiceColor')}</label>
-          <div class="qs-custom-select" id="qs-voice-color-select">
-              <button type="button" class="qs-select-trigger" aria-haspopup="listbox" aria-expanded="false">
-                  <span class="qs-color-dot"></span>
-                  <span class="qs-select-label"></span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </button>
-              <div class="qs-select-options" role="listbox" style="display: none;"></div>
-          </div>
-      </div>
-      <div class="qs-row" data-setting="cuteVoiceUI">
-          <label>${getMessage('quickSettingsLabelCuteVoice')}</label>
-          <label class="switch"><input type="checkbox" id="qs-cuteVoiceUI"><span class="track"><span class="thumb"></span></span></label>
-      </div>
-
     `;
 
     const qsToggles = ['focusMode', 'hideUpgradeButtons', 'cuteVoiceUI', 'blurChatHistory'];
@@ -541,7 +522,37 @@
         chrome.storage.sync.set({ appearance: value });
       });
     });
+
     setupQuickSettingsVoiceSelector(settings);
+
+    // Sync Appearance Segmented Control
+    const appearanceToggle = document.getElementById('qs-appearance-toggle');
+    if (appearanceToggle) {
+        // Update visual state
+        const currentAppearance = settings.appearance || 'clear';
+        appearanceToggle.setAttribute('data-switch-state', currentAppearance === 'dimmed' ? '1' : '0');
+        
+        // Add listeners (only needed once if inside the `if (!btn)` block, otherwise check for duplicates)
+        // Since we are replacing logic, ensure this runs. 
+        // Ideally, put this listener attachment inside the `if (!btn) { ... }` block to avoid duplicates.
+        const segmentBtns = appearanceToggle.querySelectorAll('.aurora-switch-btn');
+        segmentBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const settingValue = btn.dataset.settingValue;
+                const switchState = btn.dataset.value;
+
+                // Add temporary class to enable smooth theme transitions
+                document.documentElement.classList.add('cgpt-theme-transitioning');
+                if (window._auroraThemeTimer) clearTimeout(window._auroraThemeTimer);
+                window._auroraThemeTimer = setTimeout(() => {
+                    document.documentElement.classList.remove('cgpt-theme-transitioning');
+                }, 600);
+                
+                chrome.storage.sync.set({ appearance: settingValue });
+                appearanceToggle.setAttribute('data-switch-state', switchState);
+            });
+        });
+    }
   }
 
   function applyRootFlags() {
@@ -594,8 +605,8 @@
       if (document.body) add();
       else document.addEventListener('DOMContentLoaded', add, { once: true });
     } else {
-      node.classList.add('bg-visible');
-      updateBackgroundImage();
+        node.classList.add('bg-visible');
+        updateBackgroundImage();
     }
   }
 
@@ -666,8 +677,8 @@
     if (!legacyTrigger) return currentMenu;
 
     const pointerInit = { bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true };
-    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerover', pointerInit)); } catch (e) { }
-    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerenter', pointerInit)); } catch (e) { }
+    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerover', pointerInit)); } catch (e) {}
+    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerenter', pointerInit)); } catch (e) {}
     legacyTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
     legacyTrigger.focus();
     legacyTrigger.click();
@@ -795,6 +806,7 @@
     'div.bg-token-bg-primary.w-full.block:has(ul.divide-y)',
     '.py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary',
     '.divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1',
+    'button[aria-label="Scroll down"]',
     '.active\\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn',
     '.shrink-0.btn-secondary.relative.btn',
     '.shrink-0.btn-danger-outline.relative.btn',
@@ -803,7 +815,10 @@
     '.p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary',
     '.p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary',
     '.p-3.border.rounded-\\[10px\\].w-full.btn-secondary',
-    '[role="tooltip"]'
+    '[role="tooltip"]',
+    /* Toast Notifications */
+    '[role="alert"]',
+    '[role="status"]'
   ];
 
   // A single, combined selector that efficiently finds only untagged elements.
@@ -851,13 +866,13 @@
   function startObservers() {
     if (observersStarted) return;
     observersStarted = true;
-
+    
     // Performance: Pause animations and video when tab is not visible.
     document.addEventListener('visibilitychange', () => {
       const bgNode = document.getElementById(ID);
       document.documentElement.classList.toggle('cgpt-tab-hidden', document.hidden);
       if (!bgNode) return;
-
+      
       const videos = bgNode.querySelectorAll('video');
       videos.forEach(video => {
         if (document.hidden) {
@@ -896,11 +911,17 @@
       maybeApplyDefaultModel();
     }, 150);
 
-    // This observer handles all dynamic UI changes.
+    // Optimization: Batch heavy UI updates into a single animation frame
+    // to prevent layout thrashing and reduce CPU usage during DOM mutations.
+    let renderFrameId = null;
     const domObserver = new MutationObserver(() => {
-      // Run the upgrade button check immediately on every DOM change to prevent the menu item from flickering.
-      manageUpgradeButtons();
-      applyGlassEffects(); // Efficiently tag newly added elements for glass effect
+      if (renderFrameId) return; // Drop duplicate events within the same frame
+      
+      renderFrameId = requestAnimationFrame(() => {
+        manageUpgradeButtons();
+        applyGlassEffects(); // Efficiently tag newly added elements for glass effect
+        renderFrameId = null;
+      });
 
       // Run the less-critical checks on a debounce timer.
       debouncedOtherChecks();
@@ -968,7 +989,6 @@
     </div>
   `;
 
-
   function showWelcomeScreen() {
     const welcomeNode = document.createElement('div');
     welcomeNode.innerHTML = getWelcomeScreenHTML();
@@ -978,60 +998,57 @@
 
     // Get all elements at once
     const getStartedBtn = document.getElementById('get-started-btn');
-
     const finishBtn = document.getElementById('finish-btn');
     const welcomeOverlay = document.getElementById('aurora-welcome-overlay');
     const welcomeContainer = document.querySelector('.welcome-container');
     const styleBar = document.getElementById('aurora-style-bar');
-
+    
     let tempSettings = { ...settings }; // Clone settings for preview
 
     // --- Event Listeners ---
     if (getStartedBtn) {
       getStartedBtn.addEventListener('click', () => {
-        if (welcomeOverlay) {
-          welcomeOverlay.classList.add('setup-active');
-        }
+          if (welcomeOverlay) {
+            welcomeOverlay.classList.add('setup-active');
+          }
 
-        if (welcomeContainer) {
-          // Animate the center screen out (downwards)
-          welcomeContainer.classList.add('exiting');
+          if (welcomeContainer) {
+              // Animate the center screen out (downwards)
+              welcomeContainer.classList.add('exiting');
+              
+              // Trigger the bottom bar entrance slightly earlier for a seamless crossover
+              setTimeout(() => {
+                  if (styleBar) styleBar.classList.add('active');
+              }, 150);
 
-          // Trigger the bottom bar entrance slightly earlier for a seamless crossover
-          setTimeout(() => {
+              // Remove the center screen after animation completes
+              setTimeout(() => {
+                  welcomeContainer.style.display = 'none';
+              }, 500); 
+          } else {
             if (styleBar) styleBar.classList.add('active');
-          }, 150);
+          }
 
-          // Remove the center screen after animation completes
-          setTimeout(() => {
-            welcomeContainer.style.display = 'none';
-          }, 500);
-        } else {
-          if (styleBar) styleBar.classList.add('active');
-        }
-
-        // Initialize with defaults visually
-        document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="default"]').classList.add('active');
-        document.querySelector('#aurora-style-bar .pill-btn[data-appearance="clear"]').classList.add('active');
+          // Initialize with defaults visually
+          document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="default"]').classList.add('active');
+          document.querySelector('#aurora-style-bar .pill-btn[data-appearance="clear"]').classList.add('active');
       });
     }
 
-
-
     document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(tile => {
-      tile.addEventListener('click', () => {
-        document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(t => t.classList.remove('active'));
-        tile.classList.add('active');
-        const bgChoice = tile.dataset.bgUrl;
-        let newUrl = '';
-        if (bgChoice === 'blue') newUrl = BLUE_WALLPAPER_URL;
-        else if (bgChoice === 'grokHorizon') newUrl = GROK_HORIZON_URL;
-        else if (bgChoice === '__gpt5_animated__') newUrl = '__gpt5_animated__';
-
-        tempSettings.customBgUrl = newUrl;
-        settings.customBgUrl = newUrl; // Mutate global settings for live preview
-        applyAllSettings();
-      });
+        tile.addEventListener('click', () => {
+            document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(t => t.classList.remove('active'));
+            tile.classList.add('active');
+            const bgChoice = tile.dataset.bgUrl;
+            let newUrl = '';
+            if (bgChoice === 'blue') newUrl = BLUE_WALLPAPER_URL;
+            else if (bgChoice === 'grokHorizon') newUrl = GROK_HORIZON_URL;
+            else if (bgChoice === '__gpt5_animated__') newUrl = '__gpt5_animated__';
+            
+            tempSettings.customBgUrl = newUrl;
+            settings.customBgUrl = newUrl; // for live preview
+            applyAllSettings(); // Use full apply for robust preview
+        });
     });
 
     document.querySelectorAll('#aurora-style-bar .pill-btn').forEach(pill => {
@@ -1041,20 +1058,20 @@
         const appearanceChoice = pill.dataset.appearance;
         tempSettings.appearance = appearanceChoice;
         settings.appearance = appearanceChoice; // Mutate for live preview
-        applyAllSettings();
+        applyAllSettings(); // Use full apply for robust preview
       });
     });
 
     if (finishBtn) {
       finishBtn.addEventListener('click', () => {
-        tempSettings.hasSeenWelcomeScreen = true;
-        chrome.storage.sync.set(tempSettings, () => {
-          if (chrome.runtime.lastError) {
-            console.error("Aurora Extension Error (Welcome Finish):", chrome.runtime.lastError.message);
-            return;
-          }
-          if (welcomeOverlay) welcomeOverlay.remove();
-        });
+          tempSettings.hasSeenWelcomeScreen = true;
+          chrome.storage.sync.set(tempSettings, () => {
+              if (chrome.runtime.lastError) {
+                  console.error("Aurora Extension Error (Welcome Finish):", chrome.runtime.lastError.message);
+                  return;
+              }
+              if (welcomeOverlay) welcomeOverlay.remove();
+          });
       });
     }
   }
@@ -1064,60 +1081,41 @@
     // This function will be our single point of entry for processing settings updates.
     let welcomeScreenChecked = false;
 
-    const uiCache = {}; // Global cache for frequently accessed UI elements
 
-    /**
-     * A helper function to get an element from the cache or query the DOM if it's not present/valid.
-     * @param {string} key - The key to use for caching the element.
-     * @param {function(): HTMLElement | null} queryFn - A function that queries the DOM for the element.
-     * @returns {HTMLElement | null} The cached or newly queried element.
-     */
-    function getCachedElement(key, queryFn) {
-      // Return the cached element if it exists and is still connected to the DOM
-      if (uiCache[key] && uiCache[key].isConnected) {
-        return uiCache[key];
+const refreshSettingsAndApply = () => {
+  chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
+    if (chrome.runtime.lastError) {
+      console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
+      return;
+    }
+    
+    // Check if the welcome screen should be shown, but only once.
+    if (!welcomeScreenChecked) {
+      if (!freshSettings.hasSeenWelcomeScreen) {
+        showWelcomeScreen();
       }
-      // Otherwise, query for the element, cache it, and return it
-      const element = queryFn();
-      uiCache[key] = element;
-      return element;
+      welcomeScreenChecked = true; // Mark as checked for this session.
     }
 
+    // Update the global settings object with the fresh, authoritative state.
+    settings = freshSettings;
+    // Apply all visual changes based on the new settings.
+    applyAllSettings();
+  });
+};
 
-    const refreshSettingsAndApply = () => {
-      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
-        if (chrome.runtime.lastError) {
-          console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
-          return;
-        }
-
-        // Check if the welcome screen should be shown, but only once.
-        if (!welcomeScreenChecked) {
-          if (!freshSettings.hasSeenWelcomeScreen) {
-            showWelcomeScreen();
-          }
-          welcomeScreenChecked = true; // Mark as checked for this session.
-        }
-
-        // Update the global settings object with the fresh, authoritative state.
-        settings = freshSettings;
-        // Apply all visual changes based on the new settings.
-        applyAllSettings();
-      });
-    };
-
-    // Initialize i18n system with ChatGPT language detection
-    (async () => {
-      try {
-        if (window.AuroraI18n?.initialize) {
-          await window.AuroraI18n.initialize();
-          const detectedLocale = window.AuroraI18n.getDetectedLocale();
-          console.log(`Aurora: Language system initialized with locale: ${detectedLocale} `);
-        }
-      } catch (e) {
-        console.warn('Aurora: Could not initialize i18n system, using browser default:', e);
-      }
-    })();
+// Initialize i18n system with ChatGPT language detection
+(async () => {
+  try {
+    if (window.AuroraI18n?.initialize) {
+      await window.AuroraI18n.initialize();
+      const detectedLocale = window.AuroraI18n.getDetectedLocale();
+      console.log(`Aurora: Language system initialized with locale: ${detectedLocale}`);
+    }
+  } catch (e) {
+    console.warn('Aurora: Could not initialize i18n system, using browser default:', e);
+  }
+})();
 
     // Initial load when the script first runs.
     if (document.readyState === 'loading') {
@@ -1144,13 +1142,13 @@
               return;
             }
             settings = freshSettings;
-
+            
             // Apply only the necessary, non-background updates
             applyRootFlags();
             manageGpt5LimitPopup();
             manageUpgradeButtons();
             if (!settings.hideQuickSettings) {
-              manageQuickSettingsUI();
+                manageQuickSettingsUI();
             }
             maybeApplyDefaultModel();
             if (window.AuroraTokenCounter) {
