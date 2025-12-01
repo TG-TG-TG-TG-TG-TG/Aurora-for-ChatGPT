@@ -1,4 +1,4 @@
-# Aurora-for-ChatGPT V1.5.6
+# Aurora-for-ChatGPT V1.6.0
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT/blob/main/LICENSE)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Coming_Soon-lightgrey.svg)](https://github.com/TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT)
@@ -6,6 +6,8 @@
 
 Bring a **soft, ambient, blurred glow** behind the ChatGPT UI — plus a **chat visibility toggle** and a **legacy composer** option.
 Not affiliated with OpenAI. Just here to make ChatGPT feel a little cozier.
+
+> **Enjoying the extension?** Please consider dropping a **Star ⭐** on this repository to show your support! It helps visibility a ton.
 
 ### Quick Install Guide
 
@@ -133,6 +135,18 @@ No data leaves your machine.
     <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT&type=Date" width="500" />
   </picture>
 </p>
+
+## ❤️ Support the Project
+
+Aurora is 100% free and open source. I built it because I wanted a cleaner, vibey, and more personalized ChatGPT experience for myself and the community.
+
+However, keeping the **Glass Engine** running smoothly and constantly updating selectors to fight ChatGPT's frequent UI changes takes a lot of late nights and resources.
+
+If you're vibing with the extension, here are two easy ways to show some love:
+
+1.  **⭐ Star this Repo:** It helps more people find the project and motivates me to keep shipping cool features.
+2.  **☕ Buy me a Coffee:** If you want to help me continue expanding the project or just say thanks for the aesthetic upgrade, you can support me here:
+    *   [Ko-fi](https://ko-fi.com/testtm) thanks!
 
 ---
 
