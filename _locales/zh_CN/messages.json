@@ -430,5 +430,44 @@
   },
   "exportError": {
     "message": "导出失败。请重试。"
+  },
+  "sectionImportExport": {
+    "message": "导入/导出设置"
+  },
+  "buttonExportSettings": {
+    "message": "导出设置"
+  },
+  "buttonImportSettings": {
+    "message": "导入设置"
+  },
+  "alertSettingsExported": {
+    "message": "设置已复制到剪贴板！"
+  },
+  "alertSettingsImported": {
+    "message": "设置导入成功！"
+  },
+  "alertInvalidJson": {
+    "message": "无效的JSON格式"
+  },
+  "sectionAudio": {
+    "message": "音频"
+  },
+  "labelHapticSound": {
+    "message": "界面音效"
+  },
+  "tooltipHapticSound": {
+    "message": "交互时播放微妙的玻璃音效"
+  },
+  "labelAutoContrast": {
+    "message": "自动对比度（图片）"
+  },
+  "tooltipAutoContrast": {
+    "message": "根据背景亮度自动调整叠加层暗度"
+  },
+  "labelSmartSelectors": {
+    "message": "智能选择器修复"
+  },
+  "tooltipSmartSelectors": {
+    "message": "如果ChatGPT更新，自动查找元素"
   }
 }

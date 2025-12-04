@@ -448,5 +448,26 @@
   },
   "alertInvalidJson": {
     "message": "Invalid JSON format"
+  },
+  "sectionAudio": {
+    "message": "Audio"
+  },
+  "labelHapticSound": {
+    "message": "UI Haptic Sound"
+  },
+  "tooltipHapticSound": {
+    "message": "Play subtle glass sounds on interaction"
+  },
+  "labelAutoContrast": {
+    "message": "Auto-Contrast (Images)"
+  },
+  "tooltipAutoContrast": {
+    "message": "Automatically adjust overlay darkness based on background brightness"
+  },
+  "labelSmartSelectors": {
+    "message": "Smart Selector Healing"
+  },
+  "tooltipSmartSelectors": {
+    "message": "Automatically find elements if ChatGPT updates"
   }
 }

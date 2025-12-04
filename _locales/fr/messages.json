@@ -430,5 +430,44 @@
   },
   "exportError": {
     "message": "Échec de l'exportation. Veuillez réessayer."
+  },
+  "sectionImportExport": {
+    "message": "Importer/Exporter les paramètres"
+  },
+  "buttonExportSettings": {
+    "message": "Exporter les paramètres"
+  },
+  "buttonImportSettings": {
+    "message": "Importer les paramètres"
+  },
+  "alertSettingsExported": {
+    "message": "Paramètres exportés dans le presse-papiers !"
+  },
+  "alertSettingsImported": {
+    "message": "Paramètres importés avec succès !"
+  },
+  "alertInvalidJson": {
+    "message": "Format JSON invalide"
+  },
+  "sectionAudio": {
+    "message": "Audio"
+  },
+  "labelHapticSound": {
+    "message": "Sons d'interface"
+  },
+  "tooltipHapticSound": {
+    "message": "Jouer des sons subtils de verre lors des interactions"
+  },
+  "labelAutoContrast": {
+    "message": "Contraste automatique (Images)"
+  },
+  "tooltipAutoContrast": {
+    "message": "Ajuster automatiquement l'obscurité de la superposition en fonction de la luminosité de l'arrière-plan"
+  },
+  "labelSmartSelectors": {
+    "message": "Récupération intelligente des sélecteurs"
+  },
+  "tooltipSmartSelectors": {
+    "message": "Trouver automatiquement les éléments si ChatGPT se met à jour"
   }
 }
