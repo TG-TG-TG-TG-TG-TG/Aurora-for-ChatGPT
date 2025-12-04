@@ -195,7 +195,7 @@
     `;
     return wrap;
   }
-  
+
   let activeLayerId = 'a';
   let isTransitioning = false;
 
@@ -258,14 +258,14 @@
       if (isVideo) {
         inactiveVideo.src = mediaUrl;
         inactiveVideo.load();
-        inactiveVideo.play().catch(e => {}); // Autoplay might be blocked by browser
+        inactiveVideo.play().catch(e => { }); // Autoplay might be blocked by browser
         inactiveImg.src = ''; inactiveImg.srcset = ''; inactiveSource.srcset = '';
       } else {
         inactiveImg.src = mediaUrl; inactiveImg.srcset = ''; inactiveSource.srcset = '';
         inactiveVideo.src = '';
         if (settings.autoContrast) {
-            if (inactiveImg.complete) ContrastEngine.analyze(inactiveImg);
-            else inactiveImg.addEventListener('load', () => ContrastEngine.analyze(inactiveImg), { once: true });
+          if (inactiveImg.complete) ContrastEngine.analyze(inactiveImg);
+          else inactiveImg.addEventListener('load', () => ContrastEngine.analyze(inactiveImg), { once: true });
         }
       }
     };
@@ -466,12 +466,12 @@
         }
         const selectContainer = document.getElementById('qs-voice-color-select');
         if (selectContainer && !selectContainer.contains(e.target)) {
-            const selectTrigger = selectContainer.querySelector('.qs-select-trigger');
-            if (selectTrigger && selectTrigger.getAttribute('aria-expanded') === 'true') {
-                const selectOptions = selectContainer.querySelector('.qs-select-options');
-                selectTrigger.setAttribute('aria-expanded', 'false');
-                if (selectOptions) selectOptions.style.display = 'none';
-            }
+          const selectTrigger = selectContainer.querySelector('.qs-select-trigger');
+          if (selectTrigger && selectTrigger.getAttribute('aria-expanded') === 'true') {
+            const selectOptions = selectContainer.querySelector('.qs-select-options');
+            selectTrigger.setAttribute('aria-expanded', 'false');
+            if (selectOptions) selectOptions.style.display = 'none';
+          }
         }
       });
     }
@@ -534,30 +534,30 @@
     // Sync Appearance Segmented Control
     const appearanceToggle = document.getElementById('qs-appearance-toggle');
     if (appearanceToggle) {
-        // Update visual state
-        const currentAppearance = settings.appearance || 'clear';
-        appearanceToggle.setAttribute('data-switch-state', currentAppearance === 'dimmed' ? '1' : '0');
-        
-        // Add listeners (only needed once if inside the `if (!btn)` block, otherwise check for duplicates)
-        // Since we are replacing logic, ensure this runs. 
-        // Ideally, put this listener attachment inside the `if (!btn) { ... }` block to avoid duplicates.
-        const segmentBtns = appearanceToggle.querySelectorAll('.aurora-switch-btn');
-        segmentBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const settingValue = btn.dataset.settingValue;
-                const switchState = btn.dataset.value;
+      // Update visual state
+      const currentAppearance = settings.appearance || 'clear';
+      appearanceToggle.setAttribute('data-switch-state', currentAppearance === 'dimmed' ? '1' : '0');
 
-                // Add temporary class to enable smooth theme transitions
-                document.documentElement.classList.add('cgpt-theme-transitioning');
-                if (window._auroraThemeTimer) clearTimeout(window._auroraThemeTimer);
-                window._auroraThemeTimer = setTimeout(() => {
-                    document.documentElement.classList.remove('cgpt-theme-transitioning');
-                }, 600);
-                
-                chrome.storage.sync.set({ appearance: settingValue });
-                appearanceToggle.setAttribute('data-switch-state', switchState);
-            });
+      // Add listeners (only needed once if inside the `if (!btn)` block, otherwise check for duplicates)
+      // Since we are replacing logic, ensure this runs. 
+      // Ideally, put this listener attachment inside the `if (!btn) { ... }` block to avoid duplicates.
+      const segmentBtns = appearanceToggle.querySelectorAll('.aurora-switch-btn');
+      segmentBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const settingValue = btn.dataset.settingValue;
+          const switchState = btn.dataset.value;
+
+          // Add temporary class to enable smooth theme transitions
+          document.documentElement.classList.add('cgpt-theme-transitioning');
+          if (window._auroraThemeTimer) clearTimeout(window._auroraThemeTimer);
+          window._auroraThemeTimer = setTimeout(() => {
+            document.documentElement.classList.remove('cgpt-theme-transitioning');
+          }, 600);
+
+          chrome.storage.sync.set({ appearance: settingValue });
+          appearanceToggle.setAttribute('data-switch-state', switchState);
         });
+      });
     }
   }
 
@@ -611,8 +611,8 @@
       if (document.body) add();
       else document.addEventListener('DOMContentLoaded', add, { once: true });
     } else {
-        node.classList.add('bg-visible');
-        updateBackgroundImage();
+      node.classList.add('bg-visible');
+      updateBackgroundImage();
     }
   }
 
@@ -683,8 +683,8 @@
     if (!legacyTrigger) return currentMenu;
 
     const pointerInit = { bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true };
-    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerover', pointerInit)); } catch (e) {}
-    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerenter', pointerInit)); } catch (e) {}
+    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerover', pointerInit)); } catch (e) { }
+    try { legacyTrigger.dispatchEvent(new PointerEvent('pointerenter', pointerInit)); } catch (e) { }
     legacyTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
     legacyTrigger.focus();
     legacyTrigger.click();
@@ -865,7 +865,7 @@
       const t = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      
+
       osc.connect(gain);
       gain.connect(this.ctx.destination);
 
@@ -908,7 +908,7 @@
         }
       }, true); // Capture phase to catch all
       document.body.addEventListener('click', (e) => {
-         this.play('click');
+        this.play('click');
       }, true);
     }
   };
@@ -928,11 +928,11 @@
     },
     get(key) {
       if (!settings.smartSelectors) return document.querySelector(this.definitions[key]?.selector);
-      
+
       if (this.cache[key] && document.body.contains(this.cache[key])) {
         return this.cache[key];
       }
-      
+
       const def = this.definitions[key];
       if (!def) return null;
 
@@ -941,7 +941,7 @@
         el = def.heuristic();
         if (el) console.log(`[Aurora SmartDOM] Healed selector for ${key}`);
       }
-      
+
       if (el) this.cache[key] = el;
       return el;
     }
@@ -954,19 +954,19 @@
       try {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 50; 
+        canvas.width = 50;
         canvas.height = 50;
-        
+
         // Handle cross-origin if possible (won't work for all external URLs)
         if (imgElement.src.startsWith('http') && !imgElement.src.includes(location.host)) {
-             imgElement.crossOrigin = "Anonymous";
+          imgElement.crossOrigin = "Anonymous";
         }
-        
+
         ctx.drawImage(imgElement, 0, 0, 50, 50);
         const data = ctx.getImageData(0, 0, 50, 50).data;
         let r, g, b, avg;
         let colorSum = 0;
-        
+
         for (let x = 0, len = data.length; x < len; x += 4) {
           r = data[x];
           g = data[x + 1];
@@ -974,7 +974,7 @@
           avg = Math.floor((r + g + b) / 3);
           colorSum += avg;
         }
-        
+
         const brightness = Math.floor(colorSum / (50 * 50));
         // Simple logic: Bright image -> Darker overlay. Dark image -> Lighter overlay.
         // Base opacity is around 0.58.
@@ -982,7 +982,7 @@
         if (brightness > 200) newOpacity = 0.85; // Very bright bg, darken overlay
         else if (brightness > 128) newOpacity = 0.70;
         else if (brightness < 50) newOpacity = 0.40; // Very dark bg, lighten overlay
-        
+
         document.documentElement.style.setProperty('--bg-opacity', newOpacity);
       } catch (e) {
         // CORS error likely, fail silently and use default
@@ -997,31 +997,31 @@
     toggleMode() {
       this.isActive = !this.isActive;
       document.documentElement.classList.toggle('cgpt-snapshot-mode', this.isActive);
-      
+
       const btn = document.getElementById('qs-snapshot-btn');
       if (btn) {
-          btn.classList.toggle('active', this.isActive);
-          btn.title = this.isActive ? "Exit Snapshot Mode" : "Enter Snapshot Mode";
+        btn.classList.toggle('active', this.isActive);
+        btn.title = this.isActive ? "Exit Snapshot Mode" : "Enter Snapshot Mode";
       }
     },
     // Simple DOM-to-Image attempt (Canvas ForeignObject)
     async capture() {
-        // Simple implementation: Just let the user screenshot in "Snapshot Mode".
-        // A full programmatic screenshot is unstable with external assets.
-        // We will just provide the "Zen Mode" view.
-        if (!this.isActive) this.toggleMode();
-        
-        // Show a temporary toast
-        const toast = document.createElement('div');
-        toast.textContent = "Snapshot Mode Active. Use your screen capture tool now.";
-        Object.assign(toast.style, {
-            position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)',
-            background: 'rgba(0,0,0,0.8)', color: 'white', padding: '12px 24px',
-            borderRadius: '8px', zIndex: '999999', pointerEvents: 'none',
-            fontFamily: 'system-ui', fontSize: '14px', backdropFilter: 'blur(8px)'
-        });
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
+      // Simple implementation: Just let the user screenshot in "Snapshot Mode".
+      // A full programmatic screenshot is unstable with external assets.
+      // We will just provide the "Zen Mode" view.
+      if (!this.isActive) this.toggleMode();
+
+      // Show a temporary toast
+      const toast = document.createElement('div');
+      toast.textContent = "Snapshot Mode Active. Use your screen capture tool now.";
+      Object.assign(toast.style, {
+        position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)',
+        background: 'rgba(0,0,0,0.8)', color: 'white', padding: '12px 24px',
+        borderRadius: '8px', zIndex: '999999', pointerEvents: 'none',
+        fontFamily: 'system-ui', fontSize: '14px', backdropFilter: 'blur(8px)'
+      });
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
     }
   };
 
@@ -1051,21 +1051,21 @@
     if (window.AuroraTokenCounter) {
       window.AuroraTokenCounter.manage(!!settings.showTokenCounter);
     }
-    
+
     // Initialize Audio Engine listeners if enabled
     if (settings.soundEnabled) {
-        AudioEngine.init();
+      AudioEngine.init();
     }
-    
+
     // Manage Contrast Engine based on flag
     if (settings.autoContrast) {
-        const bgNode = document.getElementById(ID);
-        if (bgNode) {
-            const activeImg = bgNode.querySelector('.media-layer.active img');
-            if (activeImg && activeImg.complete) ContrastEngine.analyze(activeImg);
-        }
+      const bgNode = document.getElementById(ID);
+      if (bgNode) {
+        const activeImg = bgNode.querySelector('.media-layer.active img');
+        if (activeImg && activeImg.complete) ContrastEngine.analyze(activeImg);
+      }
     } else {
-        document.documentElement.style.removeProperty('--bg-opacity');
+      document.documentElement.style.removeProperty('--bg-opacity');
     }
   }
 
@@ -1073,13 +1073,13 @@
   function startObservers() {
     if (observersStarted) return;
     observersStarted = true;
-    
+
     // Performance: Pause animations and video when tab is not visible.
     document.addEventListener('visibilitychange', () => {
       const bgNode = document.getElementById(ID);
       document.documentElement.classList.toggle('cgpt-tab-hidden', document.hidden);
       if (!bgNode) return;
-      
+
       const videos = bgNode.querySelectorAll('video');
       videos.forEach(video => {
         if (document.hidden) {
@@ -1123,7 +1123,7 @@
     let renderFrameId = null;
     const domObserver = new MutationObserver(() => {
       if (renderFrameId) return; // Drop duplicate events within the same frame
-      
+
       renderFrameId = requestAnimationFrame(() => {
         manageUpgradeButtons();
         applyGlassEffects(); // Efficiently tag newly added elements for glass effect
@@ -1209,53 +1209,53 @@
     const welcomeOverlay = document.getElementById('aurora-welcome-overlay');
     const welcomeContainer = document.querySelector('.welcome-container');
     const styleBar = document.getElementById('aurora-style-bar');
-    
+
     let tempSettings = { ...settings }; // Clone settings for preview
 
     // --- Event Listeners ---
     if (getStartedBtn) {
       getStartedBtn.addEventListener('click', () => {
-          if (welcomeOverlay) {
-            welcomeOverlay.classList.add('setup-active');
-          }
+        if (welcomeOverlay) {
+          welcomeOverlay.classList.add('setup-active');
+        }
 
-          if (welcomeContainer) {
-              // Animate the center screen out (downwards)
-              welcomeContainer.classList.add('exiting');
-              
-              // Trigger the bottom bar entrance slightly earlier for a seamless crossover
-              setTimeout(() => {
-                  if (styleBar) styleBar.classList.add('active');
-              }, 150);
+        if (welcomeContainer) {
+          // Animate the center screen out (downwards)
+          welcomeContainer.classList.add('exiting');
 
-              // Remove the center screen after animation completes
-              setTimeout(() => {
-                  welcomeContainer.style.display = 'none';
-              }, 500); 
-          } else {
+          // Trigger the bottom bar entrance slightly earlier for a seamless crossover
+          setTimeout(() => {
             if (styleBar) styleBar.classList.add('active');
-          }
+          }, 150);
 
-          // Initialize with defaults visually
-          document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="default"]').classList.add('active');
-          document.querySelector('#aurora-style-bar .pill-btn[data-appearance="clear"]').classList.add('active');
+          // Remove the center screen after animation completes
+          setTimeout(() => {
+            welcomeContainer.style.display = 'none';
+          }, 500);
+        } else {
+          if (styleBar) styleBar.classList.add('active');
+        }
+
+        // Initialize with defaults visually
+        document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="default"]').classList.add('active');
+        document.querySelector('#aurora-style-bar .pill-btn[data-appearance="clear"]').classList.add('active');
       });
     }
 
     document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(tile => {
-        tile.addEventListener('click', () => {
-            document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(t => t.classList.remove('active'));
-            tile.classList.add('active');
-            const bgChoice = tile.dataset.bgUrl;
-            let newUrl = '';
-            if (bgChoice === 'blue') newUrl = BLUE_WALLPAPER_URL;
-            else if (bgChoice === 'grokHorizon') newUrl = GROK_HORIZON_URL;
-            else if (bgChoice === '__gpt5_animated__') newUrl = '__gpt5_animated__';
-            
-            tempSettings.customBgUrl = newUrl;
-            settings.customBgUrl = newUrl; // for live preview
-            applyAllSettings(); // Use full apply for robust preview
-        });
+      tile.addEventListener('click', () => {
+        document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(t => t.classList.remove('active'));
+        tile.classList.add('active');
+        const bgChoice = tile.dataset.bgUrl;
+        let newUrl = '';
+        if (bgChoice === 'blue') newUrl = BLUE_WALLPAPER_URL;
+        else if (bgChoice === 'grokHorizon') newUrl = GROK_HORIZON_URL;
+        else if (bgChoice === '__gpt5_animated__') newUrl = '__gpt5_animated__';
+
+        tempSettings.customBgUrl = newUrl;
+        settings.customBgUrl = newUrl; // for live preview
+        applyAllSettings(); // Use full apply for robust preview
+      });
     });
 
     document.querySelectorAll('#aurora-style-bar .pill-btn').forEach(pill => {
@@ -1271,14 +1271,14 @@
 
     if (finishBtn) {
       finishBtn.addEventListener('click', () => {
-          tempSettings.hasSeenWelcomeScreen = true;
-          chrome.storage.sync.set(tempSettings, () => {
-              if (chrome.runtime.lastError) {
-                  console.error("Aurora Extension Error (Welcome Finish):", chrome.runtime.lastError.message);
-                  return;
-              }
-              if (welcomeOverlay) welcomeOverlay.remove();
-          });
+        tempSettings.hasSeenWelcomeScreen = true;
+        chrome.storage.sync.set(tempSettings, () => {
+          if (chrome.runtime.lastError) {
+            console.error("Aurora Extension Error (Welcome Finish):", chrome.runtime.lastError.message);
+            return;
+          }
+          if (welcomeOverlay) welcomeOverlay.remove();
+        });
       });
     }
   }
@@ -1289,40 +1289,40 @@
     let welcomeScreenChecked = false;
 
 
-const refreshSettingsAndApply = () => {
-  chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
-    if (chrome.runtime.lastError) {
-      console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
-      return;
-    }
-    
-    // Check if the welcome screen should be shown, but only once.
-    if (!welcomeScreenChecked) {
-      if (!freshSettings.hasSeenWelcomeScreen) {
-        showWelcomeScreen();
+    const refreshSettingsAndApply = () => {
+      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
+        if (chrome.runtime.lastError) {
+          console.error("Aurora Extension Error: Could not refresh settings.", chrome.runtime.lastError.message);
+          return;
+        }
+
+        // Check if the welcome screen should be shown, but only once.
+        if (!welcomeScreenChecked) {
+          if (!freshSettings.hasSeenWelcomeScreen) {
+            showWelcomeScreen();
+          }
+          welcomeScreenChecked = true; // Mark as checked for this session.
+        }
+
+        // Update the global settings object with the fresh, authoritative state.
+        settings = freshSettings;
+        // Apply all visual changes based on the new settings.
+        applyAllSettings();
+      });
+    };
+
+    // Initialize i18n system with ChatGPT language detection
+    (async () => {
+      try {
+        if (window.AuroraI18n?.initialize) {
+          await window.AuroraI18n.initialize();
+          const detectedLocale = window.AuroraI18n.getDetectedLocale();
+          console.log(`Aurora: Language system initialized with locale: ${detectedLocale}`);
+        }
+      } catch (e) {
+        console.warn('Aurora: Could not initialize i18n system, using browser default:', e);
       }
-      welcomeScreenChecked = true; // Mark as checked for this session.
-    }
-
-    // Update the global settings object with the fresh, authoritative state.
-    settings = freshSettings;
-    // Apply all visual changes based on the new settings.
-    applyAllSettings();
-  });
-};
-
-// Initialize i18n system with ChatGPT language detection
-(async () => {
-  try {
-    if (window.AuroraI18n?.initialize) {
-      await window.AuroraI18n.initialize();
-      const detectedLocale = window.AuroraI18n.getDetectedLocale();
-      console.log(`Aurora: Language system initialized with locale: ${detectedLocale}`);
-    }
-  } catch (e) {
-    console.warn('Aurora: Could not initialize i18n system, using browser default:', e);
-  }
-})();
+    })();
 
     // Initial load when the script first runs.
     if (document.readyState === 'loading') {
@@ -1349,13 +1349,13 @@ const refreshSettingsAndApply = () => {
               return;
             }
             settings = freshSettings;
-            
+
             // Apply only the necessary, non-background updates
             applyRootFlags();
             manageGpt5LimitPopup();
             manageUpgradeButtons();
             if (!settings.hideQuickSettings) {
-                manageQuickSettingsUI();
+              manageQuickSettingsUI();
             }
             maybeApplyDefaultModel();
             if (window.AuroraTokenCounter) {
@@ -1385,6 +1385,10 @@ const refreshSettingsAndApply = () => {
     html.cgpt-snapshot-mode main .text-token-text-primary { margin: 0 auto !important; max-width: 800px !important; }
     html.cgpt-snapshot-mode main { padding-bottom: 50px !important; }
   `;
-  document.head.appendChild(snapshotStyle);
+  if (document.head) {
+    document.head.appendChild(snapshotStyle);
+  } else {
+    document.addEventListener('DOMContentLoaded', () => document.head.appendChild(snapshotStyle), { once: true });
+  }
 
 })();

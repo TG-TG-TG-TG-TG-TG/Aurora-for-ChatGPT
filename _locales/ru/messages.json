@@ -430,5 +430,44 @@
   },
   "exportError": {
     "message": "Ошибка экспорта. Попробуйте снова."
+  },
+  "sectionImportExport": {
+    "message": "Импорт/Экспорт настроек"
+  },
+  "buttonExportSettings": {
+    "message": "Экспорт настроек"
+  },
+  "buttonImportSettings": {
+    "message": "Импорт настроек"
+  },
+  "alertSettingsExported": {
+    "message": "Настройки скопированы в буфер обмена!"
+  },
+  "alertSettingsImported": {
+    "message": "Настройки успешно импортированы!"
+  },
+  "alertInvalidJson": {
+    "message": "Неверный формат JSON"
+  },
+  "sectionAudio": {
+    "message": "Аудио"
+  },
+  "labelHapticSound": {
+    "message": "Звуки интерфейса"
+  },
+  "tooltipHapticSound": {
+    "message": "Воспроизводить тонкие стеклянные звуки при взаимодействии"
+  },
+  "labelAutoContrast": {
+    "message": "Авто-контраст (Изображения)"
+  },
+  "tooltipAutoContrast": {
+    "message": "Автоматически регулировать затемнение оверлея на основе яркости фона"
+  },
+  "labelSmartSelectors": {
+    "message": "Умное восстановление селекторов"
+  },
+  "tooltipSmartSelectors": {
+    "message": "Автоматически находить элементы, если ChatGPT обновится"
   }
 }
