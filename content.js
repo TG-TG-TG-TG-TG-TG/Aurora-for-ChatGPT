@@ -1067,6 +1067,15 @@
     } else {
       document.documentElement.style.removeProperty('--bg-opacity');
     }
+
+    // Manage Data Masking Engine
+    if (window.DataMaskingEngine) {
+      window.DataMaskingEngine.init().then(() => {
+        if (window.DataMaskingEngine.isEnabled()) {
+          window.DataMaskingEngine.maskElement(document.body);
+        }
+      });
+    }
   }
 
   let observersStarted = false;
@@ -1121,12 +1130,24 @@
     // Optimization: Batch heavy UI updates into a single animation frame
     // to prevent layout thrashing and reduce CPU usage during DOM mutations.
     let renderFrameId = null;
-    const domObserver = new MutationObserver(() => {
+    const domObserver = new MutationObserver((mutations) => {
       if (renderFrameId) return; // Drop duplicate events within the same frame
 
       renderFrameId = requestAnimationFrame(() => {
         manageUpgradeButtons();
         applyGlassEffects(); // Efficiently tag newly added elements for glass effect
+
+        // Data Masking: Process new nodes
+        if (window.DataMaskingEngine && window.DataMaskingEngine.isEnabled()) {
+          mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                window.DataMaskingEngine.maskElement(node);
+              }
+            });
+          });
+        }
+
         renderFrameId = null;
       });
 
