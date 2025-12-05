@@ -18,7 +18,7 @@ const getMessage = (key, substitutions) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   let settingsCache = {};
-  let DEFAULTS_CACHE = {}; 
+  let DEFAULTS_CACHE = {};
   let searchableSettings = [];
 
   const applyStaticLocalization = () => {
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   applyStaticLocalization();
-  
+
   const tabs = document.querySelectorAll('.tab-link');
   const panes = document.querySelectorAll('.tab-pane');
   const mainContent = document.querySelector('.tab-content');
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchableSettings.forEach(setting => setting.element.classList.remove('is-hidden'));
     tabs.forEach(tab => tab.classList.remove('is-hidden'));
-    
+
     const activeTab = document.querySelector('.tab-link.active');
     if (!activeTab || activeTab.classList.contains('is-hidden')) {
       tabs[0]?.click();
@@ -167,6 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'soundEnabled', key: 'soundEnabled' },
     { id: 'autoContrast', key: 'autoContrast' },
     { id: 'smartSelectors', key: 'smartSelectors' },
+    { id: 'dataMaskingEnabled', key: 'dataMaskingEnabled' },
+    { id: 'maskingRandomMode', key: 'maskingRandomMode' },
   ];
 
   TOGGLE_CONFIG.forEach(({ id, key }) => {
@@ -196,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function createCustomSelect(containerId, options, storageKey, onPresetChange, config = {}) {
     const container = document.getElementById(containerId);
-    if (!container) return { update: () => {} };
+    if (!container) return { update: () => { } };
     const trigger = container.querySelector('.select-trigger');
     const label = container.querySelector('.select-label');
     const optionsContainer = container.querySelector('.select-options');
@@ -219,10 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
       optionsContainer.innerHTML = options
         .filter(option => !option.hidden)
         .map(option => {
-            const colorDotHtml = option.color ? `<span class="color-dot" style="background-color: ${option.color}; display: block;"></span>` : '';
-            const optionLabel = resolveLabel(option, option.value);
-            const isSelected = option.value === selectedValue ? 'true' : 'false';
-            return `
+          const colorDotHtml = option.color ? `<span class="color-dot" style="background-color: ${option.color}; display: block;"></span>` : '';
+          const optionLabel = resolveLabel(option, option.value);
+          const isSelected = option.value === selectedValue ? 'true' : 'false';
+          return `
             <div class="select-option" role="option" data-value="${option.value}" aria-selected="${isSelected}">
               ${colorDotHtml}
               <span class="option-label">${optionLabel}</span>
@@ -271,9 +273,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
       closeAllSelects();
       if (!isExpanded) {
-          container.classList.add('is-open');
-          trigger.setAttribute('aria-expanded', 'true');
-          optionsContainer.style.display = 'block';
+        container.classList.add('is-open');
+        trigger.setAttribute('aria-expanded', 'true');
+        optionsContainer.style.display = 'block';
       }
     });
 
@@ -282,11 +284,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeAllSelects() {
     document.querySelectorAll('.custom-select').forEach(sel => {
-        sel.classList.remove('is-open');
-        const trigger = sel.querySelector('.select-trigger');
-        const optionsContainer = sel.querySelector('.select-options');
-        if (trigger) trigger.setAttribute('aria-expanded', 'false');
-        if (optionsContainer) optionsContainer.style.display = 'none';
+      sel.classList.remove('is-open');
+      const trigger = sel.querySelector('.select-trigger');
+      const optionsContainer = sel.querySelector('.select-options');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      if (optionsContainer) optionsContainer.style.display = 'none';
     });
   }
   document.addEventListener('click', closeAllSelects);
@@ -309,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (value !== 'custom') {
-        chrome.storage.local.remove(LOCAL_BG_KEY);
+      chrome.storage.local.remove(LOCAL_BG_KEY);
     }
     chrome.storage.sync.set({ customBgUrl: newUrl });
   });
@@ -473,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
         element.checked = !!settings[key];
       }
     });
-    
+
     blurSlider.value = settings.backgroundBlur;
     blurValue.textContent = settings.backgroundBlur;
 
@@ -525,8 +527,8 @@ document.addEventListener('DOMContentLoaded', () => {
   tbBgUrl.addEventListener('change', () => {
     const urlValue = tbBgUrl.value.trim();
     const newSettings = { customBgUrl: urlValue };
-    if(urlValue !== '__local__' && urlValue !== GROK_HORIZON_URL) {
-        chrome.storage.local.remove(LOCAL_BG_KEY);
+    if (urlValue !== '__local__' && urlValue !== GROK_HORIZON_URL) {
+      chrome.storage.local.remove(LOCAL_BG_KEY);
     }
     chrome.storage.sync.set(newSettings);
   });
@@ -555,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnClearBg) {
     btnClearBg.addEventListener('click', () => {
       if (!DEFAULTS_CACHE || Object.keys(DEFAULTS_CACHE).length === 0) return;
-      
+
       const settingsToReset = {
         customBgUrl: DEFAULTS_CACHE.customBgUrl,
         backgroundBlur: DEFAULTS_CACHE.backgroundBlur,
@@ -564,7 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       chrome.storage.sync.set(settingsToReset);
       chrome.storage.local.remove(LOCAL_BG_KEY);
-      
+
       tbBgUrl.value = '';
       blurSlider.value = settingsToReset.backgroundBlur;
       blurValue.textContent = settingsToReset.backgroundBlur;

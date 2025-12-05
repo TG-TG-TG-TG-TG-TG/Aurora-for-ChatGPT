@@ -469,5 +469,47 @@
   },
   "tooltipSmartSelectors": {
     "message": "Automatically find elements if ChatGPT updates"
+  },
+  "tabPrivacy": {
+    "message": "Privacy"
+  },
+  "sectionDataMasking": {
+    "message": "Data Masking"
+  },
+  "labelEnableDataMasking": {
+    "message": "Enable Data Masking"
+  },
+  "tooltipEnableDataMasking": {
+    "message": "Automatically hide sensitive data on screen"
+  },
+  "labelRandomGeneration": {
+    "message": "Use Random Generation"
+  },
+  "tooltipRandomGeneration": {
+    "message": "Replace data with random values instead of asterisks"
+  },
+  "sectionMaskingTypes": {
+    "message": "Mask Data Types"
+  },
+  "labelMaskEmails": {
+    "message": "Email Addresses"
+  },
+  "labelMaskPhones": {
+    "message": "Phone Numbers"
+  },
+  "labelMaskCards": {
+    "message": "Credit Cards"
+  },
+  "labelMaskIP": {
+    "message": "IP Addresses"
+  },
+  "labelMaskSSN": {
+    "message": "SSN (USA)"
+  },
+  "labelMaskINN": {
+    "message": "INN (Russia)"
+  },
+  "labelMaskPassport": {
+    "message": "Passport"
   }
 }

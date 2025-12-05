@@ -51,6 +51,13 @@
       </svg>
       <span data-i18n="tabVisibility">Visibility</span>
     </button>
+    <button class="tab-link" data-tab="privacy">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+      <span data-i18n="tabPrivacy">Privacy</span>
+    </button>
   </nav>
 
   <main class="tab-content">
@@ -269,6 +276,25 @@
         <div class="label" data-i18n="labelBlurAvatar">Blur user avatar</div>
         <label class="switch" title="__MSG_tooltipBlurAvatar__" data-i18n-title="tooltipBlurAvatar">
           <input type="checkbox" id="blurAvatar">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Privacy Tab -->
+    <div id="privacy" class="tab-pane">
+      <div class="section-header" data-i18n="sectionDataMasking">Data Masking</div>
+      <div class="row">
+        <div class="label" data-i18n="labelEnableDataMasking">Enable Data Masking</div>
+        <label class="switch" title="__MSG_tooltipEnableDataMasking__" data-i18n-title="tooltipEnableDataMasking">
+          <input type="checkbox" id="dataMaskingEnabled">
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div class="row">
+        <div class="label" data-i18n="labelRandomGeneration">Use Random Generation</div>
+        <label class="switch" title="__MSG_tooltipRandomGeneration__" data-i18n-title="tooltipRandomGeneration">
+          <input type="checkbox" id="maskingRandomMode">
           <span class="track"><span class="thumb"></span></span>
         </label>
       </div>
