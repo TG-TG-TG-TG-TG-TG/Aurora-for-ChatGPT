@@ -6,6 +6,10 @@
 (() => {
     'use strict';
 
+    // Ensure Aurora namespace exists
+    if (!window.Aurora) {
+        window.Aurora = {};
+    }
     const Aurora = window.Aurora;
 
     // ============================================================================
@@ -440,6 +444,9 @@
         update: (text) => counter.update(text)
     };
 
-    Aurora.TokenCounter = TokenCounter;
-    window.Aurora = Aurora;
+    // Ensure Aurora is initialized before setting TokenCounter
+    if (!window.Aurora) {
+        window.Aurora = {};
+    }
+    window.Aurora.TokenCounter = TokenCounter;
 })();

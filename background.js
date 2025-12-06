@@ -58,7 +58,8 @@ chrome.runtime.onInstalled.addListener((details) => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.type) {
     case 'GET_SETTINGS':
-      chrome.storage.sync.get(DEFAULTS, (settings) => {
+      chrome.storage.sync.get(Object.keys(DEFAULTS), (items) => {
+        const settings = { ...DEFAULTS, ...items };
         sendResponse(settings);
       });
       return true;
