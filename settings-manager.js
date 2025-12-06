@@ -7,7 +7,7 @@
     const Aurora = window.Aurora;
 
     /**
-     * Settings manager (Singleton)
+     * Settings Manager (Singleton)
      * Provides a single point of access to settings and their synchronization
      */
     class SettingsManager {

@@ -276,7 +276,7 @@
         }
 
         /**
-         * Update styles (when blur/scaling changes)
+         * Refresh styles (when blur/scaling changes)
          */
         refreshStyles() {
             this._applyCustomStyles();

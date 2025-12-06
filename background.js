@@ -1,3 +1,8 @@
+/**
+ * Aurora for ChatGPT - Background Service Worker
+ * Settings management and message handling
+ */
+
 const DEFAULTS = {
   legacyComposer: false,
   theme: 'auto',
@@ -47,15 +52,28 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
+/**
+ * Handle messages from content scripts and popup
+ */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'GET_SETTINGS') {
-    chrome.storage.sync.get(DEFAULTS, (settings) => {
-      sendResponse(settings);
-    });
-    return true;
-  }
-  if (request.type === 'GET_DEFAULTS') {
-    sendResponse(DEFAULTS);
-    return true;
+  switch (request.type) {
+    case 'GET_SETTINGS':
+      chrome.storage.sync.get(DEFAULTS, (settings) => {
+        sendResponse(settings);
+      });
+      return true;
+
+    case 'GET_DEFAULTS':
+      sendResponse(DEFAULTS);
+      return true;
+
+    case 'RESET_ALL':
+      chrome.storage.sync.set(DEFAULTS, () => {
+        sendResponse({ success: true });
+      });
+      return true;
+
+    default:
+      return false;
   }
 });
