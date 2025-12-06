@@ -311,12 +311,72 @@
       } else {
         document.documentElement.style.removeProperty('--bg-opacity');
       }
+    } else {
+      document.documentElement.style.removeProperty('--bg-opacity');
+    }
+
+    // Manage Data Masking Engine
+    if (window.DataMaskingEngine) {
+      window.DataMaskingEngine.init().then(() => {
+        if (window.DataMaskingEngine.isEnabled()) {
+          window.DataMaskingEngine.maskElement(document.body);
+        }
+      });
+    }
+  }
 
       // Data Masking
       if (window.DataMaskingEngine?.init) {
         window.DataMaskingEngine.init();
       }
-    }
+    });
+
+    uiReadyObserver.observe(document.body, { childList: true, subtree: true });
+
+    window.addEventListener('focus', applyAllSettings, { passive: true });
+    let lastUrl = location.href;
+    const checkUrl = () => { if (location.href === lastUrl) return; lastUrl = location.href; applyAllSettings(); };
+    window.addEventListener('popstate', checkUrl, { passive: true });
+    const originalPushState = history.pushState;
+    history.pushState = function (...args) { originalPushState.apply(this, args); setTimeout(checkUrl, 0); };
+    const originalReplaceState = history.replaceState;
+    history.replaceState = function (...args) { originalReplaceState.apply(this, args); setTimeout(checkUrl, 0); };
+
+    // For performance, debounce less-critical UI checks that don't cause flicker.
+    const debouncedOtherChecks = debounce(() => {
+      manageGpt5LimitPopup();
+      maybeApplyDefaultModel();
+    }, 150);
+
+    // Optimization: Batch heavy UI updates into a single animation frame
+    // to prevent layout thrashing and reduce CPU usage during DOM mutations.
+    let renderFrameId = null;
+    const domObserver = new MutationObserver((mutations) => {
+      if (renderFrameId) return; // Drop duplicate events within the same frame
+
+      renderFrameId = requestAnimationFrame(() => {
+        manageUpgradeButtons();
+        applyGlassEffects(); // Efficiently tag newly added elements for glass effect
+
+        // Data Masking: Process new nodes
+        if (window.DataMaskingEngine && window.DataMaskingEngine.isEnabled()) {
+          mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                window.DataMaskingEngine.maskElement(node);
+              }
+            });
+          });
+        }
+
+        renderFrameId = null;
+      });
+
+      // Run the less-critical checks on a debounce timer.
+      debouncedOtherChecks();
+    });
+
+    domObserver.observe(document.body, { childList: true, subtree: true });
 
     _startObservers() {
       if (this.observersStarted) return;

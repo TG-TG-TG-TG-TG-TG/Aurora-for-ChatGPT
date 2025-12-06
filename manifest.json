@@ -34,12 +34,6 @@
         "https://openai.com/*"
       ],
       "js": [
-        "constants.js",
-        "utils.js",
-        "settings-manager.js",
-        "i18n-loader.js",
-        "background-manager.js",
-        "ui-manager.js",
         "data-masking.js",
         "token-counter.js",
         "content.js"
