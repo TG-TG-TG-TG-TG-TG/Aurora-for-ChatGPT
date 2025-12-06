@@ -1,6 +1,16 @@
+/**
+ * Aurora for ChatGPT - Data Masking Engine
+ * Automatic personal data masking
+ */
+
 (() => {
     'use strict';
 
+    const Aurora = window.Aurora;
+
+    // ============================================================================
+    // Data recognition patterns
+    // ============================================================================
     const PATTERNS = {
         email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/gi,
         creditCard: /\b\d{4}[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}\b/g,
@@ -28,10 +38,14 @@
         cpf: /\b\d{3}\.\d{3}\.\d{3}-\d{2}\b/g,
     };
 
+    // ============================================================================
+    // Random data generators
+    // ============================================================================
     const Generators = {
-        randomInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
-        randomDigits: (count) => Array.from({ length: count }, () => Generators.randomInt(0, 9)).join(''),
-        randomLetter: () => String.fromCharCode(65 + Generators.randomInt(0, 25)),
+        randomInt: Aurora.randomInt || ((min, max) => Math.floor(Math.random() * (max - min + 1)) + min),
+        randomDigits: Aurora.randomDigits || ((count) => Array.from({ length: count }, () => Generators.randomInt(0, 9)).join('')),
+        randomLetter: Aurora.randomLetter || (() => String.fromCharCode(65 + Generators.randomInt(0, 25))),
+
         email: () => `user${Generators.randomDigits(4)}@${['gmail.com', 'yahoo.com', 'mail.ru'][Generators.randomInt(0, 2)]}`,
         creditCard: () => Array.from({ length: 4 }, () => Generators.randomDigits(4)).join(' '),
         vin: () => Array.from({ length: 17 }, () => 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789'[Generators.randomInt(0, 32)]).join(''),
@@ -57,8 +71,23 @@
         cpf: () => `${Generators.randomDigits(3)}.${Generators.randomDigits(3)}.${Generators.randomDigits(3)}-${Generators.randomDigits(2)}`,
     };
 
+    // ============================================================================
+    // Data Masking Engine
+    // ============================================================================
     class DataMaskingEngine {
+        static _instance = null;
+
+        static getInstance() {
+            if (!DataMaskingEngine._instance) {
+                DataMaskingEngine._instance = new DataMaskingEngine();
+            }
+            return DataMaskingEngine._instance;
+        }
+
         constructor() {
+            if (DataMaskingEngine._instance) {
+                throw new Error('DataMaskingEngine is a singleton');
+            }
             this.originalData = new Map();
             this.dataIdCounter = 0;
             this.settings = { dataMaskingEnabled: false, maskingRandomMode: false };
@@ -70,40 +99,44 @@
 
         async init() {
             if (this.initialized) return;
-            try {
-                if (chrome?.storage?.sync) {
-                    const result = await new Promise(resolve => {
-                        chrome.storage.sync.get(['dataMaskingEnabled', 'maskingRandomMode'], resolve);
-                    });
-                    this.settings.dataMaskingEnabled = !!result.dataMaskingEnabled;
-                    this.settings.maskingRandomMode = !!result.maskingRandomMode;
-                    this.initialized = true;
 
+            try {
+                const result = await Aurora.getStorageSync(['dataMaskingEnabled', 'maskingRandomMode']);
+                this.settings.dataMaskingEnabled = !!result.dataMaskingEnabled;
+                this.settings.maskingRandomMode = !!result.maskingRandomMode;
+                this.initialized = true;
+
+                if (this.settings.dataMaskingEnabled) {
+                    this.startObserver();
+                    if (document.body) this.maskElement(document.body);
+                }
+
+                this._setupStorageListener();
+            } catch (e) {
+                console.warn('Aurora DataMasking: Init failed', e);
+            }
+        }
+
+        _setupStorageListener() {
+            if (!chrome?.storage?.onChanged) return;
+
+            chrome.storage.onChanged.addListener((changes, area) => {
+                if (area !== 'sync') return;
+
+                if (changes.dataMaskingEnabled !== undefined) {
+                    this.settings.dataMaskingEnabled = !!changes.dataMaskingEnabled.newValue;
                     if (this.settings.dataMaskingEnabled) {
                         this.startObserver();
-                        if (document.body) {
-                            this.maskElement(document.body);
-                        }
+                        if (document.body) this.maskElement(document.body);
+                    } else {
+                        this.stopObserver();
                     }
-
-                    chrome.storage.onChanged.addListener((changes, area) => {
-                        if (area === 'sync') {
-                            if (changes.dataMaskingEnabled !== undefined) {
-                                this.settings.dataMaskingEnabled = !!changes.dataMaskingEnabled.newValue;
-                                if (this.settings.dataMaskingEnabled) {
-                                    this.startObserver();
-                                    if (document.body) this.maskElement(document.body);
-                                } else {
-                                    this.stopObserver();
-                                }
-                            }
-                            if (changes.maskingRandomMode !== undefined) {
-                                this.settings.maskingRandomMode = !!changes.maskingRandomMode.newValue;
-                            }
-                        }
-                    });
                 }
-            } catch (e) { }
+
+                if (changes.maskingRandomMode !== undefined) {
+                    this.settings.maskingRandomMode = !!changes.maskingRandomMode.newValue;
+                }
+            });
         }
 
         startObserver() {
@@ -150,36 +183,38 @@
         }
 
         getMask(type, originalText) {
-            if (this.settings.maskingRandomMode) {
-                const generator = Generators[type];
-                if (generator) return generator();
+            if (this.settings.maskingRandomMode && Generators[type]) {
+                return Generators[type]();
             }
+
             const length = originalText.length;
-            if (type === 'email') {
-                const parts = originalText.split('@');
-                return '*****@*****' + (parts[1] ? '.' + parts[1].split('.').pop() : '');
-            } else if (type === 'creditCard') {
-                return '**** **** **** ' + originalText.slice(-4);
-            } else if (type.includes('phone')) {
-                return originalText.slice(0, 2) + ' (***) ***-**-**';
-            } else if (type === 'passportRU') {
-                return '** ** ******';
-            } else if (type === 'inn') {
-                return '**********';
-            } else if (type === 'snils') {
-                return '***-***-*** **';
-            } else if (type === 'ssn') {
-                return '***-**-****';
-            } else if (type === 'ipv4') {
-                return '***.***.***.***';
-            }
-            return '*'.repeat(Math.min(length, 12));
+
+            const masks = {
+                email: () => {
+                    const parts = originalText.split('@');
+                    return '*****@*****' + (parts[1] ? '.' + parts[1].split('.').pop() : '');
+                },
+                creditCard: () => '**** **** **** ' + originalText.slice(-4),
+                phoneRU: () => originalText.slice(0, 2) + ' (***) ***-**-**',
+                phoneUS: () => '(***) ***-****',
+                passportRU: () => '** ** ******',
+                inn: () => '**********',
+                snils: () => '***-***-*** **',
+                ssn: () => '***-**-****',
+                ipv4: () => '***.***.***.***'
+            };
+
+            return masks[type] ? masks[type]() : '*'.repeat(Math.min(length, 12));
         }
 
         maskTextNode(node) {
             if (!node?.textContent?.trim()) return;
+
             const parent = node.parentElement;
-            if (!parent || ['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'INPUT', 'TEXTAREA'].includes(parent.tagName)) return;
+            if (!parent) return;
+
+            const skipTags = ['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'INPUT', 'TEXTAREA'];
+            if (skipTags.includes(parent.tagName)) return;
 
             let text = node.textContent;
             let modified = false;
@@ -187,6 +222,7 @@
             for (const [type, pattern] of Object.entries(PATTERNS)) {
                 pattern.lastIndex = 0;
                 const matches = [...text.matchAll(pattern)];
+
                 for (const match of matches) {
                     const original = match[0];
                     const mask = this.getMask(type, original);
@@ -207,9 +243,9 @@
                 acceptNode: (node) => {
                     if (!node.textContent?.trim()) return NodeFilter.FILTER_REJECT;
                     const p = node.parentElement;
-                    if (!p || ['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'INPUT', 'TEXTAREA'].includes(p.tagName)) {
-                        return NodeFilter.FILTER_REJECT;
-                    }
+                    if (!p) return NodeFilter.FILTER_REJECT;
+                    const skipTags = ['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'INPUT', 'TEXTAREA'];
+                    if (skipTags.includes(p.tagName)) return NodeFilter.FILTER_REJECT;
                     return NodeFilter.FILTER_ACCEPT;
                 }
             });
@@ -225,12 +261,20 @@
         }
     }
 
-    const engine = new DataMaskingEngine();
-    window.DataMaskingEngine = engine;
+    // ============================================================================
+    // Initialization
+    // ============================================================================
+    const engine = DataMaskingEngine.getInstance();
 
-    const initEarly = () => {
-        engine.init();
+    window.DataMaskingEngine = {
+        init: () => engine.init(),
+        isEnabled: () => engine.isEnabled(),
+        maskElement: (el) => engine.maskElement(el),
+        restore: () => engine.restore()
     };
+
+    // Early initialization
+    const initEarly = () => engine.init();
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initEarly, { once: true });
