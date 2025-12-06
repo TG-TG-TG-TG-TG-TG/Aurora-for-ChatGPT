@@ -66,10 +66,12 @@
             this.observer = null;
             this.pendingNodes = [];
             this.processQueued = false;
+            this._storageListenerAdded = false;
         }
 
         async init() {
             if (this.initialized) return;
+            this.initialized = true; // Set early to prevent duplicate calls
             try {
                 if (chrome?.storage?.sync) {
                     const result = await new Promise(resolve => {
@@ -77,7 +79,6 @@
                     });
                     this.settings.dataMaskingEnabled = !!result.dataMaskingEnabled;
                     this.settings.maskingRandomMode = !!result.maskingRandomMode;
-                    this.initialized = true;
 
                     if (this.settings.dataMaskingEnabled) {
                         this.startObserver();
@@ -86,24 +87,30 @@
                         }
                     }
 
-                    chrome.storage.onChanged.addListener((changes, area) => {
-                        if (area === 'sync') {
-                            if (changes.dataMaskingEnabled !== undefined) {
-                                this.settings.dataMaskingEnabled = !!changes.dataMaskingEnabled.newValue;
-                                if (this.settings.dataMaskingEnabled) {
-                                    this.startObserver();
-                                    if (document.body) this.maskElement(document.body);
-                                } else {
-                                    this.stopObserver();
+                    // Only add listener once
+                    if (!this._storageListenerAdded) {
+                        this._storageListenerAdded = true;
+                        chrome.storage.onChanged.addListener((changes, area) => {
+                            if (area === 'sync') {
+                                if (changes.dataMaskingEnabled !== undefined) {
+                                    this.settings.dataMaskingEnabled = !!changes.dataMaskingEnabled.newValue;
+                                    if (this.settings.dataMaskingEnabled) {
+                                        this.startObserver();
+                                        if (document.body) this.maskElement(document.body);
+                                    } else {
+                                        this.stopObserver();
+                                    }
+                                }
+                                if (changes.maskingRandomMode !== undefined) {
+                                    this.settings.maskingRandomMode = !!changes.maskingRandomMode.newValue;
                                 }
                             }
-                            if (changes.maskingRandomMode !== undefined) {
-                                this.settings.maskingRandomMode = !!changes.maskingRandomMode.newValue;
-                            }
-                        }
-                    });
+                        });
+                    }
                 }
-            } catch (e) { }
+            } catch (e) {
+                this.initialized = false; // Reset on error
+            }
         }
 
         startObserver() {
@@ -183,7 +190,9 @@
 
             let text = node.textContent;
             let modified = false;
+            const replacements = [];
 
+            // Collect all matches first to avoid index shifting issues
             for (const [type, pattern] of Object.entries(PATTERNS)) {
                 pattern.lastIndex = 0;
                 const matches = [...text.matchAll(pattern)];
@@ -192,12 +201,24 @@
                     const mask = this.getMask(type, original);
                     const dataId = `m-${this.dataIdCounter++}`;
                     this.originalData.set(dataId, { original, type, node });
-                    text = text.replace(original, mask);
+                    replacements.push({
+                        original: original,
+                        mask: mask,
+                        index: match.index
+                    });
                     modified = true;
                 }
             }
 
-            if (modified) node.textContent = text;
+            // Sort by index (descending) to replace from end to start, avoiding index shifts
+            if (modified) {
+                replacements.sort((a, b) => b.index - a.index);
+                for (const replacement of replacements) {
+                    // Use substring to avoid regex special character issues
+                    text = text.substring(0, replacement.index) + replacement.mask + text.substring(replacement.index + replacement.original.length);
+                }
+                node.textContent = text;
+            }
         }
 
         maskElement(element) {

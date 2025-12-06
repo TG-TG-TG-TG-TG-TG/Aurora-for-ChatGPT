@@ -59,6 +59,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.type) {
     case 'GET_SETTINGS':
       chrome.storage.sync.get(Object.keys(DEFAULTS), (items) => {
+        if (chrome.runtime.lastError) {
+          console.error('Aurora: Failed to get settings:', chrome.runtime.lastError);
+          sendResponse(DEFAULTS);
+          return;
+        }
         const settings = { ...DEFAULTS, ...items };
         sendResponse(settings);
       });

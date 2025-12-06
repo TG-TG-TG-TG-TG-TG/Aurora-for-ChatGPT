@@ -254,9 +254,9 @@
         });
       });
 
-      finishBtn?.addEventListener('click', () => {
+      finishBtn?.addEventListener('click', async () => {
         tempSettings.hasSeenWelcomeScreen = true;
-        this.settings.setMultiple(tempSettings);
+        await this.settings.setMultiple(tempSettings);
         overlay.remove();
       });
     }
@@ -459,9 +459,13 @@
   const app = new AuroraApp();
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => app.init(), { once: true });
+    document.addEventListener('DOMContentLoaded', async () => {
+      await app.init();
+    }, { once: true });
   } else {
-    app.init();
+    (async () => {
+      await app.init();
+    })();
   }
 
 })();

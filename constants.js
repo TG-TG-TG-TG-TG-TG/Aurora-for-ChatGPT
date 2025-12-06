@@ -11,13 +11,16 @@ window.Aurora = window.Aurora || {};
 // ============================================================================
 window.Aurora.URLS = {
     BLUE_WALLPAPER: 'https://img.freepik.com/free-photo/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner_1258-54581.jpg?semt=ais_hybrid&w=740&q=80',
-    GROK_HORIZON: (() => {
+    get GROK_HORIZON() {
         try {
-            return chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
+            if (chrome?.runtime?.getURL) {
+                return chrome.runtime.getURL('Aurora/grok-4.webp');
+            }
         } catch (e) {
-            return 'Aurora/grok-4.webp';
+            // Chrome API not available yet
         }
-    })(),
+        return 'Aurora/grok-4.webp';
+    },
     DEFAULT_WEBP_SRCSET: 'https://persistent.oaistatic.com/burrito-nux/640.webp 640w, https://persistent.oaistatic.com/burrito-nux/1280.webp 1280w, https://persistent.oaistatic.com/burrito-nux/1920.webp 1920w',
     DEFAULT_IMG_SRC: 'https://persistent.oaistatic.com/burrito-nux/640.webp'
 };
