@@ -239,7 +239,10 @@
 
           tempSettings.customBgUrl = url;
           this.settings.set('customBgUrl', url);
-          this.background?.updateImage();
+          // Fire-and-forget with error handling
+          this.background?.updateImage()?.catch(err => {
+            console.warn('Aurora WelcomeScreen: Failed to update image:', err);
+          });
         });
       });
 
@@ -411,12 +414,18 @@
 
           if (isBgChange) {
             this.background.refreshStyles();
-            this.background.updateImage();
+            // Fire-and-forget with error handling
+            this.background.updateImage().catch(err => {
+              console.warn('Aurora: Failed to update image on storage change:', err);
+            });
           }
 
           this.ui.applyAll();
         } else if (area === 'local' && changes[Aurora.STORAGE_KEYS.LOCAL_BG]) {
-          this.background.updateImage();
+          // Fire-and-forget with error handling
+          this.background.updateImage().catch(err => {
+            console.warn('Aurora: Failed to update image on local storage change:', err);
+          });
         }
       });
     }

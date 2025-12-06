@@ -27,7 +27,10 @@
             this.bgNode = this._createBgNode();
             this._insertBgNode();
             this._applyCustomStyles();
-            this.updateImage();
+            // Fire-and-forget with error handling
+            this.updateImage().catch(err => {
+                console.warn('Aurora BackgroundManager: Failed to update image during init:', err);
+            });
         }
 
         /**
@@ -262,7 +265,10 @@
                 this.init();
             } else {
                 this.bgNode.classList.add('bg-visible');
-                this.updateImage();
+                // Fire-and-forget with error handling
+                this.updateImage().catch(err => {
+                    console.warn('Aurora BackgroundManager: Failed to update image during show:', err);
+                });
             }
         }
 
