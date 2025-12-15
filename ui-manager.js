@@ -186,6 +186,15 @@
             <button type="button" class="aurora-switch-btn" data-value="1" data-setting-value="dimmed">${Aurora.getMessage('glassAppearanceOptionDimmed')}</button>
           </div>
         </div>
+        <div class="qs-section-title">Holiday Effects</div>
+        <div class="qs-row" data-setting="enableSnowfall">
+          <label>Snowfall</label>
+          <label class="switch"><input type="checkbox" id="qs-enableSnowfall"><span class="track"><span class="thumb"></span></span></label>
+        </div>
+        <div class="qs-row" data-setting="enableNewYear">
+          <label>New Year '26</label>
+          <label class="switch"><input type="checkbox" id="qs-enableNewYear"><span class="track"><span class="thumb"></span></span></label>
+        </div>
       `;
         }
 
@@ -216,7 +225,7 @@
             });
 
             // Toggles
-            ['focusMode', 'hideUpgradeButtons', 'blurChatHistory'].forEach(key => {
+            ['focusMode', 'hideUpgradeButtons', 'blurChatHistory', 'enableSnowfall', 'enableNewYear'].forEach(key => {
                 const checkbox = document.getElementById(`qs-${key}`);
                 if (checkbox) {
                     checkbox.checked = !!settings[key];
@@ -253,7 +262,7 @@
             }
 
             // Update checkboxes
-            ['focusMode', 'hideUpgradeButtons', 'blurChatHistory'].forEach(key => {
+            ['focusMode', 'hideUpgradeButtons', 'blurChatHistory', 'enableSnowfall', 'enableNewYear'].forEach(key => {
                 const checkbox = document.getElementById(`qs-${key}`);
                 if (checkbox) checkbox.checked = !!settings[key];
             });
@@ -380,6 +389,81 @@
     }
 
     // ============================================================================
+    // Holiday Manager - Snowfall & New Year Garland
+    // ============================================================================
+    class HolidayManager {
+        manage(settings) {
+            this._toggleSnow(!!settings.enableSnowfall);
+            this._toggleNewYear(!!settings.enableNewYear);
+        }
+
+        _toggleSnow(enabled) {
+            let container = document.getElementById(Aurora.ELEMENT_IDS.SNOW_CONTAINER);
+            if (enabled) {
+                if (container) return; // Already exists
+                container = document.createElement('div');
+                container.id = Aurora.ELEMENT_IDS.SNOW_CONTAINER;
+                container.className = 'aurora-snow-container';
+
+                // Create 50 snowflakes
+                const fragment = document.createDocumentFragment();
+                for (let i = 0; i < 50; i++) {
+                    const snowflake = document.createElement('div');
+                    snowflake.className = 'aurora-snowflake';
+                    snowflake.style.left = `${Math.random() * 100}vw`;
+                    snowflake.style.animationDuration = `${Math.random() * 3 + 2}s`; // 2-5s
+                    snowflake.style.animationDelay = `${Math.random() * 5}s`;
+                    snowflake.style.width = `${Math.random() * 6 + 4}px`; // 4-10px
+                    snowflake.style.height = snowflake.style.width;
+                    snowflake.style.opacity = Math.random();
+                    fragment.appendChild(snowflake);
+                }
+                container.appendChild(fragment);
+                document.body.appendChild(container); // Using body for now
+                if (document.documentElement) document.documentElement.classList.add(Aurora.CSS_CLASSES.SNOWFALL_ON);
+            } else {
+                if (container) container.remove();
+                if (document.documentElement) document.documentElement.classList.remove(Aurora.CSS_CLASSES.SNOWFALL_ON);
+            }
+        }
+
+        _toggleNewYear(enabled) {
+            let container = document.getElementById(Aurora.ELEMENT_IDS.GARLAND_CONTAINER);
+            if (enabled) {
+                if (container) return; // Already exists
+                container = document.createElement('div');
+                container.id = Aurora.ELEMENT_IDS.GARLAND_CONTAINER;
+                container.className = 'aurora-garland-container';
+
+                // Create segments based on width, assuming 50px per segment
+                const segmentWidth = 50;
+                const count = Math.ceil(window.innerWidth / segmentWidth) + 1;
+                const fragment = document.createDocumentFragment();
+
+                for (let i = 0; i < count; i++) {
+                    const segment = document.createElement('div');
+                    segment.className = 'aurora-garland-wire-segment';
+
+                    const bulb = document.createElement('div');
+                    bulb.className = 'aurora-bulb';
+                    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+                    bulb.style.setProperty('--bulb-color', colors[Math.floor(Math.random() * colors.length)]);
+                    bulb.style.animationDelay = `${Math.random() * 2}s`;
+
+                    segment.appendChild(bulb);
+                    fragment.appendChild(segment);
+                }
+                container.appendChild(fragment);
+                document.body.appendChild(container); // Using body
+                if (document.documentElement) document.documentElement.classList.add(Aurora.CSS_CLASSES.NEW_YEAR_ON);
+            } else {
+                if (container) container.remove();
+                if (document.documentElement) document.documentElement.classList.remove(Aurora.CSS_CLASSES.NEW_YEAR_ON);
+            }
+        }
+    }
+
+    // ============================================================================
     // UI Manager (Facade)
     // ============================================================================
     class UIManager {
@@ -390,6 +474,7 @@
             this.upgradeHider = new UpgradeButtonManager();
             this.glassEffects = new GlassEffectManager();
             this.gpt5Limit = new Gpt5LimitManager();
+            this.holidayManager = new HolidayManager();
         }
 
         /**
@@ -450,7 +535,9 @@
             this.manageQuickSettings();
             this.upgradeHider.hide(s);
             this.glassEffects.apply();
+            this.glassEffects.apply();
             this.gpt5Limit.manage(s);
+            this.holidayManager.manage(s);
 
             // Audio
             if (s.soundEnabled) {
@@ -484,6 +571,7 @@
     Aurora.UpgradeButtonManager = UpgradeButtonManager;
     Aurora.GlassEffectManager = GlassEffectManager;
     Aurora.Gpt5LimitManager = Gpt5LimitManager;
+    Aurora.HolidayManager = HolidayManager;
     Aurora.UIManager = UIManager;
     window.Aurora = Aurora;
 })();

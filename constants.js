@@ -51,7 +51,9 @@ window.Aurora.CSS_CLASSES = {
     BLUR_AVATAR: 'cgpt-blur-avatar',
     TAB_HIDDEN: 'cgpt-tab-hidden',
     SNAPSHOT_MODE: 'cgpt-snapshot-mode',
-    THEME_TRANSITIONING: 'cgpt-theme-transitioning'
+    THEME_TRANSITIONING: 'cgpt-theme-transitioning',
+    SNOWFALL_ON: 'aurora-snowfall-on',
+    NEW_YEAR_ON: 'aurora-new-year-on'
 };
 
 // ============================================================================
@@ -63,7 +65,9 @@ window.Aurora.ELEMENT_IDS = {
     QS_BUTTON: 'cgpt-qs-btn',
     QS_PANEL: 'cgpt-qs-panel',
     TOKEN_COUNTER: 'aurora-token-counter',
-    WELCOME_OVERLAY: 'aurora-welcome-overlay'
+    WELCOME_OVERLAY: 'aurora-welcome-overlay',
+    GARLAND_CONTAINER: 'aurora-garland-container',
+    SNOW_CONTAINER: 'aurora-snow-container'
 };
 
 // ============================================================================
@@ -149,7 +153,9 @@ window.Aurora.DEFAULTS = {
     autoContrast: false,
     smartSelectors: true,
     dataMaskingEnabled: false,
-    maskingRandomMode: false
+    maskingRandomMode: false,
+    enableSnowfall: false,
+    enableNewYear: false
 };
 
 // ============================================================================
