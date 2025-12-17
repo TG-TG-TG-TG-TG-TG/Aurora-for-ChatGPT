@@ -1,8 +1,3 @@
-/**
- * Aurora for ChatGPT - Background Service Worker
- * Settings management and message handling
- */
-
 const DEFAULTS = {
   legacyComposer: false,
   theme: 'auto',
@@ -28,14 +23,9 @@ const DEFAULTS = {
   autoContrast: false,
   smartSelectors: true,
   dataMaskingEnabled: false,
-  maskingRandomMode: false,
-  enableSnowfall: false,
-  enableNewYear: false
+  maskingRandomMode: false
 };
 
-/**
- * Handle extension installation/update
- */
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.storage.sync.set(DEFAULTS);
@@ -54,34 +44,15 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
-/**
- * Handle messages from content scripts and popup
- */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  switch (request.type) {
-    case 'GET_SETTINGS':
-      chrome.storage.sync.get(Object.keys(DEFAULTS), (items) => {
-        if (chrome.runtime.lastError) {
-          console.error('Aurora: Failed to get settings:', chrome.runtime.lastError);
-          sendResponse(DEFAULTS);
-          return;
-        }
-        const settings = { ...DEFAULTS, ...items };
-        sendResponse(settings);
-      });
-      return true;
-
-    case 'GET_DEFAULTS':
-      sendResponse(DEFAULTS);
-      return true;
-
-    case 'RESET_ALL':
-      chrome.storage.sync.set(DEFAULTS, () => {
-        sendResponse({ success: true });
-      });
-      return true;
-
-    default:
-      return false;
+  if (request.type === 'GET_SETTINGS') {
+    chrome.storage.sync.get(DEFAULTS, (settings) => {
+      sendResponse(settings);
+    });
+    return true;
+  }
+  if (request.type === 'GET_DEFAULTS') {
+    sendResponse(DEFAULTS);
+    return true;
   }
 });

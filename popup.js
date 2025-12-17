@@ -169,8 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'smartSelectors', key: 'smartSelectors' },
     { id: 'dataMaskingEnabled', key: 'dataMaskingEnabled' },
     { id: 'maskingRandomMode', key: 'maskingRandomMode' },
-    { id: 'enableSnowfall', key: 'enableSnowfall' },
-    { id: 'enableNewYear', key: 'enableNewYear' },
   ];
 
   TOGGLE_CONFIG.forEach(({ id, key }) => {

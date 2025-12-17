@@ -511,20 +511,5 @@
   },
   "labelMaskPassport": {
     "message": "Passport"
-  },
-  "sectionHolidayEffects": {
-    "message": "Holiday Effects"
-  },
-  "labelSnowfall": {
-    "message": "Snowfall"
-  },
-  "tooltipSnowfall": {
-    "message": "Enable snowing animation"
-  },
-  "labelNewYear": {
-    "message": "New Year '26"
-  },
-  "tooltipNewYear": {
-    "message": "Enable New Year garland"
   }
 }
