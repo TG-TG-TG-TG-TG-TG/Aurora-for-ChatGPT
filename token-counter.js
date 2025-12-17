@@ -96,17 +96,21 @@ function resolveEncodingName() {
 function getModelTokenLimit() {
     const modelLabel = detectModelLabel();
 
-    // Try to find matching model limit
+    // 1. Try exact or fuzzy match from defined limits
     for (const [slug, limit] of Object.entries(MODEL_TOKEN_LIMITS)) {
-        if (slug !== 'default') {
-            const hints = ENCODING_HINTS.find(h => h.encoding && h.regex.test(modelLabel));
-            if (hints || modelLabel.includes(slug.replace(/-/g, ' '))) {
-                return limit;
-            }
+        if (slug === 'default') continue;
+        // Check if the label contains the slug (replacing dashes with spaces for loose matching)
+        // e.g. "gpt-5-thinking" matches "GPT-5 Thinking"
+        if (modelLabel.includes(slug) || modelLabel.includes(slug.replace(/-/g, ' '))) {
+            return limit;
         }
     }
 
-    // Return default if no match found
+    // 2. Fallback: Check encoding hints for a rough guess
+    // If it's a newer model (o200k), default to 128k. Older models default to 8k/16k logic if needed.
+    const encoding = resolveEncodingName();
+    if (encoding === 'o200k_base') return 128000;
+
     return MODEL_TOKEN_LIMITS['default'];
 }
 

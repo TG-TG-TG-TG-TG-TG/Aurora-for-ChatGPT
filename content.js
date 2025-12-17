@@ -55,11 +55,13 @@
     'gpt-5-thinking-instant': ['instant'],
     'gpt-4o': ['gpt-4o', '4o'],
     'gpt-4.1': ['gpt-4.1', 'gpt 4.1'],
-    o3: ['o3'],
-    'o4-mini': ['o4 mini', 'o4-mini']
+    'o3': ['o3'],
+    'o4-mini': ['o4 mini', 'o4-mini'],
+    'o1': ['o1'],
+    'o1-mini': ['o1 mini', 'o1-mini']
   };
 
-  const LEGACY_MODEL_SLUGS = new Set(['gpt-4o', 'gpt-4.1', 'o3', 'o4-mini']);
+  const LEGACY_MODEL_SLUGS = new Set(['gpt-4o', 'gpt-4.1', 'o3', 'o4-mini', 'o1', 'o1-mini']);
 
   const debounce = (func, wait) => {
     let timeout;
@@ -86,7 +88,7 @@
         const text = window.AuroraI18n.getMessage(key, substitutions);
         if (text && text !== key) return text;
       }
-      if (chrome?.i18n?.getMessage && chrome.runtime?.id) {
+      if (chrome?.i18n?.getMessage && chrome?.runtime?.id) {
         const text = chrome.i18n.getMessage(key, substitutions);
         if (text) return text;
       }
@@ -490,6 +492,15 @@
         <label>${getMessage('quickSettingsLabelStreamerMode')}</label>
         <label class="switch"><input type="checkbox" id="qs-blurChatHistory"><span class="track"><span class="thumb"></span></span></label>
     </div>
+      <div class="qs-section-title">Holiday Effects</div>
+      <div class="qs-row" data-setting="enableSnowfall">
+          <label>Snowfall</label>
+          <label class="switch"><input type="checkbox" id="qs-enableSnowfall"><span class="track"><span class="thumb"></span></span></label>
+      </div>
+      <div class="qs-row" data-setting="enableNewYear">
+          <label>New Year '26</label>
+          <label class="switch"><input type="checkbox" id="qs-enableNewYear"><span class="track"><span class="thumb"></span></span></label>
+      </div>
     <div class="qs-section-title">${getMessage('sectionAppearance')}</div>
       <div class="qs-row" data-setting="appearance">
           <label>${getMessage('quickSettingsLabelGlassStyle')}</label>
@@ -502,7 +513,7 @@
       </div>
     `;
 
-    const qsToggles = ['focusMode', 'hideUpgradeButtons', 'cuteVoiceUI', 'blurChatHistory'];
+    const qsToggles = ['focusMode', 'hideUpgradeButtons', 'cuteVoiceUI', 'blurChatHistory', 'enableSnowfall', 'enableNewYear'];
     qsToggles.forEach((key) => {
       const checkbox = document.getElementById(`qs-${key}`);
       if (checkbox) {
@@ -981,8 +992,7 @@
         let newOpacity = 0.58;
         if (brightness > 200) newOpacity = 0.85; // Very bright bg, darken overlay
         else if (brightness > 128) newOpacity = 0.70;
-        else if (brightness < 50) newOpacity = 0.40; // Very dark bg, lighten overlay
-
+        else if (brightness < 50) newOpacity = 0.40;
         document.documentElement.style.setProperty('--bg-opacity', newOpacity);
       } catch (e) {
         // CORS error likely, fail silently and use default
@@ -1025,7 +1035,87 @@
     }
   };
 
-  // --- End of New Classes ---
+  // --- Holiday Effects Engine ---
+  function manageHolidayEffects() {
+    // 1. Snowfall Logic
+    let snowContainer = document.getElementById('aurora-snow-container');
+    
+    if (settings.enableSnowfall) {
+      if (!snowContainer) {
+        snowContainer = document.createElement('div');
+        snowContainer.id = 'aurora-snow-container';
+        snowContainer.className = 'aurora-snow-container';
+        const frag = document.createDocumentFragment();
+        
+        // Increased count slightly for better effect with smaller size
+        for (let i = 0; i < 60; i++) {
+          const f = document.createElement('div');
+          f.className = 'aurora-snowflake';
+          f.style.left = Math.random() * 100 + 'vw';
+          
+          // Speed: Varies between 5s (fast) and 12s (slow/floating)
+          f.style.animationDuration = (Math.random() * 7 + 5) + 's'; 
+          
+          f.style.animationDelay = (Math.random() * 5) + 's';
+          
+          // Opacity: Random for depth perception
+          f.style.opacity = Math.random() * 0.7 + 0.3;
+          
+          // Size: Much smaller now (2px to 5px)
+          const size = (Math.random() * 3 + 2) + 'px';
+          f.style.width = size;
+          f.style.height = size;
+          
+          frag.appendChild(f);
+        }
+        snowContainer.appendChild(frag);
+        document.body.appendChild(snowContainer);
+        
+        // Force reflow to ensure transition works if toggled quickly
+        void snowContainer.offsetWidth; 
+      }
+      // Ensure it's visible if it was exiting
+      snowContainer.classList.remove('exiting');
+      
+    } else if (snowContainer && !snowContainer.classList.contains('exiting')) {
+      // Fade out animation
+      snowContainer.classList.add('exiting');
+      setTimeout(() => {
+        // Check again if setting is still disabled (user didn't toggle back on)
+        if (!settings.enableSnowfall && document.getElementById('aurora-snow-container')) {
+            document.getElementById('aurora-snow-container').remove();
+        }
+      }, 800); // Matches CSS transition time
+    }
+
+    // 2. New Year Garland Logic
+    let garlandContainer = document.getElementById('aurora-garland-container');
+    if (settings.enableNewYear) {
+      if (!garlandContainer) {
+        garlandContainer = document.createElement('div');
+        garlandContainer.id = 'aurora-garland-container';
+        garlandContainer.className = 'aurora-garland-container';
+        const count = Math.ceil(window.innerWidth / 50) + 1;
+        const frag = document.createDocumentFragment();
+        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
+        
+        for (let i = 0; i < count; i++) {
+          const s = document.createElement('div');
+          s.className = 'aurora-garland-wire-segment';
+          const b = document.createElement('div');
+          b.className = 'aurora-bulb';
+          b.style.setProperty('--bulb-color', colors[Math.floor(Math.random() * colors.length)]);
+          b.style.animationDelay = (Math.random() * 2) + 's';
+          s.appendChild(b);
+          frag.appendChild(s);
+        }
+        garlandContainer.appendChild(frag);
+        document.body.appendChild(garlandContainer);
+      }
+    } else if (garlandContainer) {
+      garlandContainer.remove();
+    }
+  }
 
   function applyAllSettings() {
     showBg();
@@ -1076,6 +1166,8 @@
         }
       });
     }
+
+    manageHolidayEffects();
   }
 
   let observersStarted = false;
@@ -1127,31 +1219,59 @@
       maybeApplyDefaultModel();
     }, 150);
 
-    // Optimization: Batch heavy UI updates into a single animation frame
-    // to prevent layout thrashing and reduce CPU usage during DOM mutations.
+    // Optimization: Debounce heavy visual scans for streaming text.
+    const debouncedGlassEffects = debounce(() => {
+      applyGlassEffects();
+    }, 100);
+
     let renderFrameId = null;
     const domObserver = new MutationObserver((mutations) => {
-      if (renderFrameId) return; // Drop duplicate events within the same frame
+      if (document.hidden) return;
+      if (renderFrameId) return;
+
+      // Check if a menu, dialog, or popover was just opened
+      let urgentUiUpdate = false;
+      for (const m of mutations) {
+        for (const n of m.addedNodes) {
+          if (n.nodeType === 1) { // Element node
+            // Check for popovers, dialogs, or menus
+            if (n.classList.contains('popover') || 
+                n.getAttribute('role') === 'dialog' || 
+                n.getAttribute('role') === 'menu' ||
+                n.querySelector?.('.popover, [role="dialog"], [role="menu"]')) {
+              urgentUiUpdate = true;
+              break;
+            }
+          }
+        }
+        if (urgentUiUpdate) break;
+      }
 
       renderFrameId = requestAnimationFrame(() => {
-        manageUpgradeButtons();
-        applyGlassEffects(); // Efficiently tag newly added elements for glass effect
+        // 1. Critical Hiding
+        manageUpgradeButtons(); 
 
-        // Data Masking: Process new nodes
+        // 2. Glass Effects - Instant for menus, Debounced for text
+        if (urgentUiUpdate) {
+            applyGlassEffects(); // Instant apply
+        } else {
+            debouncedGlassEffects(); // Lazy apply
+        }
+
+        // 3. Data Masking
         if (window.DataMaskingEngine && window.DataMaskingEngine.isEnabled()) {
-          mutations.forEach(mutation => {
-            mutation.addedNodes.forEach(node => {
+          for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
               if (node.nodeType === Node.ELEMENT_NODE) {
                 window.DataMaskingEngine.maskElement(node);
               }
-            });
-          });
+            }
+          }
         }
 
         renderFrameId = null;
       });
 
-      // Run the less-critical checks on a debounce timer.
       debouncedOtherChecks();
     });
 
@@ -1359,20 +1479,50 @@
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area === 'sync') {
         const changedKeys = Object.keys(changes);
+        
+        // --- 1. INSTANT UPDATES (Bypass Background Roundtrip) ---
+        // Handle visual toggles immediately for 0ms latency
+        let handledLocally = false;
+
+        // Holiday Effects
+        if (changes.enableSnowfall || changes.enableNewYear) {
+            if (changes.enableSnowfall) settings.enableSnowfall = changes.enableSnowfall.newValue;
+            if (changes.enableNewYear) settings.enableNewYear = changes.enableNewYear.newValue;
+            manageHolidayEffects();
+            handledLocally = true;
+        }
+
+        // Toggles that utilize CSS classes on <html> (applyRootFlags)
+        const rootFlagKeys = ['legacyComposer', 'disableAnimations', 'focusMode', 'cuteVoiceUI', 'blurChatHistory', 'blurAvatar', 'theme', 'customFont', 'voiceColor'];
+        const hasRootFlagChange = changedKeys.some(k => rootFlagKeys.includes(k));
+        
+        if (hasRootFlagChange) {
+            rootFlagKeys.forEach(k => {
+                if (changes[k]) settings[k] = changes[k].newValue;
+            });
+            applyRootFlags();
+            handledLocally = true;
+        }
+
+        // If the ONLY changes were things we just handled locally, stop here.
+        // This prevents the slow "refreshSettingsAndApply" loop.
+        const instantKeys = [...rootFlagKeys, 'enableSnowfall', 'enableNewYear'];
+        const isOnlyInstant = changedKeys.every(k => instantKeys.includes(k));
+        
+        if (isOnlyInstant) return;
+
+        // --- 2. HEAVY UPDATES (Background Check Required) ---
+        // For complex settings (Bg Image, Token Limits) we still do the safe roundtrip
         const backgroundKeys = ['customBgUrl', 'backgroundBlur', 'backgroundScaling'];
         const isOnlyNonBackgroundChange = changedKeys.every(key => !backgroundKeys.includes(key));
 
         if (isOnlyNonBackgroundChange && changedKeys.length > 0) {
           // Lightweight update for non-background settings
           chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
-            if (chrome.runtime.lastError) {
-              console.error("Aurora Extension Error: Could not refresh settings for lightweight update.", chrome.runtime.lastError.message);
-              return;
-            }
+            if (chrome.runtime.lastError) return;
             settings = freshSettings;
 
-            // Apply only the necessary, non-background updates
-            applyRootFlags();
+            // Run specific managers
             manageGpt5LimitPopup();
             manageUpgradeButtons();
             if (!settings.hideQuickSettings) {
@@ -1383,9 +1533,12 @@
               window.AuroraTokenCounter.manage(!!settings.showTokenCounter);
             }
             if (settings.soundEnabled) AudioEngine.attachListeners();
+            
+            // Ensure holiday effects match (idempotent)
+            manageHolidayEffects();
           });
         } else {
-          // Full refresh for background changes or mixed changes
+          // Full refresh (Background image changes, etc)
           refreshSettingsAndApply();
         }
       } else if (area === 'local' && changes[LOCAL_BG_KEY]) {

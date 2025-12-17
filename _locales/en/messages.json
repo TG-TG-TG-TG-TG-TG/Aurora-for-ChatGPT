@@ -65,6 +65,21 @@
   "tooltipLegacyComposer": {
     "message": "Use the site's standard composer styling"
   },
+  "sectionHolidayEffects": {
+    "message": "Holiday Effects"
+  },
+  "labelSnowfall": {
+    "message": "Let it snow"
+  },
+  "tooltipSnowfall": {
+    "message": "Enable snowing animation"
+  },
+  "labelNewYear": {
+    "message": "New Year '26"
+  },
+  "tooltipNewYear": {
+    "message": "Enable New Year garland lights"
+  },
   "sectionAnimations": {
     "message": "Animations"
   },

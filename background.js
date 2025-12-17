@@ -23,7 +23,9 @@ const DEFAULTS = {
   autoContrast: false,
   smartSelectors: true,
   dataMaskingEnabled: false,
-  maskingRandomMode: false
+  maskingRandomMode: false,
+  enableSnowfall: false,
+  enableNewYear: false
 };
 
 chrome.runtime.onInstalled.addListener((details) => {

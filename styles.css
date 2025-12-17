@@ -355,11 +355,6 @@ html.cgpt-focus-mode-on main .flex.h-full.flex-col { padding-top: 1.25rem; }
 
 /* --- FIX: Hide Duplicated Header (Perplexity Comet) --- */
 div.draggable.h-header-height.bg-token-bg-primary { display: none !important; }
-@keyframes aurora-menu-open { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-@keyframes aurora-menu-close { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
-html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled) :is(.popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="open"], .popover[role="dialog"][class*="md:max-w-"][data-state="open"]) { animation: aurora-menu-open 300ms cubic-bezier(0.16, 1, 0.3, 1); }
-html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled) :is(.popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="closed"], .popover[role="dialog"][class*="md:max-w-"][data-state="closed"]) { animation: aurora-menu-close 300ms cubic-bezier(0.16, 1, 0.3, 1); }
-
 /* --- FIX: Glass Effect for Custom GPT/Project Header --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div.sticky.content-fade-top:has(button[data-testid="project-modal-trigger"]) {
   /* Add padding and rounded corners for better appearance */
@@ -804,7 +799,7 @@ html.cgpt-light-mode .qs-select-trigger {
 }
 .qs-select-trigger:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  transform: scale(1.02);
+  transform: translateY(-1px);
 }
 html.cgpt-light-mode .qs-select-trigger:hover {
   background-color: rgba(0, 0, 0, 0.08);
@@ -1198,4 +1193,88 @@ html.cgpt-ambient-on button[role="switch"] > span {
   border-color: rgba(79, 140, 255, 0.6) !important;
   box-shadow: 0 6px 20px rgba(79, 140, 255, 0.3);
   transform: translateY(-1px) scale(1.01);
+}
+
+/* --- START OF NEW ADDITIONS --- */
+
+/* 1. Activity Flyout (History Search Popup) - Glass Treatment */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] {
+  background-color: var(--sidebar-glass-bg) !important;
+  border-inline-start: 1px solid var(--sidebar-glass-stroke);
+  border-radius: var(--glass-radius);
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+}
+
+/* Remove solid backgrounds inside the flyout */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] :is(.bg-token-bg-elevated-secondary, [class*="bg-token-"], .bg-primary) {
+  background-color: transparent !important;
+}
+
+/* 2. Unified Glass Scrollbars (Chrome/Webkit) */
+html.cgpt-ambient-on ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background-color: transparent;
+}
+html.cgpt-ambient-on ::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+html.cgpt-ambient-on ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+html.cgpt-ambient-on ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+/* Light Mode Scrollbar adjustments */
+html.cgpt-ambient-on.cgpt-light-mode ::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+html.cgpt-ambient-on.cgpt-light-mode ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* 3. Markdown Tables - Make transparent */
+html.cgpt-ambient-on table, 
+html.cgpt-ambient-on table :is(thead, tbody, tr, th, td) {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+html.cgpt-ambient-on.cgpt-light-mode table :is(th, td) {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 4. Form Inputs & Search Bars - Glass Effect */
+html.cgpt-ambient-on :is(input[type="text"], input[type="search"], textarea:not(#prompt-textarea)) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: inherit !important;
+  transition: all 0.2s ease !important;
+}
+html.cgpt-ambient-on :is(input[type="text"], input[type="search"], textarea:not(#prompt-textarea)):focus {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+  outline: none !important;
+}
+/* Light Mode Inputs */
+html.cgpt-ambient-on.cgpt-light-mode :is(input[type="text"], input[type="search"], textarea:not(#prompt-textarea)) {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 5. KaTeX Math - Remove solid background */
+html.cgpt-ambient-on .katex-display {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* --- FIX: New Sidebar Solid Panel --- */
+/* Hides the solid gray layer covering the blurred sidebar */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .bg-\(--sidebar-bg\,var\(--bg-elevated-secondary\)\) {
+  background-color: transparent !important;
 }

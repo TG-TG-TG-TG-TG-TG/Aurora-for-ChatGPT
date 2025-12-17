@@ -194,8 +194,17 @@ html.theme-light .track {
   border-color: rgba(0, 0, 0, 0.1);
 }
 .thumb {
-  position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%;
-  background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease;
+  position: absolute;
+  top: 0; 
+  bottom: 0;
+  margin: auto 0;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,.25);
+  transition: transform .2s ease;
 }
 input:checked + .track .thumb { transform: translateX(18px); }
 input[type="text"], button, .file-input-label {
@@ -328,4 +337,17 @@ html.theme-light .select-trigger:hover {
   flex-shrink: 0;
   border: 1px solid var(--popup-dot-border);
   display: none; /* Hide by default unless it has a color */
+}
+.qs-row .thumb {
+  position: absolute;
+  top: 0; 
+  bottom: 0;
+  margin: auto 0;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,.25);
+  transition: transform .2s ease;
 }

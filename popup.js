@@ -166,9 +166,10 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'blurAvatar', key: 'blurAvatar' },
     { id: 'soundEnabled', key: 'soundEnabled' },
     { id: 'autoContrast', key: 'autoContrast' },
-    { id: 'smartSelectors', key: 'smartSelectors' },
     { id: 'dataMaskingEnabled', key: 'dataMaskingEnabled' },
     { id: 'maskingRandomMode', key: 'maskingRandomMode' },
+    { id: 'enableSnowfall', key: 'enableSnowfall' },
+    { id: 'enableNewYear', key: 'enableNewYear' }
   ];
 
   TOGGLE_CONFIG.forEach(({ id, key }) => {
