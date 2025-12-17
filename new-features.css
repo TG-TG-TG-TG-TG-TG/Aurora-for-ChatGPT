@@ -242,3 +242,110 @@ html.cgpt-light-mode .token-budget-fill.critical {
     font-weight: 500;
     letter-spacing: 0.3px;
 }
+
+/* --- Holiday Features: Snowfall --- */
+.aurora-snow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 99999;
+    overflow: hidden;
+}
+
+.aurora-snowflake {
+    position: absolute;
+    top: -10px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: aurora-snow-fall linear infinite;
+}
+
+@keyframes aurora-snow-fall {
+    0% {
+        transform: translateY(-10vh) translateX(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 0.9;
+    }
+
+    100% {
+        transform: translateY(110vh) translateX(20px);
+        opacity: 0;
+    }
+}
+
+/* --- Holiday Features: New Year Garland --- */
+.aurora-garland-container {
+    position: fixed;
+    top: -10px;
+    /* Hide the top flat part of the wire curves */
+    left: 0;
+    width: 100%;
+    height: 60px;
+    pointer-events: none;
+    z-index: 100002;
+    display: flex;
+    justify-content: space-between;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.aurora-garland-wire-segment {
+    position: relative;
+    flex: 1;
+    height: 20px;
+    border-bottom: 2px solid rgba(50, 50, 50, 0.8);
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    margin: 0 -5px;
+    /* Overlap slightly */
+}
+
+.aurora-bulb {
+    position: absolute;
+    bottom: -14px;
+    /* Hang below the wire */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--bulb-color, #ff0);
+    box-shadow: 0 0 4px var(--bulb-color, #ff0);
+    animation: aurora-bulb-flash 2s infinite alternate;
+}
+
+.aurora-bulb::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+}
+
+@keyframes aurora-bulb-flash {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        box-shadow: 0 0 2px var(--bulb-color);
+    }
+
+    50% {
+        opacity: 1;
+        box-shadow: 0 0 12px var(--bulb-color);
+    }
+}
