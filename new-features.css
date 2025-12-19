@@ -279,6 +279,28 @@ html.cgpt-light-mode .token-budget-fill.critical {
     100% { transform: translateY(110vh) translateX(20px); opacity: 0; }
 }
 
+/* 1b. Santa Hat on OpenAI Home icon (snow toggle) */
+html.cgpt-snow-on a[data-sidebar-item="true"][href="/"]:has(svg use[href$="#55180d"]) {
+    position: relative;
+    overflow: visible;
+}
+
+html.cgpt-snow-on a[data-sidebar-item="true"][href="/"]:has(svg use[href$="#55180d"])::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 59%;
+    width: 24px;
+    height: 16px;
+    transform: translateX(-50%);
+    background-image: var(--aurora-santa-hat-image, none);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
 /* 2. New Year Garland (Lights) */
 .aurora-garland-container {
     position: fixed;

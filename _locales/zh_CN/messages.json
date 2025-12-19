@@ -65,6 +65,21 @@
   "tooltipLegacyComposer": {
     "message": "使用网站的标准编辑器样式"
   },
+  "sectionHolidayEffects": {
+    "message": "节日特效"
+  },
+  "labelSnowfall": {
+    "message": "下雪吧"
+  },
+  "tooltipSnowfall": {
+    "message": "启用下雪动画"
+  },
+  "labelNewYear": {
+    "message": "新年 '26"
+  },
+  "tooltipNewYear": {
+    "message": "启用新年彩灯串"
+  },
   "sectionAnimations": {
     "message": "动画"
   },
