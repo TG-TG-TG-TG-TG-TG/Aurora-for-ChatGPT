@@ -49,6 +49,7 @@
     {
       "resources": [
         "Aurora/grok-4.webp",
+        "santa_hat_cutout_v2.png",
         "_locales/*/messages.json",
         "vendor/tiktoken-lite/*",
         "vendor/tiktoken-lite/encoders/*"

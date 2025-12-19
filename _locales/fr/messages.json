@@ -65,6 +65,21 @@
   "tooltipLegacyComposer": {
     "message": "Utiliser le style d'éditeur standard du site"
   },
+  "sectionHolidayEffects": {
+    "message": "Effets des fêtes"
+  },
+  "labelSnowfall": {
+    "message": "Qu'il neige"
+  },
+  "tooltipSnowfall": {
+    "message": "Activer l'animation de neige"
+  },
+  "labelNewYear": {
+    "message": "Nouvel An '26"
+  },
+  "tooltipNewYear": {
+    "message": "Activer la guirlande du Nouvel An"
+  },
   "sectionAnimations": {
     "message": "Animations"
   },

@@ -71,6 +71,21 @@
   "tooltipLegacyComposer": {
     "message": "Usa el estilo estándar del editor del sitio"
   },
+  "sectionHolidayEffects": {
+    "message": "Efectos festivos"
+  },
+  "labelSnowfall": {
+    "message": "Que nieve"
+  },
+  "tooltipSnowfall": {
+    "message": "Activar animación de nieve"
+  },
+  "labelNewYear": {
+    "message": "Año Nuevo '26"
+  },
+  "tooltipNewYear": {
+    "message": "Activar guirnalda de Año Nuevo"
+  },
   "labelDisableAnimations": {
     "message": "Desactivar animaciones de menú"
   },

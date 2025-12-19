@@ -34,6 +34,7 @@
 
   const BLUE_WALLPAPER_URL = 'https://img.freepik.com/free-photo/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner_1258-54581.jpg?semt=ais_hybrid&w=740&q=80';
   const GROK_HORIZON_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
+  const SANTA_HAT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('santa_hat_cutout_v2.png') : 'santa_hat_cutout_v2.png';
 
   // Group DOM selectors for easier maintenance.
   const SELECTORS = {
@@ -492,13 +493,13 @@
         <label>${getMessage('quickSettingsLabelStreamerMode')}</label>
         <label class="switch"><input type="checkbox" id="qs-blurChatHistory"><span class="track"><span class="thumb"></span></span></label>
     </div>
-      <div class="qs-section-title">Holiday Effects</div>
+      <div class="qs-section-title">${getMessage('sectionHolidayEffects')}</div>
       <div class="qs-row" data-setting="enableSnowfall">
-          <label>Snowfall</label>
+          <label>${getMessage('labelSnowfall')}</label>
           <label class="switch"><input type="checkbox" id="qs-enableSnowfall"><span class="track"><span class="thumb"></span></span></label>
       </div>
       <div class="qs-row" data-setting="enableNewYear">
-          <label>New Year '26</label>
+          <label>${getMessage('labelNewYear')}</label>
           <label class="switch"><input type="checkbox" id="qs-enableNewYear"><span class="track"><span class="thumb"></span></span></label>
       </div>
     <div class="qs-section-title">${getMessage('sectionAppearance')}</div>
@@ -1037,6 +1038,11 @@
 
   // --- Holiday Effects Engine ---
   function manageHolidayEffects() {
+    if (SANTA_HAT_URL) {
+      document.documentElement.style.setProperty('--aurora-santa-hat-image', `url("${SANTA_HAT_URL}")`);
+    }
+    document.documentElement.classList.toggle('cgpt-snow-on', !!settings.enableSnowfall);
+
     // 1. Snowfall Logic
     let snowContainer = document.getElementById('aurora-snow-container');
     
