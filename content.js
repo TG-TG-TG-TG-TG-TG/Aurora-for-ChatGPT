@@ -262,119 +262,346 @@
     return wrap;
   }
 
-  let activeLayerId = 'a';
-  let isTransitioning = false;
+  // ========================================================================
+  // BACKGROUND MANAGER - State Machine for Reliable Background Switching
+  // ========================================================================
+  const BackgroundManager = {
+    // State: 'idle' | 'loading' | 'transitioning'
+    state: 'idle',
+    activeLayerId: 'a',
+    currentUrl: null,
+    pendingUrl: null,
+    abortController: null,
+    transitionTimeout: null,
+    TRANSITION_MS: 750,
+    LOAD_TIMEOUT_MS: 5000,
 
-  function updateBackgroundImage() {
-    const bgNode = document.getElementById(ID);
-    if (!bgNode || isTransitioning) return;
+    // Default background URLs
+    DEFAULT_SRCSET: 'https://persistent.oaistatic.com/burrito-nux/640.webp 640w, https://persistent.oaistatic.com/burrito-nux/1280.webp 1280w, https://persistent.oaistatic.com/burrito-nux/1920.webp 1920w',
+    DEFAULT_SRC: 'https://persistent.oaistatic.com/burrito-nux/640.webp',
+    VIDEO_EXTENSIONS: ['.mp4', '.webm', '.ogv'],
 
-    const url = settings.customBgUrl;
-    const inactiveLayerId = activeLayerId === 'a' ? 'b' : 'a';
-    const activeLayer = bgNode.querySelector(`.media-layer[data-layer-id="${activeLayerId}"]`);
-    const inactiveLayer = bgNode.querySelector(`.media-layer[data-layer-id="${inactiveLayerId}"]`);
+    // Get background container
+    getContainer() {
+      return document.getElementById(ID);
+    },
 
-    if (!activeLayer || !inactiveLayer) return;
+    // Get layer by ID
+    getLayer(layerId) {
+      const container = this.getContainer();
+      return container?.querySelector(`.media-layer[data-layer-id="${layerId}"]`);
+    },
 
-    // --- Prepare inactive layer for new content ---
-    inactiveLayer.classList.remove('gpt5-active');
-    const inactiveImg = inactiveLayer.querySelector('img');
-    const inactiveSource = inactiveLayer.querySelector('source');
-    const inactiveVideo = inactiveLayer.querySelector('video');
+    getActiveLayer() {
+      return this.getLayer(this.activeLayerId);
+    },
 
-    const transitionToInactive = () => {
-      isTransitioning = true;
-      inactiveLayer.classList.add('active');
-      activeLayer.classList.remove('active');
-      activeLayerId = inactiveLayerId;
-      // Wait for CSS transition to complete + buffer
-      setTimeout(() => { isTransitioning = false; }, 800);
-    };
+    getInactiveLayer() {
+      const inactiveId = this.activeLayerId === 'a' ? 'b' : 'a';
+      return this.getLayer(inactiveId);
+    },
 
-    // --- Handle different background types ---
-    if (url === '__gpt5_animated__') {
-      inactiveLayer.classList.add('gpt5-active');
-      transitionToInactive();
-      return;
-    }
-
-    const defaultWebpSrcset = `https://persistent.oaistatic.com/burrito-nux/640.webp 640w, https://persistent.oaistatic.com/burrito-nux/1280.webp 1280w, https://persistent.oaistatic.com/burrito-nux/1920.webp 1920w`;
-    const defaultImgSrc = "https://persistent.oaistatic.com/burrito-nux/640.webp";
-    const videoExtensions = ['.mp4', '.webm', '.ogv'];
-
-    const applyMedia = (mediaUrl) => {
-      const isVideo = videoExtensions.some(ext => mediaUrl.toLowerCase().includes(ext)) || mediaUrl.startsWith('data:video');
-      inactiveImg.style.display = isVideo ? 'none' : 'block';
-      inactiveVideo.style.display = isVideo ? 'block' : 'none';
-
-      const mediaEl = isVideo ? inactiveVideo : inactiveImg;
-      const eventType = isVideo ? 'loadeddata' : 'load';
-
-      const onMediaReady = () => {
-        transitionToInactive();
-        mediaEl.removeEventListener(eventType, onMediaReady);
-        mediaEl.removeEventListener('error', onMediaReady); // Also clean up error handler
-        if (settings.autoContrast && !isVideo) ContrastEngine.analyze(inactiveImg);
-      };
-
-      mediaEl.addEventListener(eventType, onMediaReady, { once: true });
-      // If media fails to load, still perform transition to avoid getting stuck
-      mediaEl.addEventListener('error', onMediaReady, { once: true });
-
-      if (isVideo) {
-        inactiveVideo.src = mediaUrl;
-        inactiveVideo.load();
-        inactiveVideo.play().catch(e => { }); // Autoplay might be blocked by browser
-        inactiveImg.src = ''; inactiveImg.srcset = ''; inactiveSource.srcset = '';
-      } else {
-        inactiveImg.src = mediaUrl; inactiveImg.srcset = ''; inactiveSource.srcset = '';
-        inactiveVideo.src = '';
-        if (settings.autoContrast) {
-          if (inactiveImg.complete) ContrastEngine.analyze(inactiveImg);
-          else inactiveImg.addEventListener('load', () => ContrastEngine.analyze(inactiveImg), { once: true });
-        }
+    // Completely clean a layer of all content and classes
+    cleanLayer(layer) {
+      if (!layer) return;
+      layer.classList.remove('active', 'gpt5-active');
+      
+      const img = layer.querySelector('img');
+      const video = layer.querySelector('video');
+      const source = layer.querySelector('source');
+      
+      if (img) {
+        img.src = '';
+        img.srcset = '';
+        img.style.display = 'none';
       }
-    };
+      if (video) {
+        video.pause();
+        video.src = '';
+        video.style.display = 'none';
+      }
+      if (source) {
+        source.srcset = '';
+      }
+    },
 
-    const applyDefault = () => {
-      inactiveImg.style.display = 'block';
-      inactiveVideo.style.display = 'none';
-      inactiveVideo.src = '';
+    // Abort any pending operation
+    abort() {
+      if (this.abortController) {
+        this.abortController.abort();
+        this.abortController = null;
+      }
+      if (this.transitionTimeout) {
+        clearTimeout(this.transitionTimeout);
+        this.transitionTimeout = null;
+      }
+      this.pendingUrl = null;
+    },
 
-      const onMediaReady = () => {
-        transitionToInactive();
-        inactiveImg.removeEventListener('load', onMediaReady);
-        inactiveImg.removeEventListener('error', onMediaReady);
-        if (settings.autoContrast) ContrastEngine.analyze(inactiveImg);
-      };
-      inactiveImg.addEventListener('load', onMediaReady, { once: true });
-      inactiveImg.addEventListener('error', onMediaReady, { once: true });
+    // Check if URL is a video
+    isVideo(url) {
+      if (!url) return false;
+      const lower = url.toLowerCase();
+      return this.VIDEO_EXTENSIONS.some(ext => lower.includes(ext)) || lower.startsWith('data:video');
+    },
 
-      inactiveImg.src = defaultImgSrc;
-      inactiveImg.srcset = defaultWebpSrcset;
-      inactiveSource.srcset = defaultWebpSrcset;
-    };
+    // Load media into a layer, returns Promise
+    loadMedia(layer, url) {
+      return new Promise((resolve, reject) => {
+        if (!layer) {
+          reject(new Error('No layer'));
+          return;
+        }
 
-    if (url) {
-      if (url === '__local__') {
-        if (chrome?.runtime?.id && chrome?.storage?.local) {
-          chrome.storage.local.get(LOCAL_BG_KEY, (res) => {
-            if (chrome.runtime.lastError || !res || !res[LOCAL_BG_KEY]) {
-              console.error("Aurora Extension Error (updateBackgroundImage):", chrome.runtime.lastError?.message || 'Local BG not found.');
-              applyDefault();
-            } else {
-              applyMedia(res[LOCAL_BG_KEY]);
-            }
-          });
+        const img = layer.querySelector('img');
+        const video = layer.querySelector('video');
+        const source = layer.querySelector('source');
+        const isVideoUrl = this.isVideo(url);
+
+        // Set up abort handling
+        const abortController = new AbortController();
+        this.abortController = abortController;
+
+        // Timeout fallback
+        const timeoutId = setTimeout(() => {
+          if (!abortController.signal.aborted) {
+            console.warn('Aurora: Media load timeout, proceeding anyway');
+            resolve();
+          }
+        }, this.LOAD_TIMEOUT_MS);
+
+        const cleanup = () => {
+          clearTimeout(timeoutId);
+          if (abortController.signal.aborted) {
+            reject(new Error('Aborted'));
+          }
+        };
+
+        if (isVideoUrl) {
+          img.style.display = 'none';
+          video.style.display = 'block';
+          
+          const onReady = () => {
+            video.removeEventListener('loadeddata', onReady);
+            video.removeEventListener('error', onError);
+            cleanup();
+            if (!abortController.signal.aborted) resolve();
+          };
+          const onError = () => {
+            video.removeEventListener('loadeddata', onReady);
+            video.removeEventListener('error', onError);
+            cleanup();
+            if (!abortController.signal.aborted) resolve(); // Still transition on error
+          };
+          
+          video.addEventListener('loadeddata', onReady, { once: true });
+          video.addEventListener('error', onError, { once: true });
+          video.src = url;
+          video.load();
+          video.play().catch(() => {}); // Ignore autoplay errors
+          
+          img.src = '';
+          img.srcset = '';
+          source.srcset = '';
         } else {
-          applyDefault();
+          video.style.display = 'none';
+          img.style.display = 'block';
+          
+          const onReady = () => {
+            img.removeEventListener('load', onReady);
+            img.removeEventListener('error', onError);
+            cleanup();
+            if (!abortController.signal.aborted) {
+              if (settings.autoContrast && typeof ContrastEngine !== 'undefined') {
+                ContrastEngine.analyze(img);
+              }
+              resolve();
+            }
+          };
+          const onError = () => {
+            img.removeEventListener('load', onReady);
+            img.removeEventListener('error', onError);
+            cleanup();
+            if (!abortController.signal.aborted) resolve();
+          };
+          
+          img.addEventListener('load', onReady, { once: true });
+          img.addEventListener('error', onError, { once: true });
+          img.src = url;
+          img.srcset = '';
+          source.srcset = '';
+          
+          video.src = '';
         }
-      } else {
-        applyMedia(url);
+      });
+    },
+
+    // Load default background
+    loadDefault(layer) {
+      return new Promise((resolve) => {
+        if (!layer) {
+          resolve();
+          return;
+        }
+
+        const img = layer.querySelector('img');
+        const video = layer.querySelector('video');
+        const source = layer.querySelector('source');
+
+        video.style.display = 'none';
+        video.src = '';
+        img.style.display = 'block';
+
+        const onReady = () => {
+          img.removeEventListener('load', onReady);
+          img.removeEventListener('error', onReady);
+          if (settings.autoContrast && typeof ContrastEngine !== 'undefined') {
+            ContrastEngine.analyze(img);
+          }
+          resolve();
+        };
+
+        img.addEventListener('load', onReady, { once: true });
+        img.addEventListener('error', onReady, { once: true });
+        
+        img.src = this.DEFAULT_SRC;
+        img.srcset = this.DEFAULT_SRCSET;
+        source.srcset = this.DEFAULT_SRCSET;
+      });
+    },
+
+    // Perform crossfade transition
+    crossfade(toLayer, fromLayer) {
+      return new Promise((resolve) => {
+        if (!toLayer || !fromLayer) {
+          resolve();
+          return;
+        }
+
+        // Use transitionend for reliable timing
+        const onTransitionEnd = (e) => {
+          if (e.propertyName === 'opacity' && e.target === toLayer) {
+            toLayer.removeEventListener('transitionend', onTransitionEnd);
+            clearTimeout(this.transitionTimeout);
+            this.transitionTimeout = null;
+            resolve();
+          }
+        };
+
+        // Fallback timeout in case transitionend doesn't fire
+        this.transitionTimeout = setTimeout(() => {
+          toLayer.removeEventListener('transitionend', onTransitionEnd);
+          this.transitionTimeout = null;
+          resolve();
+        }, this.TRANSITION_MS + 100);
+
+        toLayer.addEventListener('transitionend', onTransitionEnd);
+
+        // Trigger the transition
+        requestAnimationFrame(() => {
+          toLayer.classList.add('active');
+          fromLayer.classList.remove('active');
+        });
+      });
+    },
+
+    // Main switch function
+    async switchTo(url) {
+      // If we're busy and get a new request, queue it
+      if (this.state !== 'idle') {
+        this.pendingUrl = url;
+        this.abort();
+        // Small delay to let abort complete
+        await new Promise(r => setTimeout(r, 50));
       }
-    } else {
-      applyDefault();
+
+      // Skip if same URL
+      if (url === this.currentUrl && this.state === 'idle') {
+        return;
+      }
+
+      const container = this.getContainer();
+      if (!container) return;
+
+      const activeLayer = this.getActiveLayer();
+      const inactiveLayer = this.getInactiveLayer();
+      if (!activeLayer || !inactiveLayer) return;
+
+      try {
+        this.state = 'loading';
+
+        // Clean inactive layer completely before loading new content
+        this.cleanLayer(inactiveLayer);
+
+        // Handle animated gradient (GPT-5 style)
+        if (url === '__gpt5_animated__') {
+          inactiveLayer.classList.add('gpt5-active');
+          // No media to load, just transition
+        } else if (url === '__local__') {
+          // Load from local storage
+          if (chrome?.runtime?.id && chrome?.storage?.local) {
+            const localData = await new Promise((resolve) => {
+              chrome.storage.local.get(LOCAL_BG_KEY, (res) => {
+                if (chrome.runtime.lastError || !res || !res[LOCAL_BG_KEY]) {
+                  resolve(null);
+                } else {
+                  resolve(res[LOCAL_BG_KEY]);
+                }
+              });
+            });
+            
+            if (localData) {
+              await this.loadMedia(inactiveLayer, localData);
+            } else {
+              await this.loadDefault(inactiveLayer);
+            }
+          } else {
+            await this.loadDefault(inactiveLayer);
+          }
+        } else if (url) {
+          // Custom URL
+          await this.loadMedia(inactiveLayer, url);
+        } else {
+          // Default/no URL
+          await this.loadDefault(inactiveLayer);
+        }
+
+        // Perform crossfade
+        this.state = 'transitioning';
+        await this.crossfade(inactiveLayer, activeLayer);
+
+        // Clean old layer completely (removes gpt5-active if it was set)
+        this.cleanLayer(activeLayer);
+
+        // Update state
+        this.activeLayerId = inactiveLayer.dataset.layerId;
+        this.currentUrl = url;
+        this.state = 'idle';
+
+        // Check for pending request
+        if (this.pendingUrl !== null) {
+          const pending = this.pendingUrl;
+          this.pendingUrl = null;
+          this.switchTo(pending);
+        }
+      } catch (err) {
+        // On error or abort, reset to idle
+        this.state = 'idle';
+        if (err.message !== 'Aborted') {
+          console.error('Aurora BG switch error:', err);
+        }
+      }
+    },
+
+    // Trigger update from settings
+    update() {
+      this.switchTo(settings.customBgUrl);
     }
+  };
+
+  // Wrapper function for backward compatibility
+  function updateBackgroundImage() {
+    BackgroundManager.update();
   }
 
   function applyCustomStyles() {
@@ -1396,6 +1623,21 @@
 
         <!-- Bar 1: Style Setup -->
         <div id="aurora-style-bar" class="aurora-setup-bar">
+            <!-- Holiday Mode Section -->
+            <div class="setup-section holiday-section">
+                <div class="holiday-mode-toggle">
+                    <span class="holiday-emoji">🎄</span>
+                    <span class="holiday-label">${getMessage('labelHolidayMode')}</span>
+                    <label class="switch">
+                        <input type="checkbox" id="welcome-holiday-mode">
+                        <span class="track"><span class="thumb"></span></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="setup-divider"></div>
+
+            <!-- Background Presets -->
             <div class="setup-section">
                 <label class="section-label">${getMessage('welcomeLabelBgPreset')}</label>
                 <div class="preset-grid">
@@ -1407,16 +1649,18 @@
                         <div class="preview animated"></div>
                         <span>${getMessage('welcomePresetAnimated')}</span>
                     </button>
+                    <button class="preset-tile" data-bg-url="christmas">
+                        <div class="preview christmas"></div>
+                        <span>🎄</span>
+                    </button>
                     <button class="preset-tile" data-bg-url="grokHorizon">
                         <div class="preview grok"></div>
                         <span>${getMessage('welcomePresetHorizon')}</span>
                     </button>
-                    <button class="preset-tile" data-bg-url="blue">
-                        <div class="preview blue"></div>
-                        <span>${getMessage('welcomePresetBlue')}</span>
-                    </button>
                 </div>
             </div>
+
+            <!-- Glass Style -->
             <div class="setup-section">
                 <label class="section-label">${getMessage('welcomeLabelGlassStyle')}</label>
                 <div class="pill-group">
@@ -1424,6 +1668,7 @@
                     <button class="pill-btn" data-appearance="dimmed">${getMessage('welcomeGlassDimmed')}</button>
                 </div>
             </div>
+
             <button id="finish-btn" class="welcome-btn primary finish-button">${getMessage('welcomeBtnFinish')}</button>
         </div>
     </div>
@@ -1489,8 +1734,42 @@
         tempSettings.customBgUrl = newUrl;
         settings.customBgUrl = newUrl; // for live preview
         applyAllSettings(); // Use full apply for robust preview
+
+        // If Christmas preset selected, auto-check Holiday Mode toggle
+        const holidayToggle = document.getElementById('welcome-holiday-mode');
+        if (holidayToggle && bgChoice === 'christmas') {
+          holidayToggle.checked = true;
+          tempSettings.enableSnowfall = true;
+          tempSettings.enableNewYear = true;
+          settings.enableSnowfall = true;
+          settings.enableNewYear = true;
+          applyAllSettings();
+        }
       });
     });
+
+    // Holiday Mode toggle handler
+    const welcomeHolidayMode = document.getElementById('welcome-holiday-mode');
+    if (welcomeHolidayMode) {
+      welcomeHolidayMode.addEventListener('change', () => {
+        const isOn = welcomeHolidayMode.checked;
+        tempSettings.enableSnowfall = isOn;
+        tempSettings.enableNewYear = isOn;
+        settings.enableSnowfall = isOn;
+        settings.enableNewYear = isOn;
+        
+        if (isOn) {
+          // Also set Christmas background
+          tempSettings.customBgUrl = CHRISTMAS_BG_URL;
+          settings.customBgUrl = CHRISTMAS_BG_URL;
+          // Update preset visual selection
+          document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(t => t.classList.remove('active'));
+          const christmasTile = document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="christmas"]');
+          if (christmasTile) christmasTile.classList.add('active');
+        }
+        applyAllSettings();
+      });
+    }
 
     document.querySelectorAll('#aurora-style-bar .pill-btn').forEach(pill => {
       pill.addEventListener('click', () => {
