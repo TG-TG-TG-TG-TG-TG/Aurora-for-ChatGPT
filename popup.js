@@ -5,6 +5,7 @@
 const LOCAL_BG_KEY = 'customBgData';
 const BLUE_WALLPAPER_URL = 'https://img.freepik.com/free-photo/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner_1258-54581.jpg?semt=ais_hybrid&w=740&q=80';
 const GROK_HORIZON_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
+const CHRISTMAS_BG_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/christmas-bg.webp') : 'Aurora/christmas-bg.webp';
 const MAX_FILE_SIZE_MB = 15;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 const FEEDBACK_API_URL = 'https://auroraforchatgpt.tnemoroccan.workers.dev';
@@ -172,7 +173,7 @@ function renderUi(settings, localData = {}) {
       $.bgUrl.value = getMessage('statusLocalFileInUse') || 'Local File Active';
       $.bgUrl.disabled = true;
     } else if (document.activeElement !== $.bgUrl) {
-      const presets = [BLUE_WALLPAPER_URL, GROK_HORIZON_URL];
+      const presets = [BLUE_WALLPAPER_URL, GROK_HORIZON_URL, CHRISTMAS_BG_URL];
       $.bgUrl.value = presets.includes(settings.customBgUrl) ? '' : settings.customBgUrl;
       $.bgUrl.disabled = false;
     }
@@ -197,6 +198,7 @@ const SELECT_CONFIGS = [
       { value: 'default', labelKey: 'bgPresetOptionDefault' },
       { value: '__gpt5_animated__', labelKey: 'bgPresetOptionGpt5Animated' },
       { value: 'grokHorizon', labelKey: 'bgPresetOptionGrokHorizon' },
+      { value: 'christmas', labelKey: 'bgPresetOptionChristmas' },
       { value: 'blue', labelKey: 'bgPresetOptionBlue' },
       { value: 'custom', labelKey: 'bgPresetOptionCustom', hidden: true }
     ],
@@ -204,6 +206,7 @@ const SELECT_CONFIGS = [
       if (!v) return 'default';
       if (v === BLUE_WALLPAPER_URL) return 'blue';
       if (v === GROK_HORIZON_URL) return 'grokHorizon';
+      if (v === CHRISTMAS_BG_URL) return 'christmas';
       if (v === '__gpt5_animated__') return '__gpt5_animated__';
       return 'custom';
     },
@@ -211,6 +214,7 @@ const SELECT_CONFIGS = [
       let url = '';
       if (val === 'blue') url = BLUE_WALLPAPER_URL;
       else if (val === 'grokHorizon') url = GROK_HORIZON_URL;
+      else if (val === 'christmas') url = CHRISTMAS_BG_URL;
       else if (val === '__gpt5_animated__') url = '__gpt5_animated__';
       if (val !== 'custom') chrome.storage.local.remove(LOCAL_BG_KEY);
       chrome.storage.sync.set({ customBgUrl: url });

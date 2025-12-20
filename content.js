@@ -35,6 +35,7 @@
   const BLUE_WALLPAPER_URL = 'https://img.freepik.com/free-photo/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner_1258-54581.jpg?semt=ais_hybrid&w=740&q=80';
   const GROK_HORIZON_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
   const SANTA_HAT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('santa_hat_cutout_v2.png') : 'santa_hat_cutout_v2.png';
+  const CHRISTMAS_BG_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/christmas-bg.webp') : 'Aurora/christmas-bg.webp';
 
   // Group DOM selectors for easier maintenance.
   const SELECTORS = {
@@ -1452,6 +1453,7 @@
         let newUrl = '';
         if (bgChoice === 'blue') newUrl = BLUE_WALLPAPER_URL;
         else if (bgChoice === 'grokHorizon') newUrl = GROK_HORIZON_URL;
+        else if (bgChoice === 'christmas') newUrl = CHRISTMAS_BG_URL;
         else if (bgChoice === '__gpt5_animated__') newUrl = '__gpt5_animated__';
 
         tempSettings.customBgUrl = newUrl;
