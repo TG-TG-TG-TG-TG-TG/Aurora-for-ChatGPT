@@ -339,6 +339,17 @@
   </main>
 
   <div class="credit">
+    <div class="feedback-link" id="feedbackTrigger">
+      <span class="feedback-icon">💬</span>
+      <span data-i18n="feedbackLink">Have feedback or found a bug?</span>
+    </div>
+    <!-- Inline Feedback Box -->
+    <div id="feedbackBox" class="feedback-box" hidden>
+      <button id="closeFeedback" class="feedback-close-btn" aria-label="Close">×</button>
+      <textarea id="feedbackInput" data-i18n-placeholder="feedbackPlaceholder" placeholder="Tell us what you think..."></textarea>
+      <button id="sendFeedback" class="feedback-send-btn" data-i18n="feedbackSend">Send Feedback</button>
+      <div id="feedbackStatus" class="feedback-status" hidden></div>
+    </div>
     <span data-i18n="creditPrefix">__MSG_creditPrefix__</span>
     <a href="https://x.com/test_tm7873" target="_blank" rel="noopener noreferrer">@test_tm7873</a>
     <span data-i18n="creditSuffix">__MSG_creditSuffix__</span>

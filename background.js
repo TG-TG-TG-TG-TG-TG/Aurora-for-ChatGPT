@@ -58,3 +58,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 });
+
+chrome.commands.onCommand.addListener((command) => {
+  if (command === 'toggle-visibility') {
+    chrome.storage.sync.get('focusMode', (items) => {
+      // Toggle Focus Mode
+      chrome.storage.sync.set({ focusMode: !items.focusMode });
+    });
+  } else if (command === 'toggle-blur') {
+    chrome.storage.sync.get('blurChatHistory', (items) => {
+      // Toggle Streamer Mode (Blur)
+      chrome.storage.sync.set({ blurChatHistory: !items.blurChatHistory });
+    });
+  }
+});

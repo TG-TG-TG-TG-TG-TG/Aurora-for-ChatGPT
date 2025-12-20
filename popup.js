@@ -648,4 +648,72 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  /* --- Feedback System Logic --- */
+  const FEEDBACK_API_URL = 'https://auroraforchatgpt.tnemoroccan.workers.dev';
+  
+  const feedbackTrigger = document.getElementById('feedbackTrigger');
+  const feedbackBox = document.getElementById('feedbackBox');
+  const closeFeedbackBtn = document.getElementById('closeFeedback');
+  const sendFeedbackBtn = document.getElementById('sendFeedback');
+  const feedbackInput = document.getElementById('feedbackInput');
+  const feedbackStatus = document.getElementById('feedbackStatus');
+
+  if (feedbackTrigger && feedbackBox) {
+    feedbackTrigger.addEventListener('click', () => {
+      feedbackBox.hidden = false;
+      feedbackTrigger.hidden = true;
+      feedbackInput.focus();
+    });
+
+    const closeFeedback = () => {
+      feedbackBox.hidden = true;
+      feedbackTrigger.hidden = false;
+      feedbackStatus.hidden = true;
+      feedbackStatus.textContent = '';
+      feedbackStatus.className = 'feedback-status';
+    };
+
+    closeFeedbackBtn.addEventListener('click', closeFeedback);
+
+    sendFeedbackBtn.addEventListener('click', async () => {
+      const text = feedbackInput.value.trim();
+      if (!text) return;
+
+      sendFeedbackBtn.disabled = true;
+      sendFeedbackBtn.textContent = getMessage('feedbackSending') || 'Sending...';
+      feedbackStatus.hidden = true;
+
+      try {
+        const manifest = chrome.runtime.getManifest();
+        const response = await fetch(FEEDBACK_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            feedback: text,
+            version: manifest.version,
+            userAgent: navigator.userAgent
+          })
+        });
+
+        if (response.ok) {
+          feedbackStatus.textContent = getMessage('feedbackSuccess') || '✅ Thanks for your feedback!';
+          feedbackStatus.className = 'feedback-status success';
+          feedbackStatus.hidden = false;
+          feedbackInput.value = '';
+          setTimeout(closeFeedback, 2000);
+        } else {
+          throw new Error('Server error');
+        }
+      } catch (err) {
+        console.error('Feedback error:', err);
+        feedbackStatus.textContent = getMessage('feedbackError') || 'Failed to send. Please try again.';
+        feedbackStatus.className = 'feedback-status error';
+        feedbackStatus.hidden = false;
+      } finally {
+        sendFeedbackBtn.disabled = false;
+        sendFeedbackBtn.textContent = getMessage('feedbackSend') || 'Send Feedback';
+      }
+    });
+  }
 });

@@ -42,7 +42,7 @@ html {
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   margin: 10px;
-  min-width: 310px;
+  min-width: 400px;
   color: var(--popup-text);
   background: transparent;
   transition: height 0.2s ease-in-out; /* Smooth resize for no results */
@@ -351,3 +351,141 @@ html.theme-light .select-trigger:hover {
   box-shadow: 0 1px 3px rgba(0,0,0,.25);
   transition: transform .2s ease;
 }
+
+/* --- Feedback System --- */
+.feedback-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--primary-accent);
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.9;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.feedback-link:hover { opacity: 1; transform: translateY(-1px); }
+.feedback-link[hidden] { display: none; }
+
+/* Inline Feedback Box */
+.feedback-box {
+  position: relative;
+  width: 100%;
+  margin-top: 24px; /* Space for the floating close button */
+  margin-bottom: 10px;
+  animation: feedbackExpand 0.2s ease-out;
+}
+.feedback-box[hidden] { display: none; }
+
+@keyframes feedbackExpand {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Close Button - Floated Top Right like First File */
+.feedback-close-btn {
+  position: absolute;
+  top: -26px;
+  right: 0;
+  width: auto;
+  height: auto;
+  padding: 2px 6px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+  color: #8b98a5; /* Dark mode default */
+  opacity: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  box-shadow: none;
+}
+html.theme-light .feedback-close-btn {
+  color: #536471;
+}
+.feedback-close-btn:hover {
+  background: transparent;
+  transform: none;
+  box-shadow: none;
+  color: var(--popup-text);
+}
+
+/* Feedback Textarea */
+textarea#feedbackInput {
+  width: 100%;
+  height: 60px;
+  padding: 8px;
+  resize: none;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  
+  /* Dark Mode Default (Aurora Base) */
+  background: #15202b;
+  border: 1px solid #38444d;
+  color: #f7f9f9;
+  margin-bottom: 8px;
+}
+
+/* Light Mode Overrides */
+html.theme-light textarea#feedbackInput {
+  background: #fff;
+  border: 1px solid #cfd9de;
+  color: #0f1419;
+}
+
+textarea#feedbackInput:focus {
+  outline: none;
+  border-color: #1d9bf0;
+  box-shadow: none;
+}
+
+/* Send Button - Pill Shape */
+.feedback-send-btn {
+  width: 100%;
+  padding: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 999px; /* Pill shape */
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+  
+  /* Dark Mode Default (Aurora Base) */
+  background: #eff3f4;
+  color: #0f1419;
+}
+
+/* Light Mode Overrides */
+html.theme-light .feedback-send-btn {
+  background: #0f1419;
+  color: white;
+}
+
+.feedback-send-btn:hover {
+  opacity: 0.9;
+  transform: none;
+  box-shadow: none;
+}
+.feedback-send-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Status Message */
+.feedback-status {
+  font-size: 12px;
+  text-align: center;
+  margin-top: 8px;
+  font-weight: 500;
+  background: transparent;
+}
+.feedback-status.success { color: #00ba7c; background: transparent; }
+.feedback-status.error { color: #f4212e; background: transparent; }

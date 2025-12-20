@@ -177,6 +177,8 @@
     const wrap = document.createElement('div');
     wrap.id = ID;
     wrap.setAttribute('aria-hidden', 'true');
+    wrap.style.setProperty('--cgpt-bg-blur-radius', '60px');
+    wrap.style.setProperty('--cgpt-object-fit', 'cover');
     Object.assign(wrap.style, { position: 'fixed', inset: '0', zIndex: '-1', pointerEvents: 'none' });
 
     const createLayerContent = () => `
@@ -315,34 +317,18 @@
   }
 
   function applyCustomStyles() {
-    const ensureAndApply = () => {
-      let styleNode = document.getElementById(STYLE_ID);
-      if (!styleNode) {
-        styleNode = document.createElement('style');
-        styleNode.id = STYLE_ID;
-        (document.head || document.documentElement || document.body)?.appendChild(styleNode);
-      }
-      const blurPx = `${settings.backgroundBlur || '60'}px`;
-      const scaling = settings.backgroundScaling || 'contain';
-      styleNode.textContent = `
-        #${ID} img, #${ID} video {
-          --cgpt-bg-blur-radius: ${blurPx};
-          object-fit: ${scaling};
-        }
-        #${ID} {
-          opacity: 0;
-          transition: opacity 500ms ease-in-out;
-        }
-        #${ID}.bg-visible {
-          opacity: 1;
-        }
-      `;
-    };
-    if (!document.head && !document.body) {
-      document.addEventListener('DOMContentLoaded', ensureAndApply, { once: true });
-      return;
-    }
-    ensureAndApply();
+    const bgNode = document.getElementById(ID);
+    if (!bgNode) return;
+
+    const blurPx = `${settings.backgroundBlur || '60'}px`;
+    const scaling = settings.backgroundScaling || 'cover';
+    
+    // Apply dynamic values directly to the container
+    bgNode.style.setProperty('--cgpt-bg-blur-radius', blurPx);
+    // Used in CSS via var(--cgpt-object-fit)
+    bgNode.style.setProperty('--cgpt-object-fit', scaling);
+    
+    // Static styles moved to styles.css
   }
 
   let qsInitScheduled = false;
@@ -495,9 +481,12 @@
     </div>
       <div class="qs-section-title">${getMessage('sectionHolidayEffects')}</div>
       <div class="qs-row" data-setting="enableSnowfall">
-          <label>${getMessage('labelSnowfall')}</label>
-          <label class="switch"><input type="checkbox" id="qs-enableSnowfall"><span class="track"><span class="thumb"></span></span></label>
-      </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-snowflake"><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></svg>
+            <label>${getMessage('labelSnowfall')}</label>
+        </div>
+        <label class="switch"><input type="checkbox" id="qs-enableSnowfall"><span class="track"><span class="thumb"></span></span></label>
+    </div>
       <div class="qs-row" data-setting="enableNewYear">
           <label>${getMessage('labelNewYear')}</label>
           <label class="switch"><input type="checkbox" id="qs-enableNewYear"><span class="track"><span class="thumb"></span></span></label>
@@ -1551,24 +1540,6 @@
         refreshSettingsAndApply();
       }
     });
-  }
-
-  // Add styles for Snapshot Mode
-  const snapshotStyle = document.createElement('style');
-  snapshotStyle.textContent = `
-    html.cgpt-snapshot-mode body > *:not(#__next) { display: none !important; }
-    html.cgpt-snapshot-mode #__next > *:not(main) { display: none !important; }
-    html.cgpt-snapshot-mode #stage-slideover-sidebar { display: none !important; }
-    html.cgpt-snapshot-mode .sticky { position: static !important; }
-    html.cgpt-snapshot-mode form { display: none !important; } /* Hide composer */
-    html.cgpt-snapshot-mode header { display: none !important; }
-    html.cgpt-snapshot-mode main .text-token-text-primary { margin: 0 auto !important; max-width: 800px !important; }
-    html.cgpt-snapshot-mode main { padding-bottom: 50px !important; }
-  `;
-  if (document.head) {
-    document.head.appendChild(snapshotStyle);
-  } else {
-    document.addEventListener('DOMContentLoaded', () => document.head.appendChild(snapshotStyle), { once: true });
   }
 
 })();

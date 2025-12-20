@@ -14,8 +14,25 @@
     "128": "icons/logo-128.png"
   },
   "permissions": [
-    "storage"
+    "storage",
+    "scripting"
   ],
+  "commands": {
+    "toggle-visibility": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Toggle Focus Mode (Visibility)"
+    },
+    "toggle-blur": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
+      },
+      "description": "Toggle Blur (Streamer Mode)"
+    }
+  },
   "action": {
     "default_title": "__MSG_actionTitle__",
     "default_popup": "popup.html",
