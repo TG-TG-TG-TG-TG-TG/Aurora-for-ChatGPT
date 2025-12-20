@@ -648,4 +648,104 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  /* --- Feedback System Logic --- */
+  const FEEDBACK_API_URL = 'https://auroraforchatgpt.tnemoroccan.workers.dev';
+  
+  const feedbackTrigger = document.getElementById('feedbackTrigger');
+  const feedbackBox = document.getElementById('feedbackBox');
+  const closeFeedbackBtn = document.getElementById('closeFeedback');
+  const sendFeedbackBtn = document.getElementById('sendFeedback');
+  const feedbackInput = document.getElementById('feedbackInput');
+  const feedbackStatus = document.getElementById('feedbackStatus');
+
+  const donationModal = document.getElementById('donationModal');
+  const closeDonationModalBtn = document.getElementById('closeDonationModal');
+  const ticketIdDisplay = document.getElementById('ticketIdDisplay');
+  const copyTicketBtn = document.getElementById('copyTicketBtn');
+  const copyFeedback = document.getElementById('copyFeedback');
+
+  const generateTicketId = () => {
+    return 'AUR-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  };
+
+  if (feedbackTrigger && feedbackBox) {
+    feedbackTrigger.addEventListener('click', () => {
+      feedbackBox.hidden = false;
+      feedbackTrigger.hidden = true;
+      feedbackInput.focus();
+    });
+
+    const closeFeedback = () => {
+      feedbackBox.hidden = true;
+      feedbackTrigger.hidden = false;
+      feedbackStatus.hidden = true;
+      feedbackStatus.textContent = '';
+      feedbackStatus.className = 'feedback-status';
+    };
+
+    closeFeedbackBtn.addEventListener('click', closeFeedback);
+
+    if (closeDonationModalBtn) {
+      closeDonationModalBtn.addEventListener('click', () => {
+        donationModal.hidden = true;
+        closeFeedback();
+      });
+    }
+
+    if (copyTicketBtn) {
+      copyTicketBtn.addEventListener('click', () => {
+        const id = ticketIdDisplay.textContent;
+        navigator.clipboard.writeText(id).then(() => {
+          copyFeedback.classList.add('visible');
+          setTimeout(() => copyFeedback.classList.remove('visible'), 2000);
+        });
+      });
+    }
+
+    sendFeedbackBtn.addEventListener('click', async () => {
+      const text = feedbackInput.value.trim();
+      if (!text) return;
+
+      const ticketId = generateTicketId();
+
+      sendFeedbackBtn.disabled = true;
+      sendFeedbackBtn.textContent = getMessage('feedbackSending') || 'Sending...';
+      feedbackStatus.hidden = true;
+
+      try {
+        const manifest = chrome.runtime.getManifest();
+        const response = await fetch(FEEDBACK_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            feedback: text,
+            version: manifest.version,
+            userAgent: navigator.userAgent,
+            ticketId: ticketId
+          })
+        });
+
+        if (response.ok) {
+          ticketIdDisplay.textContent = '#' + ticketId;
+          donationModal.hidden = false;
+          
+          feedbackInput.value = '';
+          
+          feedbackBox.hidden = true;
+          
+        } else {
+          throw new Error('Server error');
+        }
+      } catch (err) {
+        console.error('Feedback error:', err);
+        feedbackStatus.textContent = getMessage('feedbackError') || 'Failed to send. Please try again.';
+        feedbackStatus.className = 'feedback-status error';
+        feedbackStatus.hidden = false;
+      } finally {
+        sendFeedbackBtn.disabled = false;
+        sendFeedbackBtn.textContent = getMessage('feedbackSend') || 'Send Feedback';
+      }
+    });
+  }
 });
