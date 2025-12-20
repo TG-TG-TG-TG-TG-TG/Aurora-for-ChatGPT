@@ -80,6 +80,12 @@
   "tooltipNewYear": {
     "message": "Enable New Year garland lights"
   },
+  "labelHolidayMode": {
+    "message": "Holiday Mode"
+  },
+  "tooltipHolidayMode": {
+    "message": "Snow, lights & festive background"
+  },
   "sectionAnimations": {
     "message": "Animations"
   },
@@ -188,6 +194,9 @@
   "bgPresetOptionGrokHorizon": {
     "message": "Grok Horizon"
   },
+  "bgPresetOptionChristmas": {
+    "message": "🎄 Christmas"
+  },
   "bgPresetOptionCustom": {
     "message": "Custom"
   },
@@ -270,10 +279,10 @@
     "message": "Preview Theme"
   },
   "welcomeTitle": {
-    "message": "Welcome to Aurora"
+    "message": "Happy Holidays! 🎄"
   },
   "welcomeDescription": {
-    "message": "A beautiful, customizable interface for ChatGPT, designed to enhance your experience with ambient backgrounds, glass effects, and more."
+    "message": "Aurora wishes you a magical season. Let's personalize your ChatGPT with ambient backgrounds, glass effects, and festive vibes."
   },
   "welcomeBtnGetStarted": {
     "message": "Get Started"
@@ -526,5 +535,65 @@
   },
   "labelMaskPassport": {
     "message": "Passport"
+  },
+  "feedbackLink": {
+    "message": "Have feedback or found a bug?"
+  },
+  "feedbackPlaceholder": {
+    "message": "Tell us what you think..."
+  },
+  "feedbackSend": {
+    "message": "Send Feedback"
+  },
+  "feedbackSuccess": {
+    "message": "Feedback sent! Thank you."
+  },
+  "feedbackError": {
+    "message": "Failed to send. Please try again."
+  },
+  "feedbackSending": {
+    "message": "Sending..."
+  },
+  "feedbackReportSent": {
+    "message": "Report Sent!"
+  },
+  "feedbackQueuedMessage": {
+    "message": "Your feedback has been queued."
+  },
+  "feedbackYourTicketId": {
+    "message": "Your Ticket ID"
+  },
+  "feedbackCopyIdTooltip": {
+    "message": "Copy ID"
+  },
+  "feedbackCopied": {
+    "message": "Copied!"
+  },
+  "feedbackPrioritizeTitle": {
+    "message": "Want this prioritized?"
+  },
+  "feedbackDonatePre": {
+    "message": "Donate to support development and include your "
+  },
+  "feedbackDonatePost": {
+    "message": " to fast-track this request."
+  },
+  "feedbackSupportKofi": {
+    "message": "☕ Support on Ko-fi"
+  },
+  "feedbackClose": {
+    "message": "No thanks, just close"
+  },
+  "ticketIdLabel": {
+    "message": "Ticket ID"
+  },
+  "feedbackServerError": {
+    "message": "Server error"
+  },
+  "buttonCopied": {
+    "message": "✓ Copied!"
+  },
+  "buttonImported": {
+    "message": "✓ Imported!"
   }
 }

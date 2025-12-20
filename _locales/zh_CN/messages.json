@@ -80,6 +80,12 @@
   "tooltipNewYear": {
     "message": "启用新年彩灯串"
   },
+  "labelHolidayMode": {
+    "message": "节日模式"
+  },
+  "tooltipHolidayMode": {
+    "message": "雪花、彩灯和节日背景"
+  },
   "sectionAnimations": {
     "message": "动画"
   },
@@ -188,6 +194,9 @@
   "bgPresetOptionGrokHorizon": {
     "message": "Grok地平线"
   },
+  "bgPresetOptionChristmas": {
+    "message": "🎄 圣诞"
+  },
   "bgPresetOptionCustom": {
     "message": "自定义"
   },
@@ -270,10 +279,10 @@
     "message": "预览主题"
   },
   "welcomeTitle": {
-    "message": "欢迎使用Aurora"
+    "message": "节日快乐！🎄"
   },
   "welcomeDescription": {
-    "message": "一个美丽的、可定制的ChatGPT界面，旨在通过环境背景、玻璃效果等增强您的体验。"
+    "message": "Aurora祝您节日快乐。使用环境背景、玻璃效果和节日氛围来个性化您的ChatGPT。"
   },
   "welcomeBtnGetStarted": {
     "message": "开始使用"
@@ -484,5 +493,65 @@
   },
   "tooltipSmartSelectors": {
     "message": "如果ChatGPT更新，自动查找元素"
+  },
+  "feedbackLink": {
+    "message": "有反馈或发现了bug？"
+  },
+  "feedbackPlaceholder": {
+    "message": "告诉我们您的想法..."
+  },
+  "feedbackSend": {
+    "message": "发送反馈"
+  },
+  "feedbackSuccess": {
+    "message": "反馈已发送！谢谢。"
+  },
+  "feedbackError": {
+    "message": "发送失败。请重试。"
+  },
+  "feedbackSending": {
+    "message": "发送中..."
+  },
+  "feedbackReportSent": {
+    "message": "报告已发送！"
+  },
+  "feedbackQueuedMessage": {
+    "message": "您的反馈已排队。"
+  },
+  "feedbackYourTicketId": {
+    "message": "您的工单 ID"
+  },
+  "feedbackCopyIdTooltip": {
+    "message": "复制 ID"
+  },
+  "feedbackCopied": {
+    "message": "已复制！"
+  },
+  "feedbackPrioritizeTitle": {
+    "message": "想要优先处理？"
+  },
+  "feedbackDonatePre": {
+    "message": "捐赠以支持开发并附上您的 "
+  },
+  "feedbackDonatePost": {
+    "message": " 以加速此请求。"
+  },
+  "feedbackSupportKofi": {
+    "message": "☕ 在 Ko-fi 上支持"
+  },
+  "feedbackClose": {
+    "message": "不用了，关闭"
+  },
+  "ticketIdLabel": {
+    "message": "工单 ID"
+  },
+  "feedbackServerError": {
+    "message": "服务器错误"
+  },
+  "buttonCopied": {
+    "message": "✓ 已复制！"
+  },
+  "buttonImported": {
+    "message": "✓ 已导入！"
   }
 }

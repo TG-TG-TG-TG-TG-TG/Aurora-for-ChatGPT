@@ -108,6 +108,7 @@ function cacheElements() {
   $.importSettings = document.getElementById('importSettings');
   $.settingsJson = document.getElementById('settingsJson');
   $.importExportRow = document.getElementById('importExportTextAreaRow');
+  $.holidayMode = document.getElementById('holidayMode');
   
   // Feedback elements
   $.feedbackTrigger = document.getElementById('feedbackTrigger');
@@ -157,6 +158,13 @@ function renderUi(settings, localData = {}) {
     const el = $.toggles?.[key];
     if (el) el.checked = !!settings[key];
   });
+
+  // Holiday Mode toggle state (on if all holiday features are enabled)
+  if ($.holidayMode) {
+    const isHolidayMode = settings.enableSnowfall && settings.enableNewYear && 
+                          settings.customBgUrl === CHRISTMAS_BG_URL;
+    $.holidayMode.checked = isHolidayMode;
+  }
 
   // Range Sliders
   if ($.blurSlider && $.blurValue) {
@@ -393,6 +401,22 @@ function setupChangeListeners() {
       });
     }
   });
+
+  // Holiday Mode toggle (combines snowfall + garland + Christmas background)
+  if ($.holidayMode) {
+    $.holidayMode.addEventListener('change', () => {
+      const isOn = $.holidayMode.checked;
+      const updates = {
+        enableSnowfall: isOn,
+        enableNewYear: isOn,
+        customBgUrl: isOn ? CHRISTMAS_BG_URL : ''
+      };
+      chrome.storage.sync.set(updates);
+      // Also update individual toggles visually
+      if ($.toggles?.enableSnowfall) $.toggles.enableSnowfall.checked = isOn;
+      if ($.toggles?.enableNewYear) $.toggles.enableNewYear.checked = isOn;
+    });
+  }
 
   // Slider with debounce
   if ($.blurSlider) {

@@ -524,6 +524,13 @@
         <label class="switch"><input type="checkbox" id="qs-blurChatHistory"><span class="track"><span class="thumb"></span></span></label>
     </div>
       <div class="qs-section-title">${getMessage('sectionHolidayEffects')}</div>
+      <div class="qs-row qs-holiday-mode" data-setting="holidayMode">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">🎄</span>
+            <label>${getMessage('labelHolidayMode')}</label>
+        </div>
+        <label class="switch"><input type="checkbox" id="qs-holidayMode"><span class="track"><span class="thumb"></span></span></label>
+      </div>
       <div class="qs-row" data-setting="enableSnowfall">
         <div style="display: flex; align-items: center; gap: 6px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-snowflake"><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></svg>
@@ -557,6 +564,29 @@
         });
       }
     });
+
+    // Holiday Mode toggle (combines snowfall + garland + Christmas background)
+    const qsHolidayMode = document.getElementById('qs-holidayMode');
+    if (qsHolidayMode) {
+      // Set initial state: on if all holiday features are enabled
+      const isHolidayMode = settings.enableSnowfall && settings.enableNewYear && 
+                            settings.customBgUrl === CHRISTMAS_BG_URL;
+      qsHolidayMode.checked = isHolidayMode;
+      
+      qsHolidayMode.addEventListener('change', () => {
+        const isOn = qsHolidayMode.checked;
+        chrome.storage.sync.set({
+          enableSnowfall: isOn,
+          enableNewYear: isOn,
+          customBgUrl: isOn ? CHRISTMAS_BG_URL : ''
+        });
+        // Also update individual toggles visually
+        const snowToggle = document.getElementById('qs-enableSnowfall');
+        const yearToggle = document.getElementById('qs-enableNewYear');
+        if (snowToggle) snowToggle.checked = isOn;
+        if (yearToggle) yearToggle.checked = isOn;
+      });
+    }
 
     setupQuickSettingsVoiceSelector(settings);
 

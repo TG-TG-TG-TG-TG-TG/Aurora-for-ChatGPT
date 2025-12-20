@@ -86,6 +86,12 @@
   "tooltipNewYear": {
     "message": "Activar guirnalda de Año Nuevo"
   },
+  "labelHolidayMode": {
+    "message": "Modo Festivo"
+  },
+  "tooltipHolidayMode": {
+    "message": "Nieve, luces y fondo festivo"
+  },
   "labelDisableAnimations": {
     "message": "Desactivar animaciones de menú"
   },
@@ -188,6 +194,9 @@
   "bgPresetOptionGrokHorizon": {
     "message": "Horizonte Grok"
   },
+  "bgPresetOptionChristmas": {
+    "message": "🎄 Navidad"
+  },
   "bgScalingOptionContain": {
     "message": "Contener (ajustar)"
   },
@@ -270,10 +279,10 @@
     "message": "Previsualizar Tema"
   },
   "welcomeTitle": {
-    "message": "Bienvenido a Aurora"
+    "message": "¡Felices Fiestas! 🎄"
   },
   "welcomeDescription": {
-    "message": "Una hermosa interfaz personalizable para ChatGPT, diseñada para mejorar tu experiencia con fondos ambientales, efectos de vidrio y más."
+    "message": "Aurora te desea una temporada mágica. Personaliza tu ChatGPT con fondos ambientales, efectos de vidrio y ambiente festivo."
   },
   "welcomeBtnGetStarted": {
     "message": "Comenzar"
@@ -484,5 +493,65 @@
   },
   "tooltipSmartSelectors": {
     "message": "Encontrar elementos automáticamente si ChatGPT se actualiza"
+  },
+  "feedbackLink": {
+    "message": "¿Tienes comentarios o encontraste un error?"
+  },
+  "feedbackPlaceholder": {
+    "message": "Cuéntanos qué piensas..."
+  },
+  "feedbackSend": {
+    "message": "Enviar Comentario"
+  },
+  "feedbackSuccess": {
+    "message": "¡Comentario enviado! Gracias."
+  },
+  "feedbackError": {
+    "message": "Error al enviar. Por favor, inténtalo de nuevo."
+  },
+  "feedbackSending": {
+    "message": "Enviando..."
+  },
+  "feedbackReportSent": {
+    "message": "¡Informe enviado!"
+  },
+  "feedbackQueuedMessage": {
+    "message": "Tu comentario ha sido puesto en cola."
+  },
+  "feedbackYourTicketId": {
+    "message": "Tu ID de Ticket"
+  },
+  "feedbackCopyIdTooltip": {
+    "message": "Copiar ID"
+  },
+  "feedbackCopied": {
+    "message": "¡Copiado!"
+  },
+  "feedbackPrioritizeTitle": {
+    "message": "¿Quieres priorizar esto?"
+  },
+  "feedbackDonatePre": {
+    "message": "Dona para apoyar el desarrollo e incluye tu "
+  },
+  "feedbackDonatePost": {
+    "message": " para acelerar esta solicitud."
+  },
+  "feedbackSupportKofi": {
+    "message": "☕ Apóyanos en Ko-fi"
+  },
+  "feedbackClose": {
+    "message": "No gracias, cerrar"
+  },
+  "ticketIdLabel": {
+    "message": "ID de Ticket"
+  },
+  "feedbackServerError": {
+    "message": "Error del servidor"
+  },
+  "buttonCopied": {
+    "message": "✓ ¡Copiado!"
+  },
+  "buttonImported": {
+    "message": "✓ ¡Importado!"
   }
 }

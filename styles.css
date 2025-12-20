@@ -762,6 +762,16 @@ html.cgpt-light-mode #cgpt-qs-panel {
 html.cgpt-light-mode .qs-row:hover { background: rgba(0,0,0,0.06); }
 .qs-row label:not(.switch) { font-size: 13px; opacity: 0.95; }
 
+/* Holiday Mode special styling */
+.qs-row.qs-holiday-mode {
+  background: linear-gradient(135deg, rgba(34, 139, 34, 0.12) 0%, rgba(178, 34, 34, 0.12) 100%);
+  border: 1px solid rgba(34, 139, 34, 0.25);
+  margin-bottom: 4px;
+}
+.qs-row.qs-holiday-mode:hover {
+  background: linear-gradient(135deg, rgba(34, 139, 34, 0.2) 0%, rgba(178, 34, 34, 0.2) 100%);
+}
+
 .qs-row .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
 .qs-row .switch input { display: none; }
 .qs-row .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(0,0,0,0.3); transition: background .2s ease; }
