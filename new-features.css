@@ -21,8 +21,7 @@ html.cgpt-ambient-on[data-custom-font="poppins"] * {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
-/* Google Fonts Import */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+/* Google Fonts imported in styles.css - do not duplicate here */
 
 /* ===== STREAMER MODE - IMPROVED BLUR EFFECTS ===== */
 

@@ -14,6 +14,16 @@ let lastCountedText = '';
 let lastTokenCount = 0;
 let lastTokenApproximate = true;
 let updateSequence = 0;
+let debouncedUpdateTimer = null;
+
+// Simple debounce helper
+const debounce = (fn, delay) => {
+    let timer = null;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+    };
+};
 
 const DEFAULT_ENCODING = 'o200k_base';
 const SECONDARY_ENCODING = 'cl100k_base';
@@ -380,6 +390,10 @@ function clearMonitoringArtifacts() {
         clearTimeout(retryTimeoutId);
         retryTimeoutId = null;
     }
+    if (debouncedUpdateTimer) {
+        clearTimeout(debouncedUpdateTimer);
+        debouncedUpdateTimer = null;
+    }
     if (textareaObserver) {
         textareaObserver.disconnect();
         textareaObserver = null;
@@ -412,11 +426,23 @@ function setupTextareaMonitoring() {
     currentTextarea = textarea;
     console.log('[Aurora Token Counter] Monitoring textarea');
 
-    // Update on input
-    currentTextareaListener = () => {
+    // Update on input (debounced to prevent expensive calls on every keystroke)
+    const rawListener = () => {
         if (!isTokenCounterEnabled) return;
         const text = textarea.value || textarea.textContent || '';
         updateTokenCounter(text);
+    };
+    
+    // Debounce the expensive token counting (150ms), but update word count immediately
+    currentTextareaListener = () => {
+        if (!isTokenCounterEnabled) return;
+        const text = textarea.value || textarea.textContent || '';
+        // Show word count immediately (cheap operation)
+        const wordCount = countWords(text);
+        renderLoading(wordCount);
+        // Debounce the expensive token counting
+        clearTimeout(debouncedUpdateTimer);
+        debouncedUpdateTimer = setTimeout(() => updateTokenCounter(text), 150);
     };
 
     textarea.addEventListener('input', currentTextareaListener);
@@ -432,7 +458,8 @@ function setupTextareaMonitoring() {
     }
 
     textareaObserver = new MutationObserver(() => {
-        if (!isTokenCounterEnabled) return;
+        // Early exit if feature disabled (defensive check for race conditions)
+        if (!isTokenCounterEnabled || !textareaObserver) return;
         const newTextarea = findComposerTextarea();
         if (newTextarea && newTextarea !== currentTextarea) {
             setupTextareaMonitoring();

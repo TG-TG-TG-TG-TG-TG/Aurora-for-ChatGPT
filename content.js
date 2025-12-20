@@ -393,23 +393,6 @@
 
   let qsInitScheduled = false;
 
-  function setupQuickSettingsToggles(settings) {
-    const toggleConfig = [
-      { id: 'qs-focusMode', key: 'focusMode' },
-      { id: 'qs-hideUpgradeButtons', key: 'hideUpgradeButtons' },
-      { id: 'qs-cuteVoiceUI', key: 'cuteVoiceUI' },
-    ];
-
-    toggleConfig.forEach(({ id, key }) => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.checked = !!settings[key];
-        el.addEventListener('change', () => {
-          chrome.storage.sync.set({ [key]: el.checked });
-        });
-      }
-    });
-  }
 
   function setupQuickSettingsVoiceSelector(settings) {
     const voiceColorOptions = [
@@ -572,22 +555,6 @@
           chrome.storage.sync.set({ [key]: checkbox.checked });
         });
       }
-    });
-
-    const appearanceButtons = Array.from(panel.querySelectorAll('[data-appearance]'));
-    const syncAppearanceButtons = () => {
-      appearanceButtons.forEach((btn) => {
-        const isActive = (settings.appearance || 'clear') === btn.dataset.appearance;
-        btn.classList.toggle('active', isActive);
-        btn.setAttribute('aria-pressed', String(isActive));
-      });
-    };
-    syncAppearanceButtons();
-    appearanceButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const value = btn.dataset.appearance;
-        chrome.storage.sync.set({ appearance: value });
-      });
     });
 
     setupQuickSettingsVoiceSelector(settings);

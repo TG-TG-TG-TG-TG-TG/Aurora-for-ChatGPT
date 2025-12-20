@@ -228,23 +228,26 @@
     const engine = new DataMaskingEngine();
     window.DataMaskingEngine = engine;
 
-    const initEarly = () => {
+    // Single initialization point with flag to prevent duplicates
+    let initCalled = false;
+    const initOnce = () => {
+        if (initCalled) return;
+        initCalled = true;
         engine.init();
     };
 
+    // Use a single pattern for initialization
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initEarly, { once: true });
+        document.addEventListener('DOMContentLoaded', initOnce, { once: true });
+    } else if (document.body) {
+        // Document already loaded with body
+        initOnce();
     } else {
-        initEarly();
-    }
-
-    if (document.body) {
-        initEarly();
-    } else {
+        // Rare edge case: document loaded but no body yet
         const earlyObserver = new MutationObserver(() => {
             if (document.body) {
                 earlyObserver.disconnect();
-                initEarly();
+                initOnce();
             }
         });
         earlyObserver.observe(document.documentElement, { childList: true });
