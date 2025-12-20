@@ -48,6 +48,31 @@ body {
   transition: height 0.2s ease-in-out; /* Smooth resize for no results */
 }
 
+/* --- Aurora Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+html.theme-light ::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+html.theme-light ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
 /* --- New: Search Bar --- */
 .search-wrapper {
   position: relative;
@@ -153,9 +178,12 @@ html.theme-light .tab-link.active {
 .tab-pane {
   display: none;
   padding: 4px;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.2s ease;
 }
 .tab-pane.active { display: block; }
+.tab-pane:not(.active) {
+  content-visibility: hidden;
+}
 /* New: No Results Message */
 .no-results-message {
   text-align: center;
@@ -308,8 +336,8 @@ html.theme-light .select-trigger:hover {
   display: none; /* Hidden by default */
   background: var(--popup-dropdown-bg);
   border: 1px solid var(--popup-dropdown-border);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 .select-options[style*="block"] {
   display: block !important;

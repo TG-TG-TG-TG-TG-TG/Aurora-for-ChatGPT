@@ -154,7 +154,7 @@ html.cgpt-ambient-on body {
 }
 
 /* --- Background Container & Media --- */
-#cgpt-ambient-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-color: var(--theme-bg-color); opacity: 0; transition: opacity 0.5s ease-in-out; }
+#cgpt-ambient-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-color: var(--theme-bg-color); opacity: 0; transition: opacity 0.5s ease-in-out; contain: paint; }
 html.cgpt-bg-anim-disabled #cgpt-ambient-bg { transition: none; }
 #cgpt-ambient-bg.bg-visible { opacity: 1; }
 #cgpt-ambient-bg .media-layer { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 750ms ease-in-out; }
@@ -760,7 +760,7 @@ html.cgpt-light-mode #cgpt-qs-panel {
 }
 .qs-row:hover { background: rgba(255, 255, 255, 0.08); }
 html.cgpt-light-mode .qs-row:hover { background: rgba(0,0,0,0.06); }
-.qs-row > label { font-size: 13px; opacity: 0.95; }
+.qs-row label:not(.switch) { font-size: 13px; opacity: 0.95; }
 
 .qs-row .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
 .qs-row .switch input { display: none; }

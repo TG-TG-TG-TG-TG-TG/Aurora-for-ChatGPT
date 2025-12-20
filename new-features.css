@@ -243,9 +243,9 @@ html.cgpt-light-mode .token-budget-fill.critical {
     letter-spacing: 0.3px;
 }
 
-/* ===== HOLIDAY EFFECTS ===== */
+/* ===== HOLIDAY EFFECTS (GPU-Optimized) ===== */
 
-/* 1. Snowfall Animation */
+/* 1. Snowfall Animation - GPU Accelerated */
 .aurora-snow-container {
     position: fixed;
     top: 0;
@@ -257,10 +257,22 @@ html.cgpt-light-mode .token-budget-fill.critical {
     overflow: hidden;
     opacity: 1;
     transition: opacity 0.8s ease-out;
+    contain: strict; /* Isolate from layout recalculations */
 }
 
 .aurora-snow-container.exiting {
     opacity: 0;
+}
+
+/* Pause animations when tab is hidden or animations disabled */
+html.cgpt-tab-hidden .aurora-snow-container,
+html.cgpt-no-animations .aurora-snow-container {
+    animation-play-state: paused !important;
+}
+
+html.cgpt-tab-hidden .aurora-snowflake,
+html.cgpt-no-animations .aurora-snowflake {
+    animation-play-state: paused !important;
 }
 
 .aurora-snowflake {
@@ -268,15 +280,31 @@ html.cgpt-light-mode .token-budget-fill.critical {
     top: -10px;
     background: white;
     border-radius: 50%;
-    opacity: 0.8;
+    /* GPU acceleration hints */
+    will-change: transform;
+    transform: translateZ(0); /* Force GPU layer */
+    backface-visibility: hidden;
     animation: aurora-snow-fall linear infinite;
+    /* Contain each snowflake */
+    contain: layout style;
 }
 
+/* Optimized keyframes: pure transform, no opacity mid-animation for less repaints */
 @keyframes aurora-snow-fall {
-    0% { transform: translateY(-10vh) translateX(0); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 0.9; }
-    100% { transform: translateY(110vh) translateX(20px); opacity: 0; }
+    0% { 
+        transform: translate3d(0, -10vh, 0);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% { 
+        transform: translate3d(15px, 110vh, 0);
+        opacity: 0;
+    }
 }
 
 /* 1b. Santa Hat on OpenAI Home icon (snow toggle) */
@@ -301,7 +329,7 @@ html.cgpt-snow-on a[data-sidebar-item="true"][href="/"]:has(svg use[href$="#5518
     z-index: 1;
 }
 
-/* 2. New Year Garland (Lights) */
+/* 2. New Year Garland (Lights) - GPU Accelerated */
 .aurora-garland-container {
     position: fixed;
     top: -10px; /* Hide top wire curve */
@@ -314,6 +342,13 @@ html.cgpt-snow-on a[data-sidebar-item="true"][href="/"]:has(svg use[href$="#5518
     justify-content: space-between;
     overflow: hidden;
     white-space: nowrap;
+    contain: strict; /* Isolate from layout recalculations */
+}
+
+/* Pause garland when tab hidden or animations disabled */
+html.cgpt-tab-hidden .aurora-garland-container .aurora-bulb,
+html.cgpt-no-animations .aurora-garland-container .aurora-bulb {
+    animation-play-state: paused !important;
 }
 
 .aurora-garland-wire-segment {
@@ -323,19 +358,24 @@ html.cgpt-snow-on a[data-sidebar-item="true"][href="/"]:has(svg use[href$="#5518
     border-bottom: 2px solid rgba(50, 50, 50, 0.8);
     border-radius: 0 0 50% 50% / 0 0 100% 100%;
     margin: 0 -5px; /* Overlap wires */
+    contain: layout style;
 }
 
 .aurora-bulb {
     position: absolute;
     bottom: -14px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateZ(0); /* GPU layer */
     width: 12px;
     height: 18px;
     border-radius: 50%;
     background: var(--bulb-color, #ff0);
-    box-shadow: 0 0 4px var(--bulb-color, #ff0);
+    /* Optimized: smaller initial shadow, animated via opacity for less work */
+    box-shadow: 0 0 8px var(--bulb-color, #ff0);
+    will-change: opacity;
+    backface-visibility: hidden;
     animation: aurora-bulb-flash 2s infinite alternate;
+    contain: layout style;
 }
 
 .aurora-bulb::before {
@@ -350,7 +390,8 @@ html.cgpt-snow-on a[data-sidebar-item="true"][href="/"]:has(svg use[href$="#5518
     border-radius: 2px;
 }
 
+/* Optimized: animate only opacity, not box-shadow (very expensive) */
 @keyframes aurora-bulb-flash {
-    0%, 100% { opacity: 0.4; box-shadow: 0 0 2px var(--bulb-color); }
-    50% { opacity: 1; box-shadow: 0 0 12px var(--bulb-color); }
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
 }

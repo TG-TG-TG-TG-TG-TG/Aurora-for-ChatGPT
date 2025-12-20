@@ -82,6 +82,14 @@
     });
   };
 
+  const safeRequestIdleCallback = (callback, options) => {
+    if (window.requestIdleCallback) {
+        window.requestIdleCallback(callback, options);
+    } else {
+        setTimeout(callback, 1);
+    }
+  };
+
   // Use AuroraI18n for language detection (ChatGPT language priority)
   const getMessage = (key, substitutions) => {
     try {
@@ -99,24 +107,76 @@
     return key;
   };
 
+  let cachedLimitTimestamp = null;
+  let hasCheckedTimestamp = false;
+  let isTimestampCleared = false;
+
   function manageGpt5LimitPopup() {
     const popup = document.querySelector(SELECTORS.GPT5_LIMIT_POPUP);
-    if (popup && !popup.textContent.toLowerCase().includes('you\'ve reached the gpt-5 limit')) return;
+    const isLimitMsg = popup && popup.textContent.toLowerCase().includes('you\'ve reached the gpt-5 limit');
+
+    // If popup exists but it's not the limit message, ignore it
+    if (popup && !isLimitMsg) return;
+
+    // If feature is disabled, just ensure it's visible
     if (!settings.hideGpt5Limit) {
-      if (popup) popup.classList.remove(HIDE_LIMIT_CLASS); return;
+      if (popup) popup.classList.remove(HIDE_LIMIT_CLASS);
+      return;
     }
+
     if (!chrome?.runtime?.id) return;
+
     if (popup) {
-      chrome.storage.local.get([TIMESTAMP_KEY], (result) => {
-        if (chrome.runtime.lastError) return;
-        if (!result[TIMESTAMP_KEY]) {
-          chrome.storage.local.set({ [TIMESTAMP_KEY]: Date.now() });
-        } else if (Date.now() - result[TIMESTAMP_KEY] > FIVE_MINUTES_MS) {
+      // Popup IS present
+      isTimestampCleared = false; // Reset cleared flag so we clean up later when it disappears
+
+      // If we already have a cached timestamp, use it
+      if (cachedLimitTimestamp) {
+        if (Date.now() - cachedLimitTimestamp > FIVE_MINUTES_MS) {
           popup.classList.add(HIDE_LIMIT_CLASS);
         }
-      });
+        return;
+      }
+
+      // If we haven't checked storage yet, check it once
+      if (!hasCheckedTimestamp) {
+        hasCheckedTimestamp = true; // Prevent spamming GET
+        chrome.storage.local.get([TIMESTAMP_KEY], (result) => {
+          if (chrome.runtime.lastError) {
+             hasCheckedTimestamp = false; // Retry next time
+             return;
+          }
+          if (result[TIMESTAMP_KEY]) {
+            cachedLimitTimestamp = result[TIMESTAMP_KEY];
+             if (Date.now() - cachedLimitTimestamp > FIVE_MINUTES_MS) {
+               popup.classList.add(HIDE_LIMIT_CLASS);
+             }
+          } else {
+            // No timestamp exists, set one
+            const now = Date.now();
+            cachedLimitTimestamp = now;
+            chrome.storage.local.set({ [TIMESTAMP_KEY]: now });
+          }
+        });
+      }
     } else {
-      chrome.storage.local.remove([TIMESTAMP_KEY]);
+      // Popup is NOT present
+      // Only remove if we haven't already marked it as cleared/removed
+      if (!isTimestampCleared) {
+        isTimestampCleared = true;
+        cachedLimitTimestamp = null;
+        hasCheckedTimestamp = false; // Reset so we fetch again next time it appears
+        
+        // Check if it actually needs removal to avoid IPC if already empty? 
+        // Chrome optimizes this but good to be explicit.
+        // We just call remove once.
+        chrome.storage.local.remove([TIMESTAMP_KEY], () => {
+            if (chrome.runtime.lastError) {
+                // validation fail or something, reset flag to try again?
+                // ignoring for now to avoid loops
+            }
+        });
+      }
     }
   }
 
@@ -840,9 +900,16 @@
    * Applies a data-attribute to elements that should have a glass effect.
    * This is more robust and maintainable than a massive CSS :is() selector.
    * It only queries for and processes elements that have not already been tagged.
+   * @param {Document|Element} root - The root element to search within.
    */
-  function applyGlassEffects() {
-    const elements = document.querySelectorAll(UNTAGGED_GLASS_SELECTOR);
+  function applyGlassEffects(root = document) {
+    // If root itself matches, tag it (rare but possible for dynamic inserts)
+    if (root.nodeType === 1 && root.matches && root.matches(UNTAGGED_GLASS_SELECTOR)) {
+        root.dataset.auroraGlass = 'true';
+    }
+
+    // Find children
+    const elements = root.querySelectorAll(UNTAGGED_GLASS_SELECTOR);
     for (const el of elements) {
       el.dataset.auroraGlass = 'true';
     }
@@ -853,6 +920,7 @@
   // 1. Audio Engine (Synthesized Haptics)
   const AudioEngine = {
     ctx: null,
+    isListening: false,
     init() {
       if (!this.ctx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -902,7 +970,8 @@
       }
     },
     attachListeners() {
-      if (!settings.soundEnabled) return;
+      if (!settings.soundEnabled || this.isListening) return;
+      this.isListening = true;
       document.body.addEventListener('mouseenter', (e) => {
         if (e.target.matches && e.target.matches('button, a, [role="button"], input, .btn')) {
           this.play('hover');
@@ -940,7 +1009,7 @@
       let el = document.querySelector(def.selector);
       if (!el && def.heuristic) {
         el = def.heuristic();
-        if (el) console.log(`[Aurora SmartDOM] Healed selector for ${key}`);
+        // Healed selector silently
       }
 
       if (el) this.cache[key] = el;
@@ -950,21 +1019,29 @@
 
   // 3. Contrast Engine
   const ContrastEngine = {
+    canvas: null,
+    ctx: null,
+    init() {
+        if (!this.canvas) {
+            this.canvas = document.createElement('canvas');
+            this.canvas.width = 50;
+            this.canvas.height = 50;
+            // WillReadFrequently optimization hint
+            this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+        }
+    },
     analyze(imgElement) {
       if (!settings.autoContrast) return;
+      this.init(); // Constant check, cheap
+      
       try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = 50;
-        canvas.height = 50;
-
         // Handle cross-origin if possible (won't work for all external URLs)
         if (imgElement.src.startsWith('http') && !imgElement.src.includes(location.host)) {
           imgElement.crossOrigin = "Anonymous";
         }
 
-        ctx.drawImage(imgElement, 0, 0, 50, 50);
-        const data = ctx.getImageData(0, 0, 50, 50).data;
+        this.ctx.drawImage(imgElement, 0, 0, 50, 50);
+        const data = this.ctx.getImageData(0, 0, 50, 50).data;
         let r, g, b, avg;
         let colorSum = 0;
 
@@ -1025,14 +1102,14 @@
     }
   };
 
-  // --- Holiday Effects Engine ---
+  // --- Holiday Effects Engine (GPU-Optimized) ---
   function manageHolidayEffects() {
     if (SANTA_HAT_URL) {
       document.documentElement.style.setProperty('--aurora-santa-hat-image', `url("${SANTA_HAT_URL}")`);
     }
     document.documentElement.classList.toggle('cgpt-snow-on', !!settings.enableSnowfall);
 
-    // 1. Snowfall Logic
+    // 1. Snowfall Logic (Optimized: fewer elements, CSS-driven properties)
     let snowContainer = document.getElementById('aurora-snow-container');
     
     if (settings.enableSnowfall) {
@@ -1040,34 +1117,39 @@
         snowContainer = document.createElement('div');
         snowContainer.id = 'aurora-snow-container';
         snowContainer.className = 'aurora-snow-container';
+        
+        // Use template for faster cloning (40 snowflakes - reduced from 60)
+        const template = document.createElement('div');
+        template.className = 'aurora-snowflake';
+        
         const frag = document.createDocumentFragment();
         
-        // Increased count slightly for better effect with smaller size
-        for (let i = 0; i < 60; i++) {
-          const f = document.createElement('div');
-          f.className = 'aurora-snowflake';
-          f.style.left = Math.random() * 100 + 'vw';
+        // Pre-generate all random values for consistency
+        for (let i = 0; i < 40; i++) {
+          const f = template.cloneNode(true);
           
-          // Speed: Varies between 5s (fast) and 12s (slow/floating)
-          f.style.animationDuration = (Math.random() * 7 + 5) + 's'; 
+          // Use CSS custom properties for GPU-optimized values
+          const left = Math.random() * 100;
+          const duration = Math.random() * 6 + 6; // 6-12s (slower = less CPU)
+          const delay = Math.random() * 8;
+          const opacity = Math.random() * 0.5 + 0.4; // 0.4-0.9
+          const size = Math.random() * 3 + 2; // 2-5px
           
-          f.style.animationDelay = (Math.random() * 5) + 's';
-          
-          // Opacity: Random for depth perception
-          f.style.opacity = Math.random() * 0.7 + 0.3;
-          
-          // Size: Much smaller now (2px to 5px)
-          const size = (Math.random() * 3 + 2) + 'px';
-          f.style.width = size;
-          f.style.height = size;
+          // Batch style assignments via cssText for fewer reflows
+          f.style.cssText = `
+            left: ${left}vw;
+            animation-duration: ${duration}s;
+            animation-delay: ${delay}s;
+            opacity: ${opacity};
+            width: ${size}px;
+            height: ${size}px;
+          `;
           
           frag.appendChild(f);
         }
+        
         snowContainer.appendChild(frag);
         document.body.appendChild(snowContainer);
-        
-        // Force reflow to ensure transition works if toggled quickly
-        void snowContainer.offsetWidth; 
       }
       // Ensure it's visible if it was exiting
       snowContainer.classList.remove('exiting');
@@ -1076,34 +1158,47 @@
       // Fade out animation
       snowContainer.classList.add('exiting');
       setTimeout(() => {
-        // Check again if setting is still disabled (user didn't toggle back on)
-        if (!settings.enableSnowfall && document.getElementById('aurora-snow-container')) {
-            document.getElementById('aurora-snow-container').remove();
+        // Check again if setting is still disabled
+        const container = document.getElementById('aurora-snow-container');
+        if (!settings.enableSnowfall && container) {
+          container.remove();
         }
-      }, 800); // Matches CSS transition time
+      }, 800);
     }
 
-    // 2. New Year Garland Logic
+    // 2. New Year Garland Logic (Optimized: fixed count, pre-defined colors)
     let garlandContainer = document.getElementById('aurora-garland-container');
+    
     if (settings.enableNewYear) {
       if (!garlandContainer) {
         garlandContainer = document.createElement('div');
         garlandContainer.id = 'aurora-garland-container';
         garlandContainer.className = 'aurora-garland-container';
-        const count = Math.ceil(window.innerWidth / 50) + 1;
-        const frag = document.createDocumentFragment();
+        
+        // Fixed count of 30 bulbs (good balance for most screens)
+        const BULB_COUNT = 30;
         const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
         
-        for (let i = 0; i < count; i++) {
-          const s = document.createElement('div');
-          s.className = 'aurora-garland-wire-segment';
-          const b = document.createElement('div');
-          b.className = 'aurora-bulb';
-          b.style.setProperty('--bulb-color', colors[Math.floor(Math.random() * colors.length)]);
-          b.style.animationDelay = (Math.random() * 2) + 's';
+        // Use template for faster cloning
+        const wireTemplate = document.createElement('div');
+        wireTemplate.className = 'aurora-garland-wire-segment';
+        const bulbTemplate = document.createElement('div');
+        bulbTemplate.className = 'aurora-bulb';
+        
+        const frag = document.createDocumentFragment();
+        
+        for (let i = 0; i < BULB_COUNT; i++) {
+          const s = wireTemplate.cloneNode(true);
+          const b = bulbTemplate.cloneNode(true);
+          
+          // Pre-compute color index for deterministic pattern
+          b.style.setProperty('--bulb-color', colors[i % colors.length]);
+          b.style.animationDelay = (i * 0.15) + 's'; // Staggered timing
+          
           s.appendChild(b);
           frag.appendChild(s);
         }
+        
         garlandContainer.appendChild(frag);
         document.body.appendChild(garlandContainer);
       }
@@ -1201,7 +1296,12 @@
 
     window.addEventListener('focus', applyAllSettings, { passive: true });
     let lastUrl = location.href;
-    const checkUrl = () => { if (location.href === lastUrl) return; lastUrl = location.href; applyAllSettings(); };
+    // Debounce navigation checks to prevent trashing on rapid state changes
+    const checkUrl = debounce(() => { 
+        if (location.href === lastUrl) return; 
+        lastUrl = location.href; 
+        applyAllSettings(); 
+    }, 50);
     window.addEventListener('popstate', checkUrl, { passive: true });
     const originalPushState = history.pushState;
     history.pushState = function (...args) { originalPushState.apply(this, args); setTimeout(checkUrl, 0); };
@@ -1212,12 +1312,14 @@
     const debouncedOtherChecks = debounce(() => {
       manageGpt5LimitPopup();
       maybeApplyDefaultModel();
+      manageUpgradeButtons(); // Moved here to be debounced
     }, 150);
 
-    // Optimization: Debounce heavy visual scans for streaming text.
-    const debouncedGlassEffects = debounce(() => {
-      applyGlassEffects();
-    }, 100);
+    // Optimization: Use Idle Callback for full document scans
+    const runGlassEffectsFull = () => {
+        safeRequestIdleCallback(() => applyGlassEffects(document), { timeout: 1000 });
+    };
+    const debouncedGlassEffects = debounce(runGlassEffectsFull, 200);
 
     let renderFrameId = null;
     const domObserver = new MutationObserver((mutations) => {
@@ -1226,42 +1328,39 @@
 
       // Check if a menu, dialog, or popover was just opened
       let urgentUiUpdate = false;
+      let newNodesToProcess = [];
+
       for (const m of mutations) {
         for (const n of m.addedNodes) {
           if (n.nodeType === 1) { // Element node
+            newNodesToProcess.push(n);
             // Check for popovers, dialogs, or menus
             if (n.classList.contains('popover') || 
                 n.getAttribute('role') === 'dialog' || 
                 n.getAttribute('role') === 'menu' ||
                 n.querySelector?.('.popover, [role="dialog"], [role="menu"]')) {
               urgentUiUpdate = true;
-              break;
             }
           }
         }
-        if (urgentUiUpdate) break;
       }
 
       renderFrameId = requestAnimationFrame(() => {
-        // 1. Critical Hiding
-        manageUpgradeButtons(); 
+        // 1. Critical Hiding - moved to debounce unless urgent
+        if (urgentUiUpdate) manageUpgradeButtons();
 
-        // 2. Glass Effects - Instant for menus, Debounced for text
+        // 2. Glass Effects - Optimized
         if (urgentUiUpdate) {
-            applyGlassEffects(); // Instant apply
+            // Instant apply ONLY to new nodes for performance
+            newNodesToProcess.forEach(node => applyGlassEffects(node));
         } else {
-            debouncedGlassEffects(); // Lazy apply
+            // Regular debounced full scan for lower priority updates
+            debouncedGlassEffects(); 
         }
 
         // 3. Data Masking
         if (window.DataMaskingEngine && window.DataMaskingEngine.isEnabled()) {
-          for (const mutation of mutations) {
-            for (const node of mutation.addedNodes) {
-              if (node.nodeType === Node.ELEMENT_NODE) {
-                window.DataMaskingEngine.maskElement(node);
-              }
-            }
-          }
+            newNodesToProcess.forEach(node => window.DataMaskingEngine.maskElement(node));
         }
 
         renderFrameId = null;

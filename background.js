@@ -28,6 +28,40 @@ const DEFAULTS = {
   enableNewYear: false
 };
 
+// --- Settings Cache for Instant Popup Response ---
+let settingsCache = null;
+let localCache = {};
+
+// Pre-cache settings on service worker startup
+chrome.storage.sync.get(DEFAULTS, (settings) => {
+  settingsCache = { ...DEFAULTS, ...settings };
+});
+chrome.storage.local.get(['customBgData', 'detectedTheme'], (local) => {
+  localCache = local || {};
+});
+
+// Keep cache in sync with any storage changes
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'sync' && settingsCache) {
+    for (const [key, { newValue }] of Object.entries(changes)) {
+      if (newValue !== undefined) {
+        settingsCache[key] = newValue;
+      } else {
+        settingsCache[key] = DEFAULTS[key];
+      }
+    }
+  }
+  if (area === 'local') {
+    for (const [key, { newValue }] of Object.entries(changes)) {
+      if (newValue !== undefined) {
+        localCache[key] = newValue;
+      } else {
+        delete localCache[key];
+      }
+    }
+  }
+});
+
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.storage.sync.set(DEFAULTS);
@@ -47,15 +81,43 @@ chrome.runtime.onInstalled.addListener((details) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // GET_SETTINGS: Returns just settings object (for content.js compatibility)
   if (request.type === 'GET_SETTINGS') {
-    chrome.storage.sync.get(DEFAULTS, (settings) => {
-      sendResponse(settings);
-    });
-    return true;
+    if (settingsCache) {
+      sendResponse(settingsCache);
+      return false; // Synchronous response
+    } else {
+      // Fallback: cache not ready yet (rare edge case)
+      chrome.storage.sync.get(DEFAULTS, (settings) => {
+        settingsCache = { ...DEFAULTS, ...settings };
+        sendResponse(settingsCache);
+      });
+      return true; // Async response
+    }
   }
+  
+  // GET_SETTINGS_FULL: Returns settings + local data (for popup.js instant open)
+  if (request.type === 'GET_SETTINGS_FULL') {
+    if (settingsCache) {
+      sendResponse({ settings: settingsCache, local: localCache });
+      return false; // Synchronous response
+    } else {
+      // Fallback: cache not ready yet (rare edge case)
+      Promise.all([
+        chrome.storage.sync.get(DEFAULTS),
+        chrome.storage.local.get(['customBgData', 'detectedTheme'])
+      ]).then(([sync, local]) => {
+        settingsCache = { ...DEFAULTS, ...sync };
+        localCache = local || {};
+        sendResponse({ settings: settingsCache, local: localCache });
+      });
+      return true; // Async response
+    }
+  }
+  
   if (request.type === 'GET_DEFAULTS') {
     sendResponse(DEFAULTS);
-    return true;
+    return false;
   }
 });
 

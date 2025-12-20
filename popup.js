@@ -1,750 +1,669 @@
-// popup.js - controls settings
+// popup.js - Zero-Latency Optimized (Instant Open)
+// Performance-first rewrite: cached settings, element caching, single-pass init
 
+// --- Constants & Defaults ---
 const LOCAL_BG_KEY = 'customBgData';
 const BLUE_WALLPAPER_URL = 'https://img.freepik.com/free-photo/abstract-luxury-gradient-blue-background-smooth-dark-blue-with-black-vignette-studio-banner_1258-54581.jpg?semt=ais_hybrid&w=740&q=80';
-const GROK_HORIZON_URL = chrome?.runtime?.getURL
-  ? chrome.runtime.getURL('Aurora/grok-4.webp')
-  : 'Aurora/grok-4.webp';
+const GROK_HORIZON_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
 const MAX_FILE_SIZE_MB = 15;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+const FEEDBACK_API_URL = 'https://auroraforchatgpt.tnemoroccan.workers.dev';
 
-const getMessage = (key, substitutions) => {
-  if (chrome?.i18n?.getMessage) {
-    const text = chrome.i18n.getMessage(key, substitutions);
-    if (text) return text;
-  }
-  return key;
+const DEFAULTS = {
+  legacyComposer: false, theme: 'auto', appearance: 'clear', hideGpt5Limit: false,
+  hideUpgradeButtons: false, disableAnimations: false, focusMode: false,
+  hideQuickSettings: false, customBgUrl: '', backgroundBlur: '60',
+  backgroundScaling: 'cover', voiceColor: 'default', cuteVoiceUI: false,
+  hasSeenWelcomeScreen: false, defaultModel: '', customFont: 'system',
+  showTokenCounter: false, blurChatHistory: false, blurAvatar: false,
+  soundEnabled: false, soundVolume: 'low', autoContrast: false,
+  smartSelectors: true, dataMaskingEnabled: false, maskingRandomMode: false,
+  enableSnowfall: false, enableNewYear: false
 };
 
+const TOGGLE_KEYS = [
+  'legacyComposer', 'hideGpt5Limit', 'hideUpgradeButtons', 'disableAnimations',
+  'focusMode', 'hideQuickSettings', 'showTokenCounter', 'blurChatHistory',
+  'blurAvatar', 'soundEnabled', 'autoContrast', 'dataMaskingEnabled',
+  'maskingRandomMode', 'enableSnowfall', 'enableNewYear', 'cuteVoiceUI'
+];
+
+// --- Element Cache (populated once on DOMContentLoaded) ---
+const $ = {};
+let selectsInitialized = false;
+let listenersAttached = false;
+
+// --- Helpers ---
+const getMessage = (key) => chrome?.i18n?.getMessage(key) || key;
+
+// --- Main Initialization (Zero-Latency) ---
 document.addEventListener('DOMContentLoaded', () => {
-  let settingsCache = {};
-  let DEFAULTS_CACHE = {};
-  let searchableSettings = [];
-
-  const applyStaticLocalization = () => {
-    document.querySelectorAll('[data-i18n]').forEach((el) => {
-      const key = el.getAttribute('data-i18n');
-      const message = getMessage(key);
-      if (message) el.textContent = message;
-    });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
-      const key = el.getAttribute('data-i18n-placeholder');
-      const message = getMessage(key);
-      if (message) el.setAttribute('placeholder', message);
-    });
-    document.querySelectorAll('[data-i18n-title]').forEach((el) => {
-      const key = el.getAttribute('data-i18n-title');
-      const message = getMessage(key);
-      if (message) el.setAttribute('title', message);
-    });
-  };
-
-  applyStaticLocalization();
-
-  const tabs = document.querySelectorAll('.tab-link');
-  const panes = document.querySelectorAll('.tab-pane');
-  const mainContent = document.querySelector('.tab-content');
-  const tabNav = document.querySelector('.tab-nav');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const targetPaneId = tab.dataset.tab;
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      panes.forEach(pane => {
-        pane.classList.toggle('active', pane.id === targetPaneId);
+  // 1. Cache all DOM elements ONCE (eliminates repeated querySelectorAll)
+  cacheElements();
+  
+  // 2. Apply localization immediately (uses cached elements)
+  applyLocalization();
+  
+  // 3. Setup static UI (tabs, feedback) - no data needed
+  setupTabs();
+  setupFeedbackSystem();
+  
+  // 4. Render with defaults INSTANTLY (0ms blocking - UI appears immediately)
+  renderUi(DEFAULTS, { detectedTheme: 'dark' });
+  
+  // 5. Hydrate with real data via INSTANT message (cached in background.js)
+  chrome.runtime.sendMessage({ type: 'GET_SETTINGS_FULL' }, (response) => {
+    if (chrome.runtime.lastError) {
+      // Fallback: direct storage access if message fails
+      Promise.all([
+        chrome.storage.sync.get(DEFAULTS),
+        chrome.storage.local.get(['customBgData', 'detectedTheme'])
+      ]).then(([sync, local]) => {
+        hydrateWithRealData({ ...DEFAULTS, ...sync }, local);
       });
-    });
-  });
-
-  const searchInput = document.getElementById('settingsSearch');
-  const clearSearchBtn = document.getElementById('clearSearchBtn');
-  let noResultsMessage = null;
-
-  function buildSearchableData() {
-    searchableSettings = [];
-    document.querySelectorAll('.tab-pane').forEach(pane => {
-      const tabId = pane.id;
-      const tabTitle = document.querySelector(`.tab-link[data-tab="${tabId}"]`)?.textContent || '';
-      pane.querySelectorAll('.row').forEach(row => {
-        const label = row.querySelector('.label')?.getAttribute('data-i18n') || row.querySelector('.label')?.textContent || '';
-        const tooltip = row.querySelector('[data-i18n-title]')?.getAttribute('data-i18n-title') || row.querySelector('[title]')?.getAttribute('title') || '';
-
-        let keywords = `${tabTitle} `;
-        if (label) keywords += (getMessage(label) || label) + ' ';
-        if (tooltip) keywords += (getMessage(tooltip) || tooltip) + ' ';
-
-        searchableSettings.push({
-          element: row,
-          tab: tabId,
-          keywords: keywords.toLowerCase().trim()
-        });
-      });
-    });
-  }
-
-  function handleSearch() {
-    const query = searchInput.value.toLowerCase().trim();
-    const matchedTabs = new Set();
-    let matchCount = 0;
-
-    clearSearchBtn.hidden = !query;
-
-    if (!query) {
-      resetSearchView();
       return;
     }
+    
+    const { settings, local } = response || {};
+    hydrateWithRealData(settings || DEFAULTS, local || {});
+  });
+});
 
-    panes.forEach(p => p.classList.remove('active'));
-    tabs.forEach(t => t.classList.add('is-hidden'));
-
-    searchableSettings.forEach(setting => {
-      const isMatch = setting.keywords.includes(query);
-      setting.element.classList.toggle('is-hidden', !isMatch);
-      if (isMatch) {
-        matchedTabs.add(setting.tab);
-        matchCount++;
-      }
-    });
-
-    if (matchCount > 0) {
-      tabNav.hidden = false;
-      if (noResultsMessage) noResultsMessage.style.display = 'none';
-
-      tabs.forEach(tab => {
-        const tabId = tab.dataset.tab;
-        const hasMatch = matchedTabs.has(tabId);
-        tab.classList.toggle('is-hidden', !hasMatch);
-      });
-
-      const firstMatchedTab = document.querySelector('.tab-link:not(.is-hidden)');
-      if (firstMatchedTab) {
-        firstMatchedTab.click();
-      }
-    } else {
-      tabNav.hidden = true;
-      if (!noResultsMessage) {
-        noResultsMessage = document.createElement('div');
-        noResultsMessage.className = 'no-results-message';
-        noResultsMessage.textContent = getMessage('noResults') || 'No results found';
-        mainContent.appendChild(noResultsMessage);
-      }
-      noResultsMessage.style.display = 'block';
-    }
+function hydrateWithRealData(settings, localData) {
+  // Re-render with actual user data
+  renderUi(settings, localData);
+  
+  // Attach event listeners ONCE (after real data is loaded)
+  if (!listenersAttached) {
+    setupChangeListeners();
+    setupImportExport();
+    listenersAttached = true;
   }
-
-  function resetSearchView() {
-    tabNav.hidden = false;
-    if (noResultsMessage) noResultsMessage.style.display = 'none';
-
-    searchableSettings.forEach(setting => setting.element.classList.remove('is-hidden'));
-    tabs.forEach(tab => tab.classList.remove('is-hidden'));
-
-    const activeTab = document.querySelector('.tab-link.active');
-    if (!activeTab || activeTab.classList.contains('is-hidden')) {
-      tabs[0]?.click();
-    } else {
-      activeTab.click();
-    }
+  
+  // Build search index in idle time (low priority, non-blocking)
+  if (window.requestIdleCallback) {
+    requestIdleCallback(buildSearchableData, { timeout: 2000 });
+  } else {
+    setTimeout(buildSearchableData, 300);
   }
+}
 
-  searchInput.addEventListener('input', handleSearch);
-  clearSearchBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    handleSearch();
-    searchInput.focus();
+// --- Element Caching (Run once, eliminates all getElementById calls) ---
+function cacheElements() {
+  // Toggle elements
+  TOGGLE_KEYS.forEach(key => { $.toggles = $.toggles || {}; $.toggles[key] = document.getElementById(key); });
+  
+  // Individual elements
+  $.blurSlider = document.getElementById('blurSlider');
+  $.blurValue = document.getElementById('blurValue');
+  $.bgUrl = document.getElementById('bgUrl');
+  $.bgFile = document.getElementById('bgFile');
+  $.clearBg = document.getElementById('clearBg');
+  $.modelRow = document.getElementById('defaultModelCustomRow');
+  $.modelInput = document.getElementById('defaultModelCustomInput');
+  $.settingsSearch = document.getElementById('settingsSearch');
+  $.clearSearchBtn = document.getElementById('clearSearchBtn');
+  $.exportSettings = document.getElementById('exportSettings');
+  $.importSettings = document.getElementById('importSettings');
+  $.settingsJson = document.getElementById('settingsJson');
+  $.importExportRow = document.getElementById('importExportTextAreaRow');
+  
+  // Feedback elements
+  $.feedbackTrigger = document.getElementById('feedbackTrigger');
+  $.feedbackBox = document.getElementById('feedbackBox');
+  $.closeFeedback = document.getElementById('closeFeedback');
+  $.sendFeedback = document.getElementById('sendFeedback');
+  $.feedbackInput = document.getElementById('feedbackInput');
+  $.feedbackStatus = document.getElementById('feedbackStatus');
+  $.donationModal = document.getElementById('donationModal');
+  $.closeDonationModal = document.getElementById('closeDonationModal');
+  $.ticketIdDisplay = document.getElementById('ticketIdDisplay');
+  $.copyTicketBtn = document.getElementById('copyTicketBtn');
+  $.copyFeedback = document.getElementById('copyFeedback');
+  
+  // Collections (cached once)
+  $.tabs = document.querySelectorAll('.tab-link');
+  $.panes = document.querySelectorAll('.tab-pane');
+  $.tabNav = document.querySelector('.tab-nav');
+  $.i18nElements = document.querySelectorAll('[data-i18n]');
+  $.i18nPlaceholders = document.querySelectorAll('[data-i18n-placeholder]');
+  $.i18nTitles = document.querySelectorAll('[data-i18n-title]');
+  $.rows = document.querySelectorAll('.row');
+  
+  // Custom selects (containers)
+  $.selects = {
+    bgPreset: document.getElementById('bgPreset'),
+    bgScalingSelector: document.getElementById('bgScalingSelector'),
+    themeSelector: document.getElementById('themeSelector'),
+    appearanceSelector: document.getElementById('appearanceSelector'),
+    fontSelector: document.getElementById('fontSelector'),
+    voiceColorSelector: document.getElementById('voiceColorSelector'),
+    defaultModelSelector: document.getElementById('defaultModelSelector')
+  };
+}
+
+// --- Core Rendering Logic (Optimized) ---
+function renderUi(settings, localData = {}) {
+  // Theme Toggle
+  let isLightTheme = settings.theme === 'light';
+  if (settings.theme === 'auto' && localData.detectedTheme === 'light') {
+    isLightTheme = true;
+  }
+  document.documentElement.classList.toggle('theme-light', isLightTheme);
+
+  // Boolean Toggles (uses cached elements)
+  TOGGLE_KEYS.forEach(key => {
+    const el = $.toggles?.[key];
+    if (el) el.checked = !!settings[key];
   });
 
-  const TOGGLE_CONFIG = [
-    { id: 'legacyComposer', key: 'legacyComposer' },
-    { id: 'hideGpt5Limit', key: 'hideGpt5Limit' },
-    { id: 'hideUpgradeButtons', key: 'hideUpgradeButtons' },
-    { id: 'disableAnimations', key: 'disableAnimations' },
-    { id: 'focusMode', key: 'focusMode' },
-    { id: 'hideQuickSettings', key: 'hideQuickSettings' },
-    { id: 'showTokenCounter', key: 'showTokenCounter' },
-    { id: 'blurChatHistory', key: 'blurChatHistory' },
-    { id: 'blurAvatar', key: 'blurAvatar' },
-    { id: 'soundEnabled', key: 'soundEnabled' },
-    { id: 'autoContrast', key: 'autoContrast' },
-    { id: 'dataMaskingEnabled', key: 'dataMaskingEnabled' },
-    { id: 'maskingRandomMode', key: 'maskingRandomMode' },
-    { id: 'enableSnowfall', key: 'enableSnowfall' },
-    { id: 'enableNewYear', key: 'enableNewYear' }
-  ];
-
-  TOGGLE_CONFIG.forEach(({ id, key }) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.addEventListener('change', () => {
-        chrome.storage.sync.set({ [key]: element.checked });
-      });
-    }
-  });
-
-  const tbBgUrl = document.getElementById('bgUrl');
-  const fileBg = document.getElementById('bgFile');
-  const btnClearBg = document.getElementById('clearBg');
-  const blurSlider = document.getElementById('blurSlider');
-  const blurValue = document.getElementById('blurValue');
-  const defaultModelCustomRow = document.getElementById('defaultModelCustomRow');
-  const defaultModelCustomInput = document.getElementById('defaultModelCustomInput');
-
-  if (blurSlider && blurValue) {
-    blurSlider.addEventListener('input', () => {
-      const newBlurValue = blurSlider.value;
-      blurValue.textContent = newBlurValue;
-      chrome.storage.sync.set({ backgroundBlur: newBlurValue });
-    });
+  // Range Sliders
+  if ($.blurSlider && $.blurValue) {
+    $.blurSlider.value = settings.backgroundBlur;
+    $.blurValue.textContent = settings.backgroundBlur;
   }
 
-  function createCustomSelect(containerId, options, storageKey, onPresetChange, config = {}) {
-    const container = document.getElementById(containerId);
-    if (!container) return { update: () => { } };
+  // Text Inputs
+  if ($.bgUrl) {
+    if (settings.customBgUrl === '__gpt5_animated__') {
+      $.bgUrl.value = getMessage('statusAnimatedBackground') || 'Animated Active';
+      $.bgUrl.disabled = true;
+    } else if (settings.customBgUrl === '__local__') {
+      $.bgUrl.value = getMessage('statusLocalFileInUse') || 'Local File Active';
+      $.bgUrl.disabled = true;
+    } else if (document.activeElement !== $.bgUrl) {
+      const presets = [BLUE_WALLPAPER_URL, GROK_HORIZON_URL];
+      $.bgUrl.value = presets.includes(settings.customBgUrl) ? '' : settings.customBgUrl;
+      $.bgUrl.disabled = false;
+    }
+  }
+
+  // Custom Model Input
+  const knownModels = ['gpt-5','gpt-5-thinking','gpt-5-thinking-mini','gpt-5-thinking-instant','gpt-4o','gpt-4.1','o3','o4-mini',''];
+  const isCustomModel = settings.defaultModel && !knownModels.includes(settings.defaultModel);
+  
+  if ($.modelRow) $.modelRow.hidden = !isCustomModel;
+  if ($.modelInput && isCustomModel) $.modelInput.value = settings.defaultModel;
+
+  // Initialize/Update Custom Selects (Optimized: builds once, updates only values)
+  initOrUpdateSelects(settings);
+}
+
+// --- Custom Selects (Single-Pass Initialization) ---
+const SELECT_CONFIGS = [
+  {
+    id: 'bgPreset', key: 'customBgUrl',
+    options: [
+      { value: 'default', labelKey: 'bgPresetOptionDefault' },
+      { value: '__gpt5_animated__', labelKey: 'bgPresetOptionGpt5Animated' },
+      { value: 'grokHorizon', labelKey: 'bgPresetOptionGrokHorizon' },
+      { value: 'blue', labelKey: 'bgPresetOptionBlue' },
+      { value: 'custom', labelKey: 'bgPresetOptionCustom', hidden: true }
+    ],
+    mapVal: (v) => {
+      if (!v) return 'default';
+      if (v === BLUE_WALLPAPER_URL) return 'blue';
+      if (v === GROK_HORIZON_URL) return 'grokHorizon';
+      if (v === '__gpt5_animated__') return '__gpt5_animated__';
+      return 'custom';
+    },
+    onSelect: (val) => {
+      let url = '';
+      if (val === 'blue') url = BLUE_WALLPAPER_URL;
+      else if (val === 'grokHorizon') url = GROK_HORIZON_URL;
+      else if (val === '__gpt5_animated__') url = '__gpt5_animated__';
+      if (val !== 'custom') chrome.storage.local.remove(LOCAL_BG_KEY);
+      chrome.storage.sync.set({ customBgUrl: url });
+    }
+  },
+  {
+    id: 'bgScalingSelector', key: 'backgroundScaling',
+    options: [
+      { value: 'contain', labelKey: 'bgScalingOptionContain' },
+      { value: 'cover', labelKey: 'bgScalingOptionCover' }
+    ]
+  },
+  {
+    id: 'themeSelector', key: 'theme',
+    options: [
+      { value: 'auto', labelKey: 'themeOptionAuto' },
+      { value: 'light', labelKey: 'themeOptionLight' },
+      { value: 'dark', labelKey: 'themeOptionDark' }
+    ]
+  },
+  {
+    id: 'appearanceSelector', key: 'appearance',
+    options: [
+      { value: 'clear', labelKey: 'glassAppearanceOptionClear' },
+      { value: 'dimmed', labelKey: 'glassAppearanceOptionDimmed' }
+    ]
+  },
+  {
+    id: 'fontSelector', key: 'customFont',
+    options: [
+      { value: 'system', labelKey: 'fontOptionSystem' },
+      { value: 'inter', labelKey: 'fontOptionInter' },
+      { value: 'roboto', labelKey: 'fontOptionRoboto' },
+      { value: 'montserrat', labelKey: 'fontOptionMontserrat' },
+      { value: 'opensans', labelKey: 'fontOptionOpenSans' },
+      { value: 'poppins', labelKey: 'fontOptionPoppins' }
+    ]
+  },
+  {
+    id: 'voiceColorSelector', key: 'voiceColor',
+    options: [
+      { value: 'default', labelKey: 'voiceColorOptionDefault', color: '#8EBBFF' },
+      { value: 'orange', labelKey: 'voiceColorOptionOrange', color: '#FF9900' },
+      { value: 'yellow', labelKey: 'voiceColorOptionYellow', color: '#FFD700' },
+      { value: 'pink', labelKey: 'voiceColorOptionPink', color: '#FF69B4' },
+      { value: 'green', labelKey: 'voiceColorOptionGreen', color: '#32CD32' },
+      { value: 'dark', labelKey: 'voiceColorOptionDark', color: '#555555' }
+    ]
+  },
+  {
+    id: 'defaultModelSelector', key: 'defaultModel',
+    options: [
+      { value: '', labelKey: 'defaultModelOptionNone' },
+      { value: 'gpt-5', label: 'Auto' },
+      { value: 'gpt-5-thinking', label: 'GPT-5 Thinking' },
+      { value: 'gpt-5-thinking-mini', label: 'GPT-5 Thinking mini' },
+      { value: 'gpt-5-thinking-instant', label: 'GPT-5 Instant' },
+      { value: 'gpt-4o', label: 'GPT-4o' },
+      { value: 'gpt-4.1', label: 'GPT-4.1' },
+      { value: 'o3', label: 'o3' },
+      { value: 'o4-mini', label: 'o4-mini' },
+      { value: '__custom__', labelKey: 'defaultModelOptionCustom' }
+    ],
+    mapVal: (v) => {
+      if (!v) return '';
+      const known = ['gpt-5','gpt-5-thinking','gpt-5-thinking-mini','gpt-5-thinking-instant','gpt-4o','gpt-4.1','o3','o4-mini',''];
+      return known.includes(v) ? v : '__custom__';
+    },
+    onSelect: (val) => {
+      if (val === '__custom__') {
+        $.modelRow.hidden = false;
+        $.modelInput?.focus();
+      } else {
+        $.modelRow.hidden = true;
+        if ($.modelInput) $.modelInput.value = '';
+        chrome.storage.sync.set({ defaultModel: val });
+      }
+    }
+  }
+];
+
+function initOrUpdateSelects(settings) {
+  SELECT_CONFIGS.forEach(cfg => {
+    const container = $.selects[cfg.id];
+    if (!container) return;
+    
     const trigger = container.querySelector('.select-trigger');
     const label = container.querySelector('.select-label');
-    const optionsContainer = container.querySelector('.select-options');
-    const dotInTrigger = trigger.querySelector('.color-dot');
-    const { manualStorage = false, mapValueToOption, formatLabel } = config;
-    let currentOptionValue = null;
-
-    const resolveLabel = (option, rawValue) => {
-      if (!option) return rawValue || '';
-      if (typeof option.getLabel === 'function') return option.getLabel(rawValue);
-      if (typeof formatLabel === 'function') {
-        const custom = formatLabel(option, rawValue);
-        if (custom) return custom;
-      }
-      if (option.labelKey) return getMessage(option.labelKey);
-      return option.label || option.value;
-    };
-
-    function renderOptions(selectedValue) {
-      optionsContainer.innerHTML = options
-        .filter(option => !option.hidden)
-        .map(option => {
-          const colorDotHtml = option.color ? `<span class="color-dot" style="background-color: ${option.color}; display: block;"></span>` : '';
-          const optionLabel = resolveLabel(option, option.value);
-          const isSelected = option.value === selectedValue ? 'true' : 'false';
-          return `
-            <div class="select-option" role="option" data-value="${option.value}" aria-selected="${isSelected}">
-              ${colorDotHtml}
-              <span class="option-label">${optionLabel}</span>
-            </div>
-            `;
-        }).join('');
-
-      optionsContainer.querySelectorAll('.select-option').forEach(optionEl => {
-        optionEl.addEventListener('click', () => {
-          const newValue = optionEl.dataset.value;
-          if (!manualStorage && storageKey) {
-            chrome.storage.sync.set({ [storageKey]: newValue });
-          }
-          if (onPresetChange) {
-            onPresetChange(newValue);
-          }
-          closeAllSelects();
-        });
-      });
+    const optsContainer = container.querySelector('.select-options');
+    const dot = trigger?.querySelector('.color-dot');
+    
+    if (!trigger || !optsContainer) return;
+    
+    const val = settings[cfg.key];
+    const effectiveVal = cfg.mapVal ? cfg.mapVal(val) : val;
+    const activeOpt = cfg.options.find(o => o.value === effectiveVal) || cfg.options[0];
+    
+    // Update trigger label
+    if (label) {
+      label.textContent = activeOpt.labelKey ? getMessage(activeOpt.labelKey) : (activeOpt.label || activeOpt.value);
     }
-
-    function updateSelectorState(value) {
-      let mappedValue = value;
-      if (typeof mapValueToOption === 'function') {
-        mappedValue = mapValueToOption(value);
-      }
-      currentOptionValue = mappedValue;
-      const selectedOption = options.find(opt => opt.value === mappedValue) || options[0];
-      const selectedLabel = resolveLabel(selectedOption, value);
-
-      if (dotInTrigger) {
-        if (selectedOption.color) {
-          dotInTrigger.style.backgroundColor = selectedOption.color;
-          dotInTrigger.style.display = 'block';
-        } else {
-          dotInTrigger.style.display = 'none';
-        }
-      }
-
-      label.textContent = selectedLabel;
-      renderOptions(currentOptionValue);
+    
+    // Update color dot if present
+    if (dot) {
+      dot.style.display = activeOpt.color ? 'block' : 'none';
+      if (activeOpt.color) dot.style.backgroundColor = activeOpt.color;
     }
-
-    trigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
-      closeAllSelects();
-      if (!isExpanded) {
-        container.classList.add('is-open');
-        trigger.setAttribute('aria-expanded', 'true');
-        optionsContainer.style.display = 'block';
-      }
-    });
-
-    return { update: updateSelectorState };
-  }
-
-  function closeAllSelects() {
-    document.querySelectorAll('.custom-select').forEach(sel => {
-      sel.classList.remove('is-open');
-      const trigger = sel.querySelector('.select-trigger');
-      const optionsContainer = sel.querySelector('.select-options');
-      if (trigger) trigger.setAttribute('aria-expanded', 'false');
-      if (optionsContainer) optionsContainer.style.display = 'none';
-    });
-  }
-  document.addEventListener('click', closeAllSelects);
-
-  const bgPresetOptions = [
-    { value: 'default', labelKey: 'bgPresetOptionDefault' },
-    { value: '__gpt5_animated__', labelKey: 'bgPresetOptionGpt5Animated' },
-    { value: 'grokHorizon', labelKey: 'bgPresetOptionGrokHorizon' },
-    { value: 'blue', labelKey: 'bgPresetOptionBlue' },
-    { value: 'custom', labelKey: 'bgPresetOptionCustom', hidden: true }
-  ];
-  const bgPresetSelect = createCustomSelect('bgPreset', bgPresetOptions, 'customBgUrl', (value) => {
-    let newUrl = '';
-    if (value === 'blue') {
-      newUrl = BLUE_WALLPAPER_URL;
-    } else if (value === '__gpt5_animated__') {
-      newUrl = '__gpt5_animated__';
-    } else if (value === 'grokHorizon') {
-      newUrl = GROK_HORIZON_URL;
-    }
-
-    if (value !== 'custom') {
-      chrome.storage.local.remove(LOCAL_BG_KEY);
-    }
-    chrome.storage.sync.set({ customBgUrl: newUrl });
-  });
-
-  const bgScalingOptions = [
-    { value: 'contain', labelKey: 'bgScalingOptionContain' },
-    { value: 'cover', labelKey: 'bgScalingOptionCover' }
-  ];
-  const bgScalingSelect = createCustomSelect('bgScalingSelector', bgScalingOptions, 'backgroundScaling');
-
-  const themeOptions = [
-    { value: 'auto', labelKey: 'themeOptionAuto' },
-    { value: 'light', labelKey: 'themeOptionLight' },
-    { value: 'dark', labelKey: 'themeOptionDark' }
-  ];
-  const themeSelect = createCustomSelect('themeSelector', themeOptions, 'theme');
-
-  const appearanceOptions = [
-    { value: 'clear', labelKey: 'glassAppearanceOptionClear' },
-    { value: 'dimmed', labelKey: 'glassAppearanceOptionDimmed' }
-  ];
-  const appearanceSelect = createCustomSelect('appearanceSelector', appearanceOptions, 'appearance');
-
-  const fontOptions = [
-    { value: 'system', labelKey: 'fontOptionSystem' },
-    { value: 'inter', labelKey: 'fontOptionInter' },
-    { value: 'roboto', labelKey: 'fontOptionRoboto' },
-    { value: 'montserrat', labelKey: 'fontOptionMontserrat' },
-    { value: 'opensans', labelKey: 'fontOptionOpenSans' },
-    { value: 'poppins', labelKey: 'fontOptionPoppins' }
-  ];
-  const fontSelect = createCustomSelect('fontSelector', fontOptions, 'customFont');
-
-  const voiceColorOptions = [
-    { value: 'default', labelKey: 'voiceColorOptionDefault', color: '#8EBBFF' },
-    { value: 'orange', labelKey: 'voiceColorOptionOrange', color: '#FF9900' },
-    { value: 'yellow', labelKey: 'voiceColorOptionYellow', color: '#FFD700' },
-    { value: 'pink', labelKey: 'voiceColorOptionPink', color: '#FF69B4' },
-    { value: 'green', labelKey: 'voiceColorOptionGreen', color: '#32CD32' },
-    { value: 'dark', labelKey: 'voiceColorOptionDark', color: '#555555' }
-  ];
-  const voiceColorSelect = createCustomSelect('voiceColorSelector', voiceColorOptions, 'voiceColor');
-
-  const defaultModelOptions = [
-    { value: '', labelKey: 'defaultModelOptionNone' },
-    { value: 'gpt-5', label: 'Auto' },
-    { value: 'gpt-5-thinking', label: 'GPT-5 Thinking' },
-    { value: 'gpt-5-thinking-mini', label: 'GPT-5 Thinking mini' },
-    { value: 'gpt-5-thinking-instant', label: 'GPT-5 Instant' },
-    { value: 'gpt-4o', label: 'GPT-4o' },
-    { value: 'gpt-4.1', label: 'GPT-4.1' },
-    { value: 'o3', label: 'o3' },
-    { value: 'o4-mini', label: 'o4-mini' },
-    { value: '__custom__', labelKey: 'defaultModelOptionCustom' }
-  ];
-
-  function isCustomModelValue(value) {
-    if (!value) return false;
-    return !defaultModelOptions.some(opt => opt.value && opt.value === value);
-  }
-
-  const defaultModelSelect = createCustomSelect(
-    'defaultModelSelector',
-    defaultModelOptions,
-    null,
-    (selectedValue) => {
-      if (selectedValue === '__custom__') {
-        if (defaultModelCustomRow) {
-          defaultModelCustomRow.hidden = false;
-        }
-        if (defaultModelCustomInput) {
-          defaultModelCustomInput.focus();
-        }
-        const existingValue = settingsCache?.defaultModel || '';
-        defaultModelSelect.update(existingValue || '');
-        return;
-      }
-      if (defaultModelCustomRow) {
-        defaultModelCustomRow.hidden = true;
-      }
-      if (defaultModelCustomInput) {
-        defaultModelCustomInput.value = '';
-      }
-      chrome.storage.sync.set({ defaultModel: selectedValue });
-      applyDefaultModelUiState(selectedValue);
-    },
-    {
-      manualStorage: true,
-      mapValueToOption: (rawValue) => {
-        if (!rawValue) return '';
-        const existing = defaultModelOptions.find(opt => opt.value === rawValue);
-        return existing ? existing.value : '__custom__';
-      },
-      formatLabel: (option, rawValue) => {
-        if (option.value === '__custom__') {
-          if (rawValue && rawValue !== '__custom__') {
-            const baseLabel = getMessage('defaultModelOptionCustomLabel');
-            return `${baseLabel || 'Custom'} (${rawValue})`;
-          }
-          return getMessage('defaultModelOptionCustomLabel') || getMessage('defaultModelOptionCustom') || 'Custom';
-        }
-      }
-    }
-  );
-
-  function applyDefaultModelUiState(rawValue) {
-    const useCustom = isCustomModelValue(rawValue);
-    if (defaultModelCustomRow) {
-      defaultModelCustomRow.hidden = !useCustom;
-    }
-    if (defaultModelCustomInput) {
-      defaultModelCustomInput.value = useCustom ? rawValue : '';
-    }
-    defaultModelSelect.update(rawValue || '');
-  }
-
-  if (defaultModelCustomInput) {
-    const persistCustomModel = () => {
-      const value = defaultModelCustomInput.value.trim();
-      if (!value) {
-        chrome.storage.sync.set({ defaultModel: '' });
-        applyDefaultModelUiState('');
-        return;
-      }
-      chrome.storage.sync.set({ defaultModel: value });
-      applyDefaultModelUiState(value);
-    };
-    defaultModelCustomInput.addEventListener('blur', persistCustomModel);
-    defaultModelCustomInput.addEventListener('change', persistCustomModel);
-    defaultModelCustomInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        persistCustomModel();
+    
+    // Build options ONLY ONCE (check if already built)
+    if (!container.dataset.built) {
+      container.dataset.built = 'true';
+      
+      // Build options HTML
+      optsContainer.innerHTML = cfg.options.filter(o => !o.hidden).map(opt => {
+        const txt = opt.labelKey ? getMessage(opt.labelKey) : (opt.label || opt.value);
+        const dotHtml = opt.color ? `<span class="color-dot" style="background-color:${opt.color};display:block;"></span>` : '';
+        return `<div class="select-option" data-value="${opt.value}">${dotHtml}<span>${txt}</span></div>`;
+      }).join('');
+      
+      // Attach trigger click listener ONCE
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
         closeAllSelects();
-      }
-    });
-  }
-
-  async function updateUi(settings) {
-    let isLightTheme = settings.theme === 'light';
-    if (settings.theme === 'auto') {
-      try {
-        const result = await new Promise((resolve, reject) => {
-          chrome.storage.local.get('detectedTheme', (res) => {
-            if (chrome.runtime.lastError) {
-              return reject(chrome.runtime.lastError);
-            }
-            resolve(res);
-          });
-        });
-        isLightTheme = result.detectedTheme === 'light';
-      } catch (e) {
-        isLightTheme = false;
-      }
-    }
-    document.documentElement.classList.toggle('theme-light', isLightTheme);
-
-    TOGGLE_CONFIG.forEach(({ id, key }) => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.checked = !!settings[key];
-      }
-    });
-
-    blurSlider.value = settings.backgroundBlur;
-    blurValue.textContent = settings.backgroundBlur;
-
-    bgScalingSelect.update(settings.backgroundScaling);
-    themeSelect.update(settings.theme);
-    appearanceSelect.update(settings.appearance || 'clear');
-    fontSelect.update(settings.customFont || 'system');
-    voiceColorSelect.update(settings.voiceColor);
-    applyDefaultModelUiState(settings.defaultModel || '');
-
-    const url = settings.customBgUrl;
-    tbBgUrl.disabled = false;
-    tbBgUrl.value = '';
-
-    if (!url) {
-      bgPresetSelect.update('default');
-    } else if (url === BLUE_WALLPAPER_URL) {
-      bgPresetSelect.update('blue');
-    } else if (url === GROK_HORIZON_URL) {
-      bgPresetSelect.update('grokHorizon');
-    } else if (url === '__gpt5_animated__') {
-      bgPresetSelect.update('__gpt5_animated__');
-      tbBgUrl.value = getMessage('statusAnimatedBackground');
-      tbBgUrl.disabled = true;
-    } else if (url === '__local__') {
-      bgPresetSelect.update('custom');
-      tbBgUrl.value = getMessage('statusLocalFileInUse');
-      tbBgUrl.disabled = true;
-    } else {
-      bgPresetSelect.update('custom');
-      tbBgUrl.value = url;
-    }
-  }
-
-  if (chrome.runtime?.sendMessage) {
-    chrome.runtime.sendMessage({ type: 'GET_DEFAULTS' }, (defaults) => {
-      if (!chrome.runtime.lastError) {
-        DEFAULTS_CACHE = defaults;
-      }
-      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (settings) => {
-        if (chrome.runtime.lastError) return;
-        settingsCache = settings;
-        updateUi(settings);
-        buildSearchableData();
+        container.classList.add('is-open');
+        optsContainer.style.display = 'block';
+        trigger.setAttribute('aria-expanded', 'true');
       });
-    });
-  }
-
-  tbBgUrl.addEventListener('change', () => {
-    const urlValue = tbBgUrl.value.trim();
-    const newSettings = { customBgUrl: urlValue };
-    if (urlValue !== '__local__' && urlValue !== GROK_HORIZON_URL) {
-      chrome.storage.local.remove(LOCAL_BG_KEY);
-    }
-    chrome.storage.sync.set(newSettings);
-  });
-
-  fileBg.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      alert(getMessage('alertFileTooLarge', String(MAX_FILE_SIZE_MB)));
-      fileBg.value = '';
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target.result;
-      chrome.storage.local.set({ [LOCAL_BG_KEY]: dataUrl }, () => {
-        chrome.storage.sync.set({ customBgUrl: '__local__' });
-      });
-    };
-    reader.readAsDataURL(file);
-    fileBg.value = '';
-  });
-
-  if (btnClearBg) {
-    btnClearBg.addEventListener('click', () => {
-      if (!DEFAULTS_CACHE || Object.keys(DEFAULTS_CACHE).length === 0) return;
-
-      const settingsToReset = {
-        customBgUrl: DEFAULTS_CACHE.customBgUrl,
-        backgroundBlur: DEFAULTS_CACHE.backgroundBlur,
-        backgroundScaling: DEFAULTS_CACHE.backgroundScaling
-      };
-
-      chrome.storage.sync.set(settingsToReset);
-      chrome.storage.local.remove(LOCAL_BG_KEY);
-
-      tbBgUrl.value = '';
-      blurSlider.value = settingsToReset.backgroundBlur;
-      blurValue.textContent = settingsToReset.backgroundBlur;
-      bgPresetSelect.update('default');
-      bgScalingSelect.update(settingsToReset.backgroundScaling);
-    });
-  }
-
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'sync') {
-      let needsFullUpdate = false;
-      for (const key in changes) {
-        if (Object.prototype.hasOwnProperty.call(settingsCache, key)) {
-          settingsCache[key] = changes[key].newValue;
-          needsFullUpdate = true;
+      
+      // Attach option click listeners ONCE using event delegation
+      optsContainer.addEventListener('click', (e) => {
+        const option = e.target.closest('.select-option');
+        if (!option) return;
+        
+        const selectedVal = option.dataset.value;
+        if (cfg.onSelect) {
+          cfg.onSelect(selectedVal);
+        } else {
+          chrome.storage.sync.set({ [cfg.key]: selectedVal });
         }
-      }
-      if (needsFullUpdate) {
-        updateUi(settingsCache);
-      }
+        
+        // Update label immediately (optimistic)
+        if (label) label.textContent = option.textContent.trim();
+        closeAllSelects();
+      });
     }
-    if (area === 'local' && changes.detectedTheme) {
-      if (settingsCache.theme === 'auto') {
-        document.documentElement.classList.toggle('theme-light', changes.detectedTheme.newValue === 'light');
-      }
+    
+    // Update selected state on options
+    optsContainer.querySelectorAll('.select-option').forEach(el => {
+      el.setAttribute('aria-selected', el.dataset.value === effectiveVal);
+    });
+  });
+}
+
+function closeAllSelects() {
+  Object.values($.selects).forEach(el => {
+    if (!el) return;
+    el.classList.remove('is-open');
+    const opts = el.querySelector('.select-options');
+    if (opts) opts.style.display = 'none';
+    const trigger = el.querySelector('.select-trigger');
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  });
+}
+
+// Close selects on outside click
+document.addEventListener('click', closeAllSelects);
+
+// --- Event Listeners (Setup ONCE) ---
+function setupChangeListeners() {
+  // Toggles - event delegation on body
+  TOGGLE_KEYS.forEach(key => {
+    const el = $.toggles?.[key];
+    if (el) {
+      el.addEventListener('change', () => {
+        chrome.storage.sync.set({ [key]: el.checked });
+      });
     }
   });
 
-  const exportBtn = document.getElementById('exportSettings');
-  const importBtn = document.getElementById('importSettings');
-  const jsonTextarea = document.getElementById('settingsJson');
-  const textareaRow = document.getElementById('importExportTextAreaRow');
+  // Slider with debounce
+  if ($.blurSlider) {
+    let sliderTimeout;
+    $.blurSlider.addEventListener('input', () => {
+      $.blurValue.textContent = $.blurSlider.value;
+      clearTimeout(sliderTimeout);
+      sliderTimeout = setTimeout(() => {
+        chrome.storage.sync.set({ backgroundBlur: $.blurSlider.value });
+      }, 150);
+    });
+  }
 
-  if (exportBtn) {
-    exportBtn.addEventListener('click', () => {
-      chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (settings) => {
-        if (chrome.runtime.lastError) return;
-        const json = JSON.stringify(settings, null, 2);
-        jsonTextarea.value = json;
-        textareaRow.hidden = false;
-        navigator.clipboard.writeText(json).then(() => {
-          exportBtn.textContent = '✓ Copied!';
-          setTimeout(() => { exportBtn.textContent = getMessage('buttonExportSettings') || 'Export Settings'; }, 2000);
-        }).catch(() => { jsonTextarea.select(); });
+  // BG URL
+  if ($.bgUrl) {
+    $.bgUrl.addEventListener('change', () => {
+      const val = $.bgUrl.value.trim();
+      if (val !== '__local__' && val !== '__gpt5_animated__') {
+        chrome.storage.local.remove(LOCAL_BG_KEY);
+      }
+      chrome.storage.sync.set({ customBgUrl: val });
+    });
+  }
+
+  // BG File
+  if ($.bgFile) {
+    $.bgFile.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        alert(getMessage('alertFileTooLarge') || 'File too large (Max 15MB)');
+        $.bgFile.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        chrome.storage.local.set({ [LOCAL_BG_KEY]: ev.target.result }, () => {
+          if (chrome.runtime.lastError) {
+            alert("Error saving image: " + chrome.runtime.lastError.message);
+          } else {
+            chrome.storage.sync.set({ customBgUrl: '__local__' });
+          }
+        });
+      };
+      reader.readAsDataURL(file);
+      $.bgFile.value = '';
+    });
+  }
+
+  // Reset
+  if ($.clearBg) {
+    $.clearBg.addEventListener('click', () => {
+      chrome.storage.sync.set({
+        customBgUrl: DEFAULTS.customBgUrl,
+        backgroundBlur: DEFAULTS.backgroundBlur,
+        backgroundScaling: DEFAULTS.backgroundScaling
+      });
+      chrome.storage.local.remove(LOCAL_BG_KEY);
+      if ($.blurSlider) {
+        $.blurSlider.value = DEFAULTS.backgroundBlur;
+        $.blurValue.textContent = DEFAULTS.backgroundBlur;
+      }
+      if ($.bgUrl) $.bgUrl.value = '';
+    });
+  }
+
+  // Custom Model Text
+  if ($.modelInput) {
+    $.modelInput.addEventListener('change', () => {
+      chrome.storage.sync.set({ defaultModel: $.modelInput.value.trim() });
+    });
+  }
+
+  // Search with debounce
+  if ($.settingsSearch) {
+    let searchTimeout;
+    $.settingsSearch.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(handleSearch, 50);
+    });
+    if ($.clearSearchBtn) {
+      $.clearSearchBtn.addEventListener('click', () => {
+        $.settingsSearch.value = '';
+        handleSearch();
+        $.settingsSearch.focus();
+      });
+    }
+  }
+}
+
+// --- Static Setup Functions ---
+function applyLocalization() {
+  $.i18nElements?.forEach(el => el.textContent = getMessage(el.dataset.i18n));
+  $.i18nPlaceholders?.forEach(el => el.placeholder = getMessage(el.dataset.i18nPlaceholder));
+  $.i18nTitles?.forEach(el => el.title = getMessage(el.dataset.i18nTitle));
+}
+
+function setupTabs() {
+  $.tabs?.forEach(tab => {
+    tab.addEventListener('click', () => {
+      $.tabs.forEach(t => t.classList.remove('active'));
+      $.panes.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      const target = document.getElementById(tab.dataset.tab);
+      if (target) target.classList.add('active');
+    });
+  });
+}
+
+// --- Search Logic ---
+let searchableData = [];
+
+function buildSearchableData() {
+  searchableData = [];
+  $.panes?.forEach(pane => {
+    const tabName = document.querySelector(`.tab-link[data-tab="${pane.id}"]`)?.textContent || '';
+    pane.querySelectorAll('.row').forEach(row => {
+      const label = row.querySelector('.label')?.textContent || '';
+      const keywords = (tabName + ' ' + label + ' ' + (row.querySelector('[title]')?.title || '')).toLowerCase();
+      searchableData.push({ element: row, tabId: pane.id, keywords });
+    });
+  });
+}
+
+function handleSearch() {
+  const query = $.settingsSearch?.value.toLowerCase().trim() || '';
+  if ($.clearSearchBtn) $.clearSearchBtn.hidden = !query;
+
+  if (!query) {
+    if ($.tabNav) $.tabNav.hidden = false;
+    $.panes?.forEach(p => p.classList.remove('active'));
+    $.tabs?.forEach(t => t.classList.remove('active', 'is-hidden'));
+    $.rows?.forEach(r => r.classList.remove('is-hidden'));
+    $.tabs?.[0]?.click();
+    return;
+  }
+
+  if ($.tabNav) $.tabNav.hidden = false;
+  const matchedTabIds = new Set();
+
+  searchableData.forEach(item => {
+    const match = item.keywords.includes(query);
+    item.element.classList.toggle('is-hidden', !match);
+    if (match) matchedTabIds.add(item.tabId);
+  });
+
+  $.tabs?.forEach(tab => {
+    tab.classList.toggle('is-hidden', !matchedTabIds.has(tab.dataset.tab));
+  });
+
+  const first = document.querySelector('.tab-link:not(.is-hidden)');
+  if (first) first.click();
+}
+
+// --- Import/Export ---
+function setupImportExport() {
+  if ($.exportSettings) {
+    $.exportSettings.addEventListener('click', () => {
+      chrome.storage.sync.get(null, (items) => {
+        $.settingsJson.value = JSON.stringify(items, null, 2);
+        $.importExportRow.hidden = false;
+        navigator.clipboard.writeText($.settingsJson.value);
+        $.exportSettings.textContent = getMessage('buttonCopied') || 'Copied!';
+        setTimeout(() => $.exportSettings.textContent = getMessage('buttonExportSettings') || 'Export', 2000);
       });
     });
   }
 
-  if (importBtn) {
-    importBtn.addEventListener('click', () => {
-      if (textareaRow.hidden) {
-        textareaRow.hidden = false;
-        jsonTextarea.focus();
-        return;
-      }
-      const jsonString = jsonTextarea.value.trim();
-      if (!jsonString) {
-        alert('Please paste settings JSON first');
+  if ($.importSettings) {
+    $.importSettings.addEventListener('click', () => {
+      if ($.importExportRow.hidden) {
+        $.importExportRow.hidden = false;
+        $.settingsJson?.focus();
         return;
       }
       try {
-        const importedSettings = JSON.parse(jsonString);
-        if (typeof importedSettings !== 'object' || Array.isArray(importedSettings)) throw new Error('Invalid settings format');
-        chrome.storage.sync.set(importedSettings, () => {
-          if (chrome.runtime.lastError) {
-            alert('Error: ' + chrome.runtime.lastError.message);
-            return;
-          }
-          importBtn.textContent = '✓ Imported!';
+        const data = JSON.parse($.settingsJson.value);
+        chrome.storage.sync.set(data, () => {
+          $.importSettings.textContent = 'Imported!';
           setTimeout(() => {
-            importBtn.textContent = getMessage('buttonImportSettings') || 'Import Settings';
-            textareaRow.hidden = true;
-            jsonTextarea.value = '';
-          }, 2000);
+            $.importSettings.textContent = getMessage('buttonImportSettings') || 'Import';
+            $.importExportRow.hidden = true;
+            location.reload();
+          }, 1000);
         });
       } catch (e) {
-        alert('Invalid JSON format: ' + e.message);
+        alert('Invalid JSON');
       }
     });
   }
+}
 
-  /* --- Feedback System Logic --- */
-  const FEEDBACK_API_URL = 'https://auroraforchatgpt.tnemoroccan.workers.dev';
-  
-  const feedbackTrigger = document.getElementById('feedbackTrigger');
-  const feedbackBox = document.getElementById('feedbackBox');
-  const closeFeedbackBtn = document.getElementById('closeFeedback');
-  const sendFeedbackBtn = document.getElementById('sendFeedback');
-  const feedbackInput = document.getElementById('feedbackInput');
-  const feedbackStatus = document.getElementById('feedbackStatus');
+// --- Feedback System ---
+function setupFeedbackSystem() {
+  if (!$.feedbackTrigger) return;
 
-  const donationModal = document.getElementById('donationModal');
-  const closeDonationModalBtn = document.getElementById('closeDonationModal');
-  const ticketIdDisplay = document.getElementById('ticketIdDisplay');
-  const copyTicketBtn = document.getElementById('copyTicketBtn');
-  const copyFeedback = document.getElementById('copyFeedback');
+  const generateTicketId = () => 'AUR-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-  const generateTicketId = () => {
-    return 'AUR-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  $.feedbackTrigger.addEventListener('click', () => {
+    $.feedbackBox.hidden = false;
+    $.feedbackTrigger.hidden = true;
+    $.feedbackInput?.focus();
+  });
+
+  const resetFeedbackUI = () => {
+    $.feedbackBox.hidden = true;
+    $.feedbackTrigger.hidden = false;
+    $.feedbackStatus.hidden = true;
+    $.feedbackStatus.textContent = '';
+    $.feedbackStatus.className = 'feedback-status';
   };
 
-  if (feedbackTrigger && feedbackBox) {
-    feedbackTrigger.addEventListener('click', () => {
-      feedbackBox.hidden = false;
-      feedbackTrigger.hidden = true;
-      feedbackInput.focus();
-    });
+  $.closeFeedback?.addEventListener('click', resetFeedbackUI);
 
-    const closeFeedback = () => {
-      feedbackBox.hidden = true;
-      feedbackTrigger.hidden = false;
-      feedbackStatus.hidden = true;
-      feedbackStatus.textContent = '';
-      feedbackStatus.className = 'feedback-status';
-    };
+  $.closeDonationModal?.addEventListener('click', () => {
+    $.donationModal.hidden = true;
+    resetFeedbackUI();
+  });
 
-    closeFeedbackBtn.addEventListener('click', closeFeedback);
+  $.copyTicketBtn?.addEventListener('click', () => {
+    navigator.clipboard.writeText($.ticketIdDisplay.textContent);
+    $.copyFeedback?.classList.add('visible');
+    setTimeout(() => $.copyFeedback?.classList.remove('visible'), 2000);
+  });
 
-    if (closeDonationModalBtn) {
-      closeDonationModalBtn.addEventListener('click', () => {
-        donationModal.hidden = true;
-        closeFeedback();
+  $.sendFeedback?.addEventListener('click', async () => {
+    const text = $.feedbackInput?.value.trim();
+    if (!text) return;
+
+    $.sendFeedback.disabled = true;
+    $.sendFeedback.textContent = getMessage('feedbackSending') || 'Sending...';
+    $.feedbackStatus.hidden = true;
+
+    const ticketId = generateTicketId();
+
+    try {
+      const manifest = chrome.runtime.getManifest();
+      const response = await fetch(FEEDBACK_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          feedback: text,
+          version: manifest.version,
+          userAgent: navigator.userAgent,
+          ticketId: ticketId
+        })
       });
+
+      if (response.ok) {
+        $.ticketIdDisplay.textContent = '#' + ticketId;
+        $.donationModal.hidden = false;
+        $.feedbackInput.value = '';
+        $.feedbackBox.hidden = true;
+      } else {
+        throw new Error('Server Error');
+      }
+    } catch (err) {
+      console.error(err);
+      $.feedbackStatus.textContent = getMessage('feedbackError') || 'Failed. Try again.';
+      $.feedbackStatus.className = 'feedback-status error';
+      $.feedbackStatus.hidden = false;
+    } finally {
+      $.sendFeedback.disabled = false;
+      $.sendFeedback.textContent = getMessage('feedbackSend') || 'Send Feedback';
     }
+  });
+}
 
-    if (copyTicketBtn) {
-      copyTicketBtn.addEventListener('click', () => {
-        const id = ticketIdDisplay.textContent;
-        navigator.clipboard.writeText(id).then(() => {
-          copyFeedback.classList.add('visible');
-          setTimeout(() => copyFeedback.classList.remove('visible'), 2000);
-        });
-      });
-    }
-
-    sendFeedbackBtn.addEventListener('click', async () => {
-      const text = feedbackInput.value.trim();
-      if (!text) return;
-
-      const ticketId = generateTicketId();
-
-      sendFeedbackBtn.disabled = true;
-      sendFeedbackBtn.textContent = getMessage('feedbackSending') || 'Sending...';
-      feedbackStatus.hidden = true;
-
-      try {
-        const manifest = chrome.runtime.getManifest();
-        const response = await fetch(FEEDBACK_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            feedback: text,
-            version: manifest.version,
-            userAgent: navigator.userAgent,
-            ticketId: ticketId
-          })
-        });
-
-        if (response.ok) {
-          ticketIdDisplay.textContent = '#' + ticketId;
-          donationModal.hidden = false;
-          
-          feedbackInput.value = '';
-          
-          feedbackBox.hidden = true;
-          
-        } else {
-          throw new Error('Server error');
-        }
-      } catch (err) {
-        console.error('Feedback error:', err);
-        feedbackStatus.textContent = getMessage('feedbackError') || 'Failed to send. Please try again.';
-        feedbackStatus.className = 'feedback-status error';
-        feedbackStatus.hidden = false;
-      } finally {
-        sendFeedbackBtn.disabled = false;
-        sendFeedbackBtn.textContent = getMessage('feedbackSend') || 'Send Feedback';
+// --- Live Storage Listener (Keep popup in sync) ---
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'sync') {
+    chrome.runtime.sendMessage({ type: 'GET_SETTINGS_FULL' }, (response) => {
+      if (response && !chrome.runtime.lastError) {
+        const { settings, local } = response;
+        renderUi(settings || DEFAULTS, local || {});
       }
     });
   }

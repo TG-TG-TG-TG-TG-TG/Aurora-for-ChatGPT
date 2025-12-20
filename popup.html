@@ -342,15 +342,15 @@
     <div class="donation-content">
       <div class="donation-header">
         <div class="success-icon">✨</div>
-        <h2>Report Sent!</h2>
-        <p>Your feedback has been queued.</p>
+        <h2 data-i18n="feedbackReportSent">__MSG_feedbackReportSent__</h2>
+        <p data-i18n="feedbackQueuedMessage">__MSG_feedbackQueuedMessage__</p>
       </div>
 
       <div class="ticket-section">
-        <label>Your Ticket ID</label>
+        <label data-i18n="feedbackYourTicketId">__MSG_feedbackYourTicketId__</label>
         <div class="ticket-display">
           <code id="ticketIdDisplay">#AUR-....</code>
-          <button id="copyTicketBtn" title="Copy ID">
+          <button id="copyTicketBtn" title="__MSG_feedbackCopyIdTooltip__" data-i18n-title="feedbackCopyIdTooltip">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -358,19 +358,19 @@
             </svg>
           </button>
         </div>
-        <div class="copy-feedback" id="copyFeedback">Copied!</div>
+        <div class="copy-feedback" id="copyFeedback" data-i18n="feedbackCopied">__MSG_feedbackCopied__</div>
       </div>
 
       <div class="donation-pitch">
-        <p>Want this prioritized?</p>
-        <span>Donate to support development and include your <b>Ticket ID</b> to fast-track this request.</span>
+        <p data-i18n="feedbackPrioritizeTitle">__MSG_feedbackPrioritizeTitle__</p>
+        <span><span data-i18n="feedbackDonatePre">__MSG_feedbackDonatePre__</span><b><span data-i18n="ticketIdLabel">__MSG_ticketIdLabel__</span></b><span data-i18n="feedbackDonatePost">__MSG_feedbackDonatePost__</span></span>
       </div>
 
       <a href="https://ko-fi.com/testtm" target="_blank" id="kofiBtn" class="kofi-btn">
-        <span>☕ Support on Ko-fi</span>
+        <span data-i18n="feedbackSupportKofi">__MSG_feedbackSupportKofi__</span>
       </a>
 
-      <button id="closeDonationModal" class="close-modal-link">No thanks, just close</button>
+      <button id="closeDonationModal" class="close-modal-link" data-i18n="feedbackClose">__MSG_feedbackClose__</button>
     </div>
   </div>
 
