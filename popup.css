@@ -374,9 +374,10 @@ html.theme-light .select-trigger:hover {
 .feedback-box {
   position: relative;
   width: 100%;
-  margin-top: 24px; /* Space for the floating close button */
+  margin-top: 24px;
   margin-bottom: 10px;
   animation: feedbackExpand 0.2s ease-out;
+  box-sizing: border-box; /* Fix: prevents container from expanding beyond parent */
 }
 .feedback-box[hidden] { display: none; }
 
@@ -389,7 +390,7 @@ html.theme-light .select-trigger:hover {
 .feedback-close-btn {
   position: absolute;
   top: -26px;
-  right: 0;
+  right: 10px; /* Fix: moved left to avoid getting stuck under the scrollbar */
   width: auto;
   height: auto;
   padding: 2px 6px;
@@ -426,6 +427,7 @@ textarea#feedbackInput {
   border-radius: 4px;
   font-family: inherit;
   font-size: 13px;
+  box-sizing: border-box; /* Fix: ensures padding doesn't cause overflow */
   
   /* Dark Mode Default (Aurora Base) */
   background: #15202b;
@@ -489,3 +491,139 @@ html.theme-light .feedback-send-btn {
 }
 .feedback-status.success { color: #00ba7c; background: transparent; }
 .feedback-status.error { color: #f4212e; background: transparent; }
+
+/* --- Donation / Priority Modal --- */
+.donation-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  animation: modalFadeIn 0.3s forwards;
+}
+.donation-modal[hidden] { display: none; }
+
+@keyframes modalFadeIn { to { opacity: 1; } }
+
+.donation-content {
+  width: 85%;
+  max-width: 320px;
+  background: var(--popup-bg);
+  border: 1px solid var(--popup-border);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  transform: scale(0.95);
+  animation: modalPopUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes modalPopUp { to { transform: scale(1); } }
+
+.donation-header .success-icon { font-size: 32px; margin-bottom: 8px; }
+.donation-header h2 { margin: 0 0 4px 0; font-size: 18px; color: var(--popup-text); }
+.donation-header p { margin: 0 0 20px 0; font-size: 13px; opacity: 0.7; }
+
+.ticket-section {
+  background: var(--popup-input-bg);
+  border: 1px solid var(--popup-border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.ticket-section label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.5;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.ticket-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--popup-bg);
+  border: 1px solid var(--popup-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.ticket-display code {
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary-accent);
+  letter-spacing: 0.5px;
+}
+
+#copyTicketBtn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  opacity: 0.6;
+  cursor: pointer;
+  color: var(--popup-text);
+  display: flex;
+}
+#copyTicketBtn:hover { opacity: 1; transform: scale(1.1); }
+
+.copy-feedback {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  width: 100%;
+  font-size: 11px;
+  color: #4ade80;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.copy-feedback.visible { opacity: 1; }
+
+.donation-pitch { margin-bottom: 20px; }
+.donation-pitch p { margin: 0 0 4px 0; font-weight: 600; font-size: 14px; }
+.donation-pitch span { font-size: 12px; opacity: 0.8; line-height: 1.4; display: block; }
+
+.kofi-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px;
+  background: #FF5E5B;
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.kofi-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 94, 91, 0.4);
+}
+
+.close-modal-link {
+  background: none;
+  border: none;
+  color: var(--popup-text);
+  opacity: 0.5;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px;
+}
+.close-modal-link:hover { opacity: 0.8; }

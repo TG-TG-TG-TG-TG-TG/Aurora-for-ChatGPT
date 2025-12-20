@@ -659,6 +659,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const feedbackInput = document.getElementById('feedbackInput');
   const feedbackStatus = document.getElementById('feedbackStatus');
 
+  const donationModal = document.getElementById('donationModal');
+  const closeDonationModalBtn = document.getElementById('closeDonationModal');
+  const ticketIdDisplay = document.getElementById('ticketIdDisplay');
+  const copyTicketBtn = document.getElementById('copyTicketBtn');
+  const copyFeedback = document.getElementById('copyFeedback');
+
+  const generateTicketId = () => {
+    return 'AUR-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  };
+
   if (feedbackTrigger && feedbackBox) {
     feedbackTrigger.addEventListener('click', () => {
       feedbackBox.hidden = false;
@@ -676,9 +686,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closeFeedbackBtn.addEventListener('click', closeFeedback);
 
+    if (closeDonationModalBtn) {
+      closeDonationModalBtn.addEventListener('click', () => {
+        donationModal.hidden = true;
+        closeFeedback();
+      });
+    }
+
+    if (copyTicketBtn) {
+      copyTicketBtn.addEventListener('click', () => {
+        const id = ticketIdDisplay.textContent;
+        navigator.clipboard.writeText(id).then(() => {
+          copyFeedback.classList.add('visible');
+          setTimeout(() => copyFeedback.classList.remove('visible'), 2000);
+        });
+      });
+    }
+
     sendFeedbackBtn.addEventListener('click', async () => {
       const text = feedbackInput.value.trim();
       if (!text) return;
+
+      const ticketId = generateTicketId();
 
       sendFeedbackBtn.disabled = true;
       sendFeedbackBtn.textContent = getMessage('feedbackSending') || 'Sending...';
@@ -692,16 +721,19 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify({
             feedback: text,
             version: manifest.version,
-            userAgent: navigator.userAgent
+            userAgent: navigator.userAgent,
+            ticketId: ticketId
           })
         });
 
         if (response.ok) {
-          feedbackStatus.textContent = getMessage('feedbackSuccess') || '✅ Thanks for your feedback!';
-          feedbackStatus.className = 'feedback-status success';
-          feedbackStatus.hidden = false;
+          ticketIdDisplay.textContent = '#' + ticketId;
+          donationModal.hidden = false;
+          
           feedbackInput.value = '';
-          setTimeout(closeFeedback, 2000);
+          
+          feedbackBox.hidden = true;
+          
         } else {
           throw new Error('Server error');
         }

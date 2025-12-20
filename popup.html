@@ -338,6 +338,42 @@
     </div>
   </main>
 
+  <div id="donationModal" class="donation-modal" hidden>
+    <div class="donation-content">
+      <div class="donation-header">
+        <div class="success-icon">✨</div>
+        <h2>Report Sent!</h2>
+        <p>Your feedback has been queued.</p>
+      </div>
+
+      <div class="ticket-section">
+        <label>Your Ticket ID</label>
+        <div class="ticket-display">
+          <code id="ticketIdDisplay">#AUR-....</code>
+          <button id="copyTicketBtn" title="Copy ID">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="copy-feedback" id="copyFeedback">Copied!</div>
+      </div>
+
+      <div class="donation-pitch">
+        <p>Want this prioritized?</p>
+        <span>Donate to support development and include your <b>Ticket ID</b> to fast-track this request.</span>
+      </div>
+
+      <a href="https://ko-fi.com/testtm" target="_blank" id="kofiBtn" class="kofi-btn">
+        <span>☕ Support on Ko-fi</span>
+      </a>
+
+      <button id="closeDonationModal" class="close-modal-link">No thanks, just close</button>
+    </div>
+  </div>
+
   <div class="credit">
     <div class="feedback-link" id="feedbackTrigger">
       <span class="feedback-icon">💬</span>
