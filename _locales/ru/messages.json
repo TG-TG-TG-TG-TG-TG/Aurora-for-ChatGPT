@@ -329,6 +329,21 @@
   "welcomeBtnNext": {
     "message": "Далее"
   },
+  "welcomeBtnSkip": {
+    "message": "Пропустить"
+  },
+  "welcomeSupportTitle": {
+    "message": "Поддержите Aurora"
+  },
+  "welcomeSupportDescription": {
+    "message": "Aurora бесплатна и имеет открытый исходный код. Если вам нравится, рассмотрите возможность поддержки разработки небольшим пожертвованием или поставьте звезду на GitHub!"
+  },
+  "welcomeSupportDonate": {
+    "message": "Купите мне кофе"
+  },
+  "welcomeSupportStar": {
+    "message": "Звезда на GitHub"
+  },
   "welcomeLabelVoice": {
     "message": "Настройка голоса"
   },
@@ -601,5 +616,8 @@
   },
   "buttonImported": {
     "message": "✓ Импортировано!"
+  },
+  "sectionStreamerMode": {
+    "message": "Режим стримера"
   }
 }

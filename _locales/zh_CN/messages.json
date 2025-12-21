@@ -329,6 +329,21 @@
   "welcomeBtnNext": {
     "message": "下一步"
   },
+  "welcomeBtnSkip": {
+    "message": "暂时跳过"
+  },
+  "welcomeSupportTitle": {
+    "message": "支持 Aurora"
+  },
+  "welcomeSupportDescription": {
+    "message": "Aurora 是免费且开源的。如果您喜欢它，请考虑通过小额捐赠或在 GitHub 上给我们加星来支持开发！"
+  },
+  "welcomeSupportDonate": {
+    "message": "请我喝咖啡"
+  },
+  "welcomeSupportStar": {
+    "message": "在 GitHub 上加星"
+  },
   "welcomeLabelVoice": {
     "message": "语音自定义"
   },
@@ -559,5 +574,8 @@
   },
   "buttonImported": {
     "message": "✓ 已导入！"
+  },
+  "sectionStreamerMode": {
+    "message": "主播模式"
   }
 }

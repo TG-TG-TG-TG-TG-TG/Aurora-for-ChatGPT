@@ -1614,9 +1614,15 @@
             <!-- Screen 1: Introduction -->
             <div id="screen-1" class="screen active">
                 <div class="content-panel">
-                    <div class="logo">✨</div>
+                    <img src="${chrome.runtime.getURL('icons/logo-48.png')}" alt="Aurora" class="aurora-logo-img">
                     <h1>${getMessage('welcomeTitle')}</h1>
                     <p>${getMessage('welcomeDescription')}</p>
+                    <!-- Progress Indicator -->
+                    <div class="progress-dots">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
                     <button id="get-started-btn" class="welcome-btn primary">${getMessage('welcomeBtnGetStarted')}</button>
                 </div>
             </div>
@@ -1650,9 +1656,9 @@
                         <div class="preview animated"></div>
                         <span>${getMessage('welcomePresetAnimated')}</span>
                     </button>
-                    <button class="preset-tile" data-bg-url="christmas">
+                    <button class="preset-tile christmas-tile" data-bg-url="christmas">
                         <div class="preview christmas"></div>
-                        <span>🎄</span>
+                        <span>🎄 Christmas</span>
                     </button>
                     <button class="preset-tile" data-bg-url="grokHorizon">
                         <div class="preview grok"></div>
@@ -1664,13 +1670,62 @@
             <!-- Glass Style -->
             <div class="setup-section">
                 <label class="section-label">${getMessage('welcomeLabelGlassStyle')}</label>
-                <div class="pill-group">
-                    <button class="pill-btn" data-appearance="clear">${getMessage('welcomeGlassClear')}</button>
-                    <button class="pill-btn" data-appearance="dimmed">${getMessage('welcomeGlassDimmed')}</button>
+                <div class="aurora-glass-switch" id="welcome-glass-switch" data-switch-state="0">
+                    <div class="aurora-switch-glider"></div>
+                    <button type="button" class="aurora-switch-btn" data-value="0" data-appearance="clear">${getMessage('welcomeGlassClear')}</button>
+                    <button type="button" class="aurora-switch-btn" data-value="1" data-appearance="dimmed">${getMessage('welcomeGlassDimmed')}</button>
                 </div>
             </div>
 
-            <button id="finish-btn" class="welcome-btn primary finish-button">${getMessage('welcomeBtnFinish')}</button>
+            <!-- Progress Indicator Step 2 -->
+            <div class="progress-dots bar-dots">
+                <span class="dot"></span>
+                <span class="dot active"></span>
+                <span class="dot"></span>
+            </div>
+
+            <button id="next-to-support-btn" class="welcome-btn primary finish-button">${getMessage('welcomeBtnNext')}</button>
+        </div>
+
+        <!-- Screen 3: Support Project -->
+        <div id="aurora-support-screen" class="support-screen">
+            <div class="support-card">
+                <div class="support-header">
+                    <span class="support-icon">💖</span>
+                    <h2>${getMessage('welcomeSupportTitle')}</h2>
+                </div>
+                <p class="support-description">${getMessage('welcomeSupportDescription')}</p>
+                
+                <div class="support-buttons">
+                    <a href="https://ko-fi.com/testtm" target="_blank" rel="noopener" class="support-btn donate-btn">
+                        <span class="btn-icon">☕</span>
+                        <span>${getMessage('welcomeSupportDonate')}</span>
+                    </a>
+                    <a href="https://github.com/AuroraForChatGPT/Aurora-for-ChatGPT" target="_blank" rel="noopener" class="support-btn github-btn">
+                        <span class="btn-icon">⭐</span>
+                        <span>${getMessage('welcomeSupportStar')}</span>
+                    </a>
+                </div>
+
+                <div class="progress-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot active"></span>
+                </div>
+
+                <button id="finish-btn" class="welcome-btn primary">${getMessage('welcomeBtnFinish')}</button>
+                <button id="skip-support-btn" class="welcome-btn-link">${getMessage('welcomeBtnSkip')}</button>
+            </div>
+        </div>
+
+        <!-- Success Overlay -->
+        <div id="aurora-success-overlay" class="success-overlay">
+            <div class="success-checkmark">
+                <svg viewBox="0 0 52 52">
+                    <circle cx="26" cy="26" r="25" fill="none"/>
+                    <path fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
         </div>
     </div>
   `;
@@ -1684,12 +1739,46 @@
 
     // Get all elements at once
     const getStartedBtn = document.getElementById('get-started-btn');
+    const nextToSupportBtn = document.getElementById('next-to-support-btn');
     const finishBtn = document.getElementById('finish-btn');
+    const skipSupportBtn = document.getElementById('skip-support-btn');
     const welcomeOverlay = document.getElementById('aurora-welcome-overlay');
     const welcomeContainer = document.querySelector('.welcome-container');
     const styleBar = document.getElementById('aurora-style-bar');
+    const supportScreen = document.getElementById('aurora-support-screen');
 
     let tempSettings = { ...settings }; // Clone settings for preview
+
+    const finishWelcome = () => {
+      tempSettings.hasSeenWelcomeScreen = true;
+      chrome.storage.sync.set(tempSettings, () => {
+        if (chrome.runtime.lastError) {
+          console.error("Aurora Extension Error (Welcome Finish):", chrome.runtime.lastError.message);
+          return;
+        }
+        // Show success animation
+        const successOverlay = document.getElementById('aurora-success-overlay');
+        if (successOverlay) {
+          successOverlay.classList.add('active');
+          setTimeout(() => {
+            if (welcomeOverlay) welcomeOverlay.remove();
+            // Add sparkle hint to Quick Settings button for new users
+            setTimeout(() => {
+              const qsBtn = document.getElementById(QS_BUTTON_ID);
+              if (qsBtn) {
+                qsBtn.classList.add('sparkle-hint');
+                // Remove sparkle when clicked
+                qsBtn.addEventListener('click', () => {
+                  qsBtn.classList.remove('sparkle-hint');
+                }, { once: true });
+              }
+            }, 500);
+          }, 1200);
+        } else {
+          if (welcomeOverlay) welcomeOverlay.remove();
+        }
+      });
+    };
 
     // --- Event Listeners ---
     if (getStartedBtn) {
@@ -1699,15 +1788,10 @@
         }
 
         if (welcomeContainer) {
-          // Animate the center screen out (downwards)
           welcomeContainer.classList.add('exiting');
-
-          // Trigger the bottom bar entrance slightly earlier for a seamless crossover
           setTimeout(() => {
             if (styleBar) styleBar.classList.add('active');
           }, 150);
-
-          // Remove the center screen after animation completes
           setTimeout(() => {
             welcomeContainer.style.display = 'none';
           }, 500);
@@ -1716,9 +1800,33 @@
         }
 
         // Initialize with defaults visually
-        document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="default"]').classList.add('active');
-        document.querySelector('#aurora-style-bar .pill-btn[data-appearance="clear"]').classList.add('active');
+        const defaultTile = document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="default"]');
+        if (defaultTile) defaultTile.classList.add('active');
+        // Glass switch defaults to state="0" (Clear) which is already set in HTML
       });
+    }
+
+    // Step 2 → Step 3 (Style Bar → Support Screen)
+    if (nextToSupportBtn) {
+      nextToSupportBtn.addEventListener('click', () => {
+        if (styleBar) {
+          styleBar.classList.remove('active');
+          styleBar.classList.add('exiting');
+        }
+        setTimeout(() => {
+          if (supportScreen) supportScreen.classList.add('active');
+        }, 200);
+      });
+    }
+
+    // Skip support → finish immediately
+    if (skipSupportBtn) {
+      skipSupportBtn.addEventListener('click', finishWelcome);
+    }
+
+    // Finish button → save and show success
+    if (finishBtn) {
+      finishBtn.addEventListener('click', finishWelcome);
     }
 
     document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(tile => {
@@ -1733,8 +1841,8 @@
         else if (bgChoice === '__gpt5_animated__') newUrl = '__gpt5_animated__';
 
         tempSettings.customBgUrl = newUrl;
-        settings.customBgUrl = newUrl; // for live preview
-        applyAllSettings(); // Use full apply for robust preview
+        settings.customBgUrl = newUrl;
+        applyAllSettings();
 
         // If Christmas preset selected, auto-check Holiday Mode toggle
         const holidayToggle = document.getElementById('welcome-holiday-mode');
@@ -1760,10 +1868,8 @@
         settings.enableNewYear = isOn;
         
         if (isOn) {
-          // Also set Christmas background
           tempSettings.customBgUrl = CHRISTMAS_BG_URL;
           settings.customBgUrl = CHRISTMAS_BG_URL;
-          // Update preset visual selection
           document.querySelectorAll('#aurora-style-bar .preset-tile').forEach(t => t.classList.remove('active'));
           const christmasTile = document.querySelector('#aurora-style-bar .preset-tile[data-bg-url="christmas"]');
           if (christmasTile) christmasTile.classList.add('active');
@@ -1772,26 +1878,17 @@
       });
     }
 
-    document.querySelectorAll('#aurora-style-bar .pill-btn').forEach(pill => {
-      pill.addEventListener('click', () => {
-        document.querySelectorAll('#aurora-style-bar .pill-btn').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        const appearanceChoice = pill.dataset.appearance;
-        tempSettings.appearance = appearanceChoice;
-        settings.appearance = appearanceChoice; // Mutate for live preview
-        applyAllSettings(); // Use full apply for robust preview
-      });
-    });
-
-    if (finishBtn) {
-      finishBtn.addEventListener('click', () => {
-        tempSettings.hasSeenWelcomeScreen = true;
-        chrome.storage.sync.set(tempSettings, () => {
-          if (chrome.runtime.lastError) {
-            console.error("Aurora Extension Error (Welcome Finish):", chrome.runtime.lastError.message);
-            return;
-          }
-          if (welcomeOverlay) welcomeOverlay.remove();
+    // Glass Style animated switch handler
+    const glassSwitch = document.getElementById('welcome-glass-switch');
+    if (glassSwitch) {
+      glassSwitch.querySelectorAll('.aurora-switch-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const value = btn.dataset.value;
+          const appearanceChoice = btn.dataset.appearance;
+          glassSwitch.setAttribute('data-switch-state', value);
+          tempSettings.appearance = appearanceChoice;
+          settings.appearance = appearanceChoice;
+          applyAllSettings();
         });
       });
     }

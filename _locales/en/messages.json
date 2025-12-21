@@ -329,6 +329,21 @@
   "welcomeBtnNext": {
     "message": "Next"
   },
+  "welcomeBtnSkip": {
+    "message": "Skip for now"
+  },
+  "welcomeSupportTitle": {
+    "message": "Support Aurora"
+  },
+  "welcomeSupportDescription": {
+    "message": "Aurora is free and open source. If you enjoy it, consider supporting development with a small donation or starring us on GitHub!"
+  },
+  "welcomeSupportDonate": {
+    "message": "Buy me a coffee"
+  },
+  "welcomeSupportStar": {
+    "message": "Star on GitHub"
+  },
   "welcomeLabelVoice": {
     "message": "Voice Customization"
   },
@@ -601,5 +616,8 @@
   },
   "buttonImported": {
     "message": "✓ Imported!"
+  },
+  "sectionStreamerMode": {
+    "message": "Streamer Mode"
   }
 }
