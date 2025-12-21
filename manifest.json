@@ -1,26 +1,45 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
-  "version": "1.5.6",
+  "version": "1.6.0",
   "default_locale": "en",
   "description": "__MSG_extensionDescription__",
   "background": {
     "service_worker": "background.js"
   },
   "icons": {
-    "16":  "icons/logo-16.png",
-    "32":  "icons/logo-32.png",
-    "48":  "icons/logo-48.png",
+    "16": "icons/logo-16.png",
+    "32": "icons/logo-32.png",
+    "48": "icons/logo-48.png",
     "128": "icons/logo-128.png"
   },
-  "permissions": ["storage"],
+  "permissions": [
+    "storage",
+    "scripting"
+  ],
+  "commands": {
+    "toggle-visibility": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Toggle Focus Mode (Visibility)"
+    },
+    "toggle-blur": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
+      },
+      "description": "Toggle Blur (Streamer Mode)"
+    }
+  },
   "action": {
     "default_title": "__MSG_actionTitle__",
     "default_popup": "popup.html",
     "default_icon": {
-      "16":  "icons/logo-16.png",
-      "32":  "icons/logo-32.png",
-      "48":  "icons/logo-48.png",
+      "16": "icons/logo-16.png",
+      "32": "icons/logo-32.png",
+      "48": "icons/logo-48.png",
       "128": "icons/logo-128.png"
     }
   },
@@ -31,8 +50,15 @@
         "https://chatgpt.com/*",
         "https://openai.com/*"
       ],
-      "js": ["i18n-loader.js", "content.js"],
-      "css": ["styles.css", "sidebar.css", "quick-settings.css"],
+      "js": [
+        "data-masking.js",
+        "token-counter.js",
+        "content.js"
+      ],
+      "css": [
+        "styles.css",
+        "new-features.css"
+      ],
       "run_at": "document_start"
     }
   ],
@@ -40,7 +66,11 @@
     {
       "resources": [
         "Aurora/grok-4.webp",
-        "_locales/*/messages.json"
+        "Aurora/christmas-bg.webp",
+        "santa_hat_cutout_v2.png",
+        "_locales/*/messages.json",
+        "vendor/tiktoken-lite/*",
+        "vendor/tiktoken-lite/encoders/*"
       ],
       "matches": [
         "https://chat.openai.com/*",

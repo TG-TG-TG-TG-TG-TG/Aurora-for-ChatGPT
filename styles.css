@@ -1,5 +1,8 @@
 /* Aurora for ChatGPT - Main Stylesheet */
 
+/* Import Google Fonts for custom font support */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
 :root {
   /* Base Colors & Background */
   --theme-bg-color: #000;
@@ -38,12 +41,41 @@
   --clear-saturate: 180%;
   --clear-shadow: 0 16px 50px rgba(0,0,0,0.4);
   --clear-bg: rgba(255, 255, 255, 0.08);
-  --clear-border: rgba(255,255,255,0.2);
-  --clear-glow: rgba(255,255,255,0.08);
+  --clear-border: rgba(255, 255, 255, 0.2);
+  --clear-glow: rgba(255, 255, 255, 0.08);
   --clear-shadow-light: 0 16px 40px rgba(0,0,0,0.18);
   --clear-bg-light: rgba(255,255,255,0.2);
   --clear-border-light: rgba(0,0,0,0.15);
   --clear-glow-light: rgba(255,255,255,0.25);
+  
+  /* --- SEMANTIC THEME LAYER (OPTIMIZATION) --- */
+  /* Default Mappings (Dimmed) - updated dynamically by classes below */
+  --aurora-glass-bg: var(--composer-bg);
+  --aurora-glass-border: var(--composer-border);
+  --aurora-glass-shadow: var(--composer-shadow);
+  --aurora-glass-blur: var(--composer-blur);
+  --aurora-glass-saturate: var(--glass-saturate);
+  --aurora-glass-glow: transparent;
+
+  /* CSS Variable-Driven State Defaults */
+  --aurora-display-limit: block;
+  --aurora-display-upgrade: block;
+  --aurora-display-sora: block;
+  --aurora-display-gpts: block;
+
+  /* --- COMPONENT: AURORA GLASS SWITCH --- */
+  --switch-radius: 14px;
+  --switch-glider-radius: 10px;
+  --switch-bg: rgba(0, 0, 0, 0.25);
+  --switch-border: rgba(255, 255, 255, 0.08);
+  --switch-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  --switch-glider-bg: rgba(255, 255, 255, 0.12);
+  --switch-glider-border: rgba(255, 255, 255, 0.15);
+  --switch-glider-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --switch-text-color: var(--theme-text-secondary);
+  --switch-active-text-color: #fff;
+  --switch-active-text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  --switch-glider-blur: blur(8px) saturate(120%);
 }
 
 html.cgpt-ambient-on.cgpt-light-mode {
@@ -69,6 +101,52 @@ html.cgpt-ambient-on.cgpt-light-mode {
   --sidebar-gradient-overlay: linear-gradient( to bottom, rgba(0,0,0,0.015), rgba(255,255,255,0.015) );
 }
 
+/* --- Switch Component Overrides --- */
+
+html.cgpt-light-mode {
+  --switch-bg: rgba(0, 0, 0, 0.05);
+  --switch-border: rgba(0, 0, 0, 0.06);
+  --switch-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  --switch-glider-bg: #fff;
+  --switch-glider-border: rgba(0,0,0,0.08);
+  --switch-glider-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  --switch-active-text-color: #000;
+  --switch-active-text-shadow: none;
+}
+
+html.cgpt-appearance-clear {
+  --switch-bg: var(--clear-bg);
+  --switch-border: var(--clear-border);
+  --switch-shadow: inset 0 0 2px 0 var(--clear-glow), inset 0 1px 4px rgba(0,0,0,0.2);
+  --switch-glider-bg: rgba(255, 255, 255, 0.15);
+  --switch-glider-border: var(--clear-border);
+  --switch-glider-shadow: inset 0 0 1px 0 var(--clear-glow), 0 4px 15px rgba(0,0,0,0.15);
+  --switch-glider-blur: blur(12px) saturate(160%);
+
+  /* Semantic Layer Update for CLEAR Theme */
+  --aurora-glass-bg: var(--clear-bg);
+  --aurora-glass-border: var(--clear-border);
+  --aurora-glass-shadow: var(--clear-shadow);
+  --aurora-glass-blur: var(--clear-blur);
+  --aurora-glass-saturate: var(--clear-saturate);
+  --aurora-glass-glow: var(--clear-glow);
+}
+
+html.cgpt-appearance-clear.cgpt-light-mode {
+  --switch-bg: var(--clear-bg-light);
+  --switch-border: var(--clear-border-light);
+  --switch-shadow: inset 0 0 2px 0 var(--clear-glow-light);
+  --switch-glider-bg: rgba(255, 255, 255, 0.65);
+  --switch-glider-border: var(--clear-border-light);
+  --switch-glider-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+  /* Semantic Layer Update for CLEAR + LIGHT Theme */
+  --aurora-glass-bg: var(--clear-bg-light);
+  --aurora-glass-border: var(--clear-border-light);
+  --aurora-glass-shadow: var(--clear-shadow-light);
+  --aurora-glass-glow: var(--clear-glow-light);
+}
+
 /* --- Base Transparency --- */
 html.cgpt-ambient-on,
 html.cgpt-ambient-on body {
@@ -76,15 +154,15 @@ html.cgpt-ambient-on body {
 }
 
 /* --- Background Container & Media --- */
-#cgpt-ambient-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-color: var(--theme-bg-color); opacity: 0; transition: opacity 0.5s ease-in-out; }
+#cgpt-ambient-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-color: var(--theme-bg-color); opacity: 0; transition: opacity 0.5s ease-in-out; contain: paint; }
 html.cgpt-bg-anim-disabled #cgpt-ambient-bg { transition: none; }
 #cgpt-ambient-bg.bg-visible { opacity: 1; }
 #cgpt-ambient-bg .media-layer { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 750ms ease-in-out; }
 #cgpt-ambient-bg .media-layer.active { opacity: 1; }
 #cgpt-ambient-bg picture, #cgpt-ambient-bg img, #cgpt-ambient-bg video, #cgpt-ambient-bg .haze, #cgpt-ambient-bg .overlay, #cgpt-ambient-bg .animated-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
-#cgpt-ambient-bg img, #cgpt-ambient-bg video { filter: blur(var(--cgpt-bg-blur-radius, 60px)) var(--bg-filter); opacity: var(--bg-opacity); will-change: transform, filter; z-index: 0; }
-#cgpt-ambient-bg .haze { z-index: 2; background: var(--haze-gradient); }
-#cgpt-ambient-bg .overlay { z-index: 1; background: var(--overlay-gradient) !important; }
+#cgpt-ambient-bg img, #cgpt-ambient-bg video { filter: blur(var(--cgpt-bg-blur-radius, 60px)) var(--bg-filter); opacity: var(--bg-opacity); will-change: transform, filter, opacity; z-index: 0; transition: filter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+#cgpt-ambient-bg .haze { z-index: 2; background: var(--haze-gradient); transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.6s ease; }
+#cgpt-ambient-bg .overlay { z-index: 1; background: var(--overlay-gradient) !important; transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.6s ease; }
 html.cgpt-appearance-clear #cgpt-ambient-bg .overlay { background: transparent !important; }
 html.cgpt-appearance-clear #cgpt-ambient-bg .haze { display: none !important; }
 html.cgpt-appearance-clear:not(.cgpt-light-mode) #cgpt-ambient-bg img, html.cgpt-appearance-clear:not(.cgpt-light-mode) #cgpt-ambient-bg video { filter: blur(var(--cgpt-bg-blur-radius, 60px)) brightness(0.85) saturate(1.04); opacity: 1; }
@@ -96,7 +174,6 @@ html.cgpt-appearance-clear.cgpt-light-mode #cgpt-ambient-bg img, html.cgpt-appea
 @keyframes move-blob-3 { 0% { transform: scale(1) translate(0px, 0px); } 33% { transform: scale(1.15) translate(20vw, 20vh); } 66% { transform: scale(0.85) translate(-30vw, -10vh); } 100% { transform: scale(1) translate(0px, 0px); } }
 #cgpt-ambient-bg .animated-bg { display: none; z-index: 0; overflow: hidden; position: relative; }
 #cgpt-ambient-bg .media-layer.gpt5-active .animated-bg { display: block; }
-#cgpt-ambient-bg .media-layer.gpt5-active video, #cgpt-ambient-bg .media-layer.gpt5-active picture { display: none; }
 .animated-bg .blob { position: absolute; border-radius: 50%; opacity: 0.45; filter: blur(100px); will-change: transform; }
 .animated-bg .blob:nth-child(1) { width: 60vmax; height: 60vmax; top: -30vmax; left: -20vmax; background: #ff99c8; animation: move-blob-1 45s infinite alternate ease-in-out; }
 .animated-bg .blob:nth-child(2) { width: 70vmax; height: 70vmax; bottom: -40vmax; right: -30vmax; background: #a9d6ff; animation: move-blob-2 60s infinite alternate ease-in-out; }
@@ -122,106 +199,28 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(.popover[data-radix-menu-con
 
 /* --- UNIFIED GLASS ENGINE --- */
 /* This is the master selector for ALL elements that receive a glass effect. */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(
-  /* Popups, Menus, Dialogs */
-  .popover.bg-token-main-surface-primary[data-radix-menu-content],
-  .popover.bg-token-main-surface-primary[role="dialog"],
-  div[role="dialog"][class*="shadow-long"],
-  .popover.bg-token-main-surface-primary.max-w-xs,
-  div.sticky.top-14.bg-token-main-surface-primary,
-  div[role="dialog"]:has(input#search[placeholder="Search GPTs"]),
-  textarea.bg-token-main-surface-primary.border-token-border-default,
-  .bg-token-main-surface-primary.sticky.top-\[-1px\],
-  /* Composer & Code Blocks */
-  form[data-type="unified-composer"] > div > div,
-  div[data-message-author-role="assistant"] pre > div[class*="bg-"],
-  /* Buttons & UI Elements */
-  #cgpt-qs-panel,
-  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary,
-  .py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary,
-  .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1,
-  .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn,
-  .shrink-0.btn-secondary.relative.btn,
-  .shrink-0.btn-danger-outline.relative.btn,
-  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
-  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary,
-  .p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary,
-  .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary,
-  .p-3.border.rounded-\[10px\].w-full.btn-secondary
-) {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [data-aurora-glass="true"] {
   /* Default: "Dimmed" Glass Style */
-  background: var(--composer-bg) !important;
-  border: 1px solid var(--composer-border) !important;
-  box-shadow: var(--composer-shadow) !important;
-  -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
-  backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate)) !important;
-  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease;
+  background: var(--aurora-glass-bg) !important;
+  border: 1px solid var(--aurora-glass-border) !important;
+  box-shadow: inset 0 0 2px 0 var(--aurora-glass-glow), var(--aurora-glass-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate)) !important;
+  backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate)) !important;
+  /* Removed background transition to prevent open glitches */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Override for "Clear" Glass Style */
-html.cgpt-ambient-on.cgpt-appearance-clear:not(.cgpt-legacy-composer) :is(
-  /* The same master selector */
-  .popover.bg-token-main-surface-primary[data-radix-menu-content],
-  .popover.bg-token-main-surface-primary[role="dialog"],
-  div[role="dialog"][class*="shadow-long"],
-  .popover.bg-token-main-surface-primary.max-w-xs,
-  div.sticky.top-14.bg-token-main-surface-primary,
-  div[role="dialog"]:has(input#search[placeholder="Search GPTs"]),
-  textarea.bg-token-main-surface-primary.border-token-border-default,
-  .bg-token-main-surface-primary.sticky.top-\[-1px\],
-  form[data-type="unified-composer"] > div > div,
-  div[data-message-author-role="assistant"] pre > div[class*="bg-"],
-  #cgpt-qs-panel,
-  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary,
-  .py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary,
-  .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1,
-  .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn,
-  .shrink-0.btn-secondary.relative.btn,
-  .shrink-0.btn-danger-outline.relative.btn,
-  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
-  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary,
-  .p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary,
-  .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary,
-  .p-3.border.rounded-\[10px\].w-full.btn-secondary
-) {
-  background: var(--clear-bg) !important;
-  border: 1px solid var(--clear-border) !important;
-  box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow) !important;
-  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
-  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+/* Menu/Popover Opening Animation (same as Quick Settings panel) */
+html.cgpt-ambient-on:not(.cgpt-animations-disabled):not(.cgpt-legacy-composer) .popover[data-aurora-glass="true"],
+html.cgpt-ambient-on:not(.cgpt-animations-disabled):not(.cgpt-legacy-composer) [role="menu"][data-aurora-glass="true"],
+html.cgpt-ambient-on:not(.cgpt-animations-disabled):not(.cgpt-legacy-composer) [data-radix-menu-content][data-aurora-glass="true"] {
+  animation: menu-pop-open 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top center;
 }
-
-/* Light Mode Override for "Clear" Glass Style */
-html.cgpt-ambient-on.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) :is(
-  /* The same master selector */
-  .popover.bg-token-main-surface-primary[data-radix-menu-content],
-  .popover.bg-token-main-surface-primary[role="dialog"],
-  div[role="dialog"][class*="shadow-long"],
-  .popover.bg-token-main-surface-primary.max-w-xs,
-  div.sticky.top-14.bg-token-main-surface-primary,
-  div[role="dialog"]:has(input#search[placeholder="Search GPTs"]),
-  textarea.bg-token-main-surface-primary.border-token-border-default,
-  .bg-token-main-surface-primary.sticky.top-\[-1px\],
-  form[data-type="unified-composer"] > div > div,
-  div[data-message-author-role="assistant"] pre > div[class*="bg-"],
-  #cgpt-qs-panel,
-  ul.p-2\.5.divide-y.flex-col.bg-token-bg-primary,
-  .py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary,
-  .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1,
-  .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn,
-  .shrink-0.btn-secondary.relative.btn,
-  .shrink-0.btn-danger-outline.relative.btn,
-  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
-  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary,
-  .p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary,
-  .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary,
-  .p-3.border.rounded-\[10px\].w-full.btn-secondary
-) {
-  background: var(--clear-bg-light) !important;
-  border-color: var(--clear-border-light) !important;
-  box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light) !important;
+@keyframes menu-pop-open {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
-
 /* --- Element-Specific Overrides & Hover Effects --- */
 
 /* User Message Bubble (Special Case) */
@@ -245,33 +244,45 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) .shrink-0.btn-danger-outline.rel
  * @description Makes the inner buttons of suggestion lists transparent
  *              to reveal the parent's glass effect.
 */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"][class*="flex-col"] button {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"] button {
   background-color: transparent !important;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"][class*="flex-col"] button:hover {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"] button:hover {
   background: var(--menu-item-hover) !important;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"][class*="flex-col"][class*="bg-token-bg-primary"] {
-  /* Smaller radius on top, larger radius on the bottom to match the composer */
+/* Updated to target the wrapper div which now holds the background */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-aurora-glass="true"]:has(> ul[class*="divide-y"]) {
+  /* Add padding and rounded corners for better appearance */
   border-radius: var(--glass-radius) !important;
-  
-  /* A small margin to visually separate it from the composer */
-  margin-top: 2px !important;
+  margin-top: 4px !important;
+  /* Ensure the container doesn't have extra background layers */
 }
 
 /* Code Blocks & Children */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-sidebar-surface-primary,
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre > div[class*="bg-"] > div[class*="bg-"] { background-color: transparent !important; }
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre code { background: transparent !important; }
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button { background: rgba(255, 255, 255, 0.08) !important; border: 1px solid rgba(255, 255, 255, 0.12) !important; -webkit-backdrop-filter: blur(8px) saturate(120%) !important; backdrop-filter: blur(8px) saturate(120%) !important; padding: 4px 10px !important; border-radius: 8px !important; transition: background 0.2s ease, transform 250ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important; will-change: transform, box-shadow; }
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover { background: rgba(255, 255, 255, 0.15) !important; }
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button { background: rgba(0, 0, 0, 0.04) !important; border-color: rgba(0, 0, 0, 0.08) !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; }
-html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover { background: rgba(0, 0, 0, 0.08) !important; }
-html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button { background: var(--clear-bg, rgba(255, 255, 255, 0.08)) !important; border: 1px solid var(--clear-border, rgba(255,255,255,0.2)) !important; box-shadow: inset 0 0 1px 0 var(--clear-glow, rgba(255,255,255,0.08)), 0 4px 12px rgba(0,0,0,0.25) !important; -webkit-backdrop-filter: blur(var(--clear-blur, 24px)) saturate(var(--clear-saturate, 180%)) !important; backdrop-filter: blur(var(--clear-blur, 24px)) saturate(var(--clear-saturate, 180%)) !important; }
-html.cgpt-appearance-clear:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover { background: rgba(255, 255, 255, 0.16) !important; }
-html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button { background: var(--clear-bg-light, rgba(255,255,255,0.2)) !important; border-color: var(--clear-border-light, rgba(0,0,0,0.15)) !important; box-shadow: inset 0 0 1px 0 var(--clear-glow-light, rgba(255,255,255,0.25)), 0 4px 12px rgba(0,0,0,0.1) !important; }
-html.cgpt-appearance-clear.cgpt-light-mode:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre .bg-token-bg-elevated-secondary button:hover { background: rgba(255, 255, 255, 0.3) !important; }
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre { border-radius: var(--glass-radius) !important; overflow: hidden !important; }
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre > div[class*="bg-"] > div[class*="bg-"] { background-color: transparent !important; }
+
+/* Inline Code Blur Effect */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .markdown code:not(pre code) {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .markdown code:not(pre code) {
+  background: rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+}
 
 /*
  * @name Copy Code Button Background Fix
@@ -290,11 +301,37 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="as
     background: color-mix(in oklab, currentColor 10%, transparent) !important;
 }
 
+/* --- Tooltip Polishing --- */
+/* Hide the solid arrow to create a floating glass effect */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-black[data-state*="open"]) [data-radix-popper-arrow] {
+  display: none !important;
+}
+
+/* 1. Apply Glass to the Tooltip Container (Base & Root .bg-black override) */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-black[data-state*="open"]) {
+  background: var(--aurora-glass-bg) !important;
+  background-color: var(--aurora-glass-bg) !important; /* Explicitly override color */
+  border: 1px solid var(--aurora-glass-border) !important;
+  box-shadow: inset 0 0 2px 0 var(--aurora-glass-glow), var(--aurora-glass-shadow) !important;
+  -webkit-backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate)) !important;
+  backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate)) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+/* 2. AGGRESSIVE Child Cleanup (The "Nuclear" Fix) */
+/* Forces ANY child element (div, span, etc.) inside the tooltip to be transparent. */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-black[data-state*="open"]) * {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 /* --- Light Mode Color Overrides --- */
 html.cgpt-ambient-on.cgpt-light-mode body, html.cgpt-ambient-on.cgpt-light-mode [class*="text-token-text-"], html.cgpt-ambient-on.cgpt-light-mode [class*="text-gray-"] { color: var(--theme-text-primary) !important; }
 html.cgpt-ambient-on.cgpt-light-mode svg { color: var(--theme-text-primary) !important; }
 html.cgpt-ambient-on.cgpt-light-mode ::placeholder { color: var(--theme-text-primary) !important; opacity: 0.7; }
-html.cgpt-ambient-on.cgpt-light-mode button { background: transparent !important; border-color: rgba(0, 0, 0, 0.1) !important; color: var(--theme-text-primary) !important; }
+html.cgpt-ambient-on.cgpt-light-mode button:not(#aurora-welcome-overlay *) { background: transparent !important; border-color: rgba(0, 0, 0, 0.1) !important; color: var(--theme-text-primary) !important; }
 html.cgpt-ambient-on.cgpt-light-mode button[role="switch"][data-state="unchecked"] { background-color: rgba(0, 0, 0, 0.15) !important; }
 html.cgpt-ambient-on.cgpt-light-mode button[role="switch"][data-state="checked"] { background-color: #4f8cff !important; }
 html.cgpt-ambient-on.cgpt-light-mode .bg-token-main-surface-primary { background: rgba(255, 255, 255, 0.3) !important; border-color: rgba(0, 0, 0, 0.1) !important; }
@@ -320,20 +357,22 @@ html.cgpt-focus-mode-on #thread-bottom-container { visibility: hidden !important
 html.cgpt-focus-mode-on main .flex.h-full.flex-col { padding-top: 1.25rem; }
 
 /* --- Misc & Animations --- */
-.cgpt-hide-gpt5-limit, .cgpt-hide-upgrade, .cgpt-hide-sora, .cgpt-hide-gpts { display: none !important; }
-.bg-red-500.text-white.border-red-500 { display: none !important; }
-@keyframes aurora-menu-open { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-@keyframes aurora-menu-close { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
-html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled) :is(.popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="open"], .popover[role="dialog"][class*="md:max-w-"][data-state="open"]) { animation: aurora-menu-open 300ms cubic-bezier(0.16, 1, 0.3, 1); }
-html.cgpt-ambient-on:not(.cgpt-legacy-composer):not(.cgpt-animations-disabled) :is(.popover.bg-token-main-surface-primary[data-radix-menu-content][data-state="closed"], .popover[role="dialog"][class*="md:max-w-"][data-state="closed"]) { animation: aurora-menu-close 300ms cubic-bezier(0.16, 1, 0.3, 1); }
+.aurora-target-limit { display: var(--aurora-display-limit) !important; }
+.aurora-target-upgrade { display: var(--aurora-display-upgrade) !important; }
+.aurora-target-sora { display: var(--aurora-display-sora) !important; }
+.aurora-target-gpts { display: var(--aurora-display-gpts) !important; }
 
+.bg-red-500.text-white.border-red-500 { display: none !important; }
+
+/* --- FIX: Hide Duplicated Header (Perplexity Comet) --- */
+div.draggable.h-header-height.bg-token-bg-primary { display: none !important; }
 /* --- FIX: Glass Effect for Custom GPT/Project Header --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div.sticky.content-fade-top:has(button[data-testid="project-modal-trigger"]) {
   /* Add padding and rounded corners for better appearance */
   padding: 8px 12px;
   border-radius: var(--glass-radius);
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
 }
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .flex-col.w-full.h-full.flex.z-50.top-0.start-0.fixed.bg-token-main-surface-primary {
   background: rgba(18, 18, 18, 0.5) !important;
@@ -404,10 +443,259 @@ html.cgpt-appearance-clear #aurora-welcome-overlay .content-panel {
 #aurora-welcome-overlay h1 { color: var(--theme-text-primary); font-size: 32px; font-weight: 600; margin: 0 0 12px 0; }
 #aurora-welcome-overlay p { font-size: 16px; color: var(--theme-text-secondary); line-height: 1.6; margin: 0 0 24px 0; }
 #aurora-welcome-overlay .welcome-btn { font-family: inherit; font-size: 16px; font-weight: 500; padding: 12px 24px; border-radius: 12px; border: none; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease; width: 100%; margin-top: 16px; }
-#aurora-welcome-overlay .welcome-btn.primary { background-color: #4f8cff; color: white !important; }
+#aurora-welcome-overlay .welcome-btn.primary { background-color: #4f8cff !important; color: white !important; }
 #aurora-welcome-overlay .welcome-btn:hover { transform: scale(1.02); }
 
-/* --- Setup Bar --- */
+/* Aurora Logo Image */
+#aurora-welcome-overlay .aurora-logo-img {
+  display: block;
+  margin: 0 auto 16px;
+  width: 64px;
+  height: 64px;
+  animation: content-fade-in 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  filter: drop-shadow(0 4px 12px rgba(79, 140, 255, 0.4));
+}
+
+/* Progress Indicator Dots */
+#aurora-welcome-overlay .progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0 8px;
+}
+#aurora-welcome-overlay .progress-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+#aurora-welcome-overlay .progress-dots .dot.active {
+  background: #4f8cff;
+  border-color: rgba(79, 140, 255, 0.5);
+  box-shadow: 0 0 8px rgba(79, 140, 255, 0.5);
+}
+html.cgpt-light-mode #aurora-welcome-overlay .progress-dots .dot {
+  background: rgba(0, 0, 0, 0.15);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+html.cgpt-light-mode #aurora-welcome-overlay .progress-dots .dot.active {
+  background: #4f8cff;
+}
+.aurora-setup-bar .bar-dots {
+  margin: 0;
+}
+
+/* Christmas Tile Festive Glow */
+.aurora-setup-bar .christmas-tile {
+  animation: christmas-glow 2s ease-in-out infinite;
+  position: relative;
+}
+@keyframes christmas-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 139, 34, 0); }
+  50% { box-shadow: 0 0 12px 2px rgba(34, 139, 34, 0.4), 0 0 20px 4px rgba(178, 34, 34, 0.2); }
+}
+.aurora-setup-bar .christmas-tile::after {
+  content: '✨';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 12px;
+  animation: sparkle-float 1.5s ease-in-out infinite;
+}
+@keyframes sparkle-float {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+  50% { transform: translateY(-3px) scale(1.1); opacity: 0.8; }
+}
+
+/* Success Checkmark Overlay */
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 10, 0.8);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.success-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.success-checkmark {
+  width: 80px;
+  height: 80px;
+}
+.success-checkmark svg {
+  width: 100%;
+  height: 100%;
+}
+.success-checkmark circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #4f8cff;
+  fill: none;
+}
+.success-overlay.active .success-checkmark circle {
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+.success-checkmark path {
+  stroke: #4f8cff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+}
+.success-overlay.active .success-checkmark path {
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards;
+}
+@keyframes stroke {
+  100% { stroke-dashoffset: 0; }
+}
+
+/* --- Support Screen (Step 3) --- */
+.support-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 10, 0.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.support-screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.support-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  padding: 32px 40px;
+  width: 420px;
+  max-width: 90vw;
+  text-align: center;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: inset 0 1.5px 1px 0 var(--glass-inner-highlight), var(--glass-shadow);
+  animation: content-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+html.cgpt-appearance-clear .support-card {
+  background: var(--clear-bg) !important;
+  border: 1px solid var(--clear-border) !important;
+  box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow) !important;
+}
+.support-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.support-icon {
+  font-size: 32px;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(255, 105, 180, 0.5)); }
+}
+.support-card h2 {
+  color: var(--theme-text-primary);
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+.support-description {
+  color: var(--theme-text-secondary);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+.support-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.support-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.support-btn .btn-icon {
+  font-size: 18px;
+}
+.donate-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  color: white;
+  border: none;
+}
+.donate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+}
+.github-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--theme-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.github-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+html.cgpt-light-mode .github-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: var(--theme-text-primary);
+}
+html.cgpt-light-mode .github-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+.welcome-btn-link {
+  background: none;
+  border: none;
+  color: var(--theme-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 16px;
+  margin-top: 8px;
+  transition: color 0.2s ease;
+  font-family: inherit;
+}
+.welcome-btn-link:hover {
+  color: var(--theme-text-primary);
+}
+
+/* Setup bar exiting animation */
+.aurora-setup-bar.exiting {
+  transform: translateX(-50%) translateY(150%);
+  opacity: 0;
+}
 .aurora-setup-bar {
   position: fixed;
   bottom: 7.5vh;
@@ -447,22 +735,11 @@ html.cgpt-appearance-clear.cgpt-light-mode .aurora-setup-bar {
   border-color: var(--clear-border-light) !important;
   box-shadow: inset 0 0 2px 0 var(--clear-glow-light), var(--clear-shadow-light) !important;
 }
-.aurora-setup-bar .setup-section { 
-  margin-bottom: 0; 
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.aurora-setup-bar .section-label { 
-  margin-bottom: 0; 
-  white-space: nowrap;
-  font-size: 14px; 
-  font-weight: 500; 
-  color: var(--theme-text-primary); 
-  opacity: 0.8; 
-}
+.aurora-setup-bar .setup-section { margin-bottom: 0; display: flex; align-items: center; gap: 12px; }
+.aurora-setup-bar .section-label { margin-bottom: 0; white-space: nowrap; font-size: 14px; font-weight: 500; color: var(--theme-text-primary); opacity: 0.8; }
 .aurora-setup-bar .preset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.aurora-setup-bar .preset-tile { background: rgba(255, 255, 255, 0.05); border: 2px solid transparent; border-radius: 12px; padding: 8px; cursor: pointer; transition: all 0.2s ease; color: var(--theme-text-secondary); font-family: inherit; font-size: 14px; }
+.aurora-setup-bar .preset-tile { background: rgba(255, 255, 255, 0.05); border: 2px solid transparent; border-radius: 12px; padding: 8px; cursor: pointer; transition: all 0.2s ease; color: var(--theme-text-secondary); font-family: inherit; font-size: 14px; min-width: 70px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+.aurora-setup-bar .preset-tile span { display: block; text-align: center; width: 100%; }
 html.cgpt-light-mode .aurora-setup-bar .preset-tile { background: rgba(0,0,0,0.05); }
 .aurora-setup-bar .preset-tile:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
 html.cgpt-light-mode .aurora-setup-bar .preset-tile:hover { background: rgba(0,0,0,0.1); }
@@ -472,11 +749,55 @@ html.cgpt-light-mode .aurora-setup-bar .preset-tile:hover { background: rgba(0,0
 .aurora-setup-bar .preview.animated { background: linear-gradient(45deg, #ff99c8, #a9d6ff, #fcf6bd); }
 .aurora-setup-bar .preview.grok { background-image: url('chrome-extension://__MSG_@@extension_id__/Aurora/grok-4.webp'); }
 .aurora-setup-bar .preview.blue { background-color: #3b82f6; }
-.aurora-setup-bar .pill-group { display: flex; gap: 8px; background: rgba(0,0,0,0.2); border-radius: 99px; padding: 4px; }
+.aurora-setup-bar .preview.christmas { background: linear-gradient(135deg, #1a472a 0%, #2d5a27 50%, #8b0000 100%); background-size: cover; }
+
+/* Holiday Mode Section in Setup Bar */
+.aurora-setup-bar .holiday-section { 
+  background: linear-gradient(135deg, rgba(34, 139, 34, 0.15) 0%, rgba(178, 34, 34, 0.15) 100%);
+  border: 1px solid rgba(34, 139, 34, 0.25);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.aurora-setup-bar .holiday-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.aurora-setup-bar .holiday-emoji {
+  font-size: 20px;
+  animation: holiday-tree-bounce 2s ease-in-out infinite;
+}
+@keyframes holiday-tree-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+.aurora-setup-bar .holiday-label {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--theme-text-primary);
+  white-space: nowrap;
+}
+.aurora-setup-bar .setup-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.15);
+}
+html.cgpt-light-mode .aurora-setup-bar .setup-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.aurora-setup-bar .pill-group { display: flex; gap: 8px; background: rgba(0,0,0,0.2); border-radius: 999px; padding: 4px; }
 html.cgpt-light-mode .aurora-setup-bar .pill-group { background: rgba(0,0,0,0.1); }
-.aurora-setup-bar .pill-btn { flex-grow: 1; border: none; background: transparent; color: var(--theme-text-secondary) !important; font-family: inherit; font-size: 14px; padding: 8px 16px; border-radius: 99px; cursor: pointer; transition: all 0.2s ease; }
+.aurora-setup-bar .pill-btn { flex-grow: 1; border: none; background: transparent; color: var(--theme-text-secondary) !important; font-family: inherit; font-size: 14px; padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: all 0.2s ease; }
 .aurora-setup-bar .pill-btn.active { background: rgba(255, 255, 255, 0.15); color: var(--theme-text-primary) !important; font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 html.cgpt-light-mode .aurora-setup-bar .pill-btn.active { background: rgba(255, 255, 255, 0.5); }
+
+/* Aurora Glass Switch in Setup Bar */
+.aurora-setup-bar .aurora-glass-switch {
+  width: 140px;
+  min-width: 140px;
+}
+
 .aurora-setup-bar .finish-button { width: auto; margin-top: 0; }
 
 /* Voice Setup Bar specific styles */
@@ -495,3 +816,1155 @@ html.cgpt-light-mode .aurora-setup-bar .track { background: rgba(0,0,0,0.2); }
 .aurora-setup-bar .thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
 .aurora-setup-bar input:checked + .track .thumb { transform: translateX(18px); }
 #aurora-voice-bar { flex-direction: column; align-items: flex-start; gap: 12px; min-width: 420px; }
+
+/* --- Sidebar Styles --- */
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
+  position: relative;
+  background: transparent !important;
+  border-radius: var(--glass-radius);
+  overflow: hidden;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .bg-token-bg-elevated-secondary,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-bg-"]:not([class*="bg-token-bg-elevated-secondary"]),
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-surface"] {
+  background-color: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--sidebar-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  box-shadow: inset -1px 0 0 var(--sidebar-glass-stroke), var(--sidebar-glass-shadow);
+  /* Removed transition to prevent open glitches */
+  transition: none;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky {
+  position: sticky;
+  isolation: isolate;
+  background: transparent !important;
+  border-radius: var(--glass-radius);
+  contain: paint;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--sidebar-glass-bg);
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  box-shadow: 0 1px 0 var(--sidebar-sticky-highlight) inset, var(--sidebar-glass-shadow);
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky > *,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .hover\:bg-token-surface-hover:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .focus-visible\:bg-token-surface-hover:focus-visible {
+  background-color: color-mix(in oklab, currentColor 7%, transparent) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--sidebar-gradient-overlay);
+}
+
+/* --- Activity Flyout Glass Treatment --- */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .bg-token-sidebar-surface-primary:has(section[data-testid="screen-threadFlyOut"]) {
+  background-color: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] {
+  position: relative;
+  border-radius: var(--activity-glass-radius, var(--glass-radius, 18px));
+  isolation: isolate;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-inline-start-color: var(--activity-glass-stroke, var(--sidebar-glass-stroke));
+  border-inline-start-style: solid;
+  background-color: var(--activity-glass-bg, var(--sidebar-glass-bg)) !important;
+  background-image: var(--activity-gradient-overlay, var(--sidebar-gradient-overlay));
+  background-repeat: no-repeat;
+  background-origin: border-box;
+  -webkit-backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  box-shadow: inset -1px 0 0 var(--activity-glass-stroke, var(--sidebar-glass-stroke)), var(--activity-glass-shadow, var(--sidebar-glass-shadow));
+  --activity-header-divider: color-mix(in srgb, var(--activity-glass-stroke, rgba(255,255,255,0.2)) 65%, transparent);
+  /* Removed transition to prevent open glitches */
+  transition: none;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] :is(.bg-token-bg-elevated-secondary, [class*="bg-token-bg-"], [class*="bg-token-surface"], [class*="bg-token-main-surface"], .bg-primary) {
+  background-color: transparent !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] :is(.border-token-border-sharp, .dark\:border-token-main-surface-secondary) {
+  border-color: var(--activity-header-divider, var(--activity-glass-stroke, rgba(255,255,255,0.16))) !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .tall\:sticky {
+  position: sticky;
+  isolation: isolate;
+  background: transparent !important;
+  border-radius: var(--activity-glass-radius, var(--glass-radius, 18px));
+  contain: paint;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky::before,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .tall\:sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--activity-glass-bg, var(--sidebar-glass-bg));
+  -webkit-backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  backdrop-filter: blur(var(--activity-glass-blur, var(--sidebar-glass-blur))) saturate(var(--activity-glass-sat, var(--sidebar-glass-sat)));
+  box-shadow: 0 1px 0 var(--sidebar-sticky-highlight) inset, var(--activity-glass-shadow, var(--sidebar-glass-shadow));
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky > *,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .tall\:sticky > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .hover\:bg-token-surface-hover:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .focus-visible\:bg-token-surface-hover:focus-visible {
+  background-color: color-mix(in oklab, currentColor 7%, transparent) !important;
+}
+
+/* --- Quick Settings Styles --- */
+
+#cgpt-qs-btn {
+  position: fixed;
+  bottom: 12px;
+  right: 16px;
+  z-index: 99998;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(30, 30, 30, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+#cgpt-qs-btn:hover { transform: scale(1.08); }
+#cgpt-qs-btn svg { width: 20px; height: 20px; color: white; opacity: 0.9; }
+html.cgpt-light-mode #cgpt-qs-btn {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(0,0,0,0.1);
+}
+html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
+
+/* Sparkle hint animation for new users */
+#cgpt-qs-btn.sparkle-hint {
+  animation: sparkle-pulse 1.5s ease-in-out infinite;
+}
+#cgpt-qs-btn.sparkle-hint::after {
+  content: '✨';
+  position: fixed;
+  bottom: 42px;
+  right: 8px;
+  font-size: 14px;
+  animation: sparkle-float 1s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 99999;
+}
+@keyframes sparkle-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(79, 140, 255, 0);
+  }
+  50% { 
+    box-shadow: 0 0 20px 4px rgba(79, 140, 255, 0.5), 0 0 40px 8px rgba(79, 140, 255, 0.2);
+  }
+}
+/* Keyframe animations for the panel */
+@keyframes qs-panel-open { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes qs-panel-close { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
+#cgpt-qs-panel {
+  position: fixed;
+  bottom: 60px;
+  right: 16px;
+  z-index: 99997;
+  width: 260px;
+  /* Dynamic Glass Style (Dimmed by default) */
+  background: var(--aurora-glass-bg);
+  border: 1px solid var(--aurora-glass-border);
+  -webkit-backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate));
+  backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate));
+  box-shadow: inset 0 0 2px 0 var(--aurora-glass-glow), var(--aurora-glass-shadow);
+  /* End of New Style */
+  border-radius: 14px;
+  padding: 8px;
+  transform-origin: bottom right;
+  color: #fff;
+  /* Add transitions for smooth style changes (background/backdrop removed for open glitch) */
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  /* Panel is hidden by default through its data-state */
+}
+
+html.cgpt-light-mode #cgpt-qs-panel {
+    color: #000;
+}
+
+/* State-based animation styling */
+#cgpt-qs-panel[data-state="closed"] {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+#cgpt-qs-panel[data-state="open"] {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+  visibility: visible;
+  animation: qs-panel-open 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#cgpt-qs-panel[data-state="closing"] {
+  pointer-events: none;
+  visibility: visible;
+  /* `forwards` will hold the `to` state of the animation */
+  animation: qs-panel-close 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.qs-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  opacity: 0.6;
+  padding: 8px 8px 4px;
+}
+.qs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+.qs-row:hover { background: rgba(255, 255, 255, 0.08); }
+html.cgpt-light-mode .qs-row:hover { background: rgba(0,0,0,0.06); }
+.qs-row label:not(.switch) { font-size: 13px; opacity: 0.95; }
+
+/* Holiday Mode special styling */
+.qs-row.qs-holiday-mode {
+  background: linear-gradient(135deg, rgba(34, 139, 34, 0.12) 0%, rgba(178, 34, 34, 0.12) 100%);
+  border: 1px solid rgba(34, 139, 34, 0.25);
+  margin-bottom: 4px;
+}
+.qs-row.qs-holiday-mode:hover {
+  background: linear-gradient(135deg, rgba(34, 139, 34, 0.2) 0%, rgba(178, 34, 34, 0.2) 100%);
+}
+
+.qs-row .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
+.qs-row .switch input { display: none; }
+.qs-row .track { position: absolute; inset: 0; border-radius: 999px; background: rgba(0,0,0,0.3); transition: background .2s ease; }
+html.cgpt-light-mode .qs-row .track { background: rgba(0,0,0,0.2); }
+.qs-row input:checked + .track { background: #4f8cff; }
+.qs-row .thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s ease; }
+.qs-row input:checked + .track .thumb { transform: translateX(18px); }
+
+.qs-custom-select {
+  position: relative;
+  max-width: 150px;
+  width: 100%;
+}
+.qs-select-trigger {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  gap: 8px;
+  transition: background-color 0.2s ease, transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+html.cgpt-light-mode .qs-select-trigger {
+  border-color: rgba(0, 0, 0, 0.08);
+  background-color: rgba(0, 0, 0, 0.03);
+}
+.qs-select-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+html.cgpt-light-mode .qs-select-trigger:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+.qs-select-trigger > .qs-select-label {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qs-select-trigger svg {
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+.qs-select-trigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.qs-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+html:not(.cgpt-light-mode) .qs-color-dot {
+  border-color: rgba(255,255,255,0.1);
+}
+.qs-select-options {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  z-index: 99999;
+  min-width: 170px;
+  list-style: none;
+  padding: 6px;
+  margin: 0;
+  /* OPTIMIZED: Uses Semantic Variables */
+  background: var(--aurora-glass-bg);
+  border: 1px solid var(--aurora-glass-border);
+  box-shadow: inset 0 0 2px 0 var(--aurora-glass-glow), var(--aurora-glass-shadow);
+  -webkit-backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate));
+  backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate));
+  /* End Optimized */
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  border-radius: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.qs-select-options::-webkit-scrollbar {
+  display: none;
+}
+html.cgpt-light-mode .qs-select-options {
+  /* This rule is now empty as variables handle light mode */
+}
+
+.qs-select-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+.qs-select-option:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+html.cgpt-light-mode .qs-select-option:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.qs-select-option[aria-selected="true"] {
+  font-weight: 500;
+}
+.qs-select-option .qs-checkmark {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  opacity: 0;
+}
+.qs-select-option[aria-selected="true"] .qs-checkmark {
+  opacity: 1;
+}
+
+.qs-pill-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 150px;
+}
+
+html.cgpt-light-mode .qs-pill-group {
+  border-color: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.qs-pill {
+  flex: 1;
+  padding: 5px 10px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.qs-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+html.cgpt-light-mode .qs-pill {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+html.cgpt-light-mode .qs-pill:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.qs-pill.active {
+  background: linear-gradient(135deg, #4f8cff 0%, #3b7ce8 100%);
+  color: white !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(79, 140, 255, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  transform: translateY(0);
+}
+
+/* --- Custom Font Support --- */
+/* Apply custom fonts to all ChatGPT elements when selected */
+html[data-custom-font="inter"],
+html[data-custom-font="inter"] body,
+html[data-custom-font="inter"] * {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+html[data-custom-font="roboto"],
+html[data-custom-font="roboto"] body,
+html[data-custom-font="roboto"] * {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+html[data-custom-font="montserrat"],
+html[data-custom-font="montserrat"] body,
+html[data-custom-font="montserrat"] * {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+html[data-custom-font="opensans"],
+html[data-custom-font="opensans"] body,
+html[data-custom-font="opensans"] * {
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+html[data-custom-font="poppins"],
+html[data-custom-font="poppins"] body,
+html[data-custom-font="poppins"] * {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif !important;
+}
+
+/* System font - no changes needed */
+html[data-custom-font="system"] {
+  /* Use default system fonts */
+}
+
+html.cgpt-light-mode .qs-pill.active {
+  background: linear-gradient(135deg, #4f8cff 0%, #3b7ce8 100%);
+  box-shadow: 0 2px 6px rgba(79, 140, 255, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+
+/* --- Reusable Class Definitions: Aurora Glass Switch --- */
+.aurora-glass-switch {
+  position: relative;
+  display: flex;
+  background: var(--switch-bg);
+  padding: 4px;
+  border-radius: var(--switch-radius);
+  border: 1px solid var(--switch-border);
+  box-shadow: var(--switch-shadow);
+  width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  isolation: isolate;
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.aurora-switch-glider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  /* Default Dimmed Style */
+  background: var(--switch-glider-bg);
+  border: 1px solid var(--switch-glider-border);
+  border-radius: var(--switch-glider-radius);
+  box-shadow: var(--switch-glider-shadow);
+  -webkit-backdrop-filter: var(--switch-glider-blur);
+  backdrop-filter: var(--switch-glider-blur);
+  z-index: 1;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s ease, border-color 0.4s ease;
+  pointer-events: none;
+}
+
+/* Sliding Logic for 2-State Switch */
+.aurora-glass-switch[data-switch-state="0"] .aurora-switch-glider { transform: translateX(0%); }
+.aurora-glass-switch[data-switch-state="1"] .aurora-switch-glider { transform: translateX(100%); }
+
+.aurora-switch-btn {
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  border: none;
+  padding: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--switch-text-color);
+  border-radius: var(--switch-glider-radius);
+  cursor: pointer;
+  transition: color 0.3s ease;
+  text-align: center;
+}
+
+.aurora-switch-btn:hover {
+  color: var(--theme-text-primary);
+}
+
+/* Active Text Logic */
+.aurora-glass-switch[data-switch-state="0"] .aurora-switch-btn[data-value="0"],
+.aurora-glass-switch[data-switch-state="1"] .aurora-switch-btn[data-value="1"] {
+  color: var(--switch-active-text-color);
+  font-weight: 600;
+  text-shadow: var(--switch-active-text-shadow);
+}
+html.cgpt-light-mode .aurora-glass-switch[data-switch-state="0"] .aurora-switch-btn[data-value="0"],
+html.cgpt-light-mode .aurora-glass-switch[data-switch-state="1"] .aurora-switch-btn[data-value="1"] {
+  color: #000;
+  text-shadow: none;
+}
+
+/* --- SCOPED TRANSITIONS (Prevents Open Glitch) --- */
+/* Transitions are only enabled when the user is actively switching themes */
+
+html.cgpt-theme-transitioning [data-aurora-glass="true"],
+html.cgpt-theme-transitioning #cgpt-qs-panel,
+html.cgpt-theme-transitioning .qs-select-options {
+  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
+}
+
+html.cgpt-theme-transitioning #stage-slideover-sidebar::before,
+html.cgpt-theme-transitioning section[data-testid="screen-threadFlyOut"] {
+  transition: background 0.4s ease, background-color 0.4s ease, background-image 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* --- Hiding Utility Classes --- */
+.cgpt-hide-upgrade, .cgpt-hide-gpt5-limit { display: none !important; }
+
+/* --- Unified Aurora Style: Missing Elements (Tables, Inputs, Math, Scrollbars) --- */
+
+/* 1. Markdown Tables - Remove solid backgrounds to blend with glass */
+html.cgpt-ambient-on table {
+  background: transparent !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+html.cgpt-ambient-on table thead,
+html.cgpt-ambient-on table tbody,
+html.cgpt-ambient-on table tr,
+html.cgpt-ambient-on table th,
+html.cgpt-ambient-on table td {
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+html.cgpt-ambient-on.cgpt-light-mode table th,
+html.cgpt-ambient-on.cgpt-light-mode table td {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 2. Form Inputs & Textareas (Settings, Search, Custom Instructions) */
+html.cgpt-ambient-on input[type="text"],
+html.cgpt-ambient-on input[type="search"],
+html.cgpt-ambient-on textarea:not(#prompt-textarea) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: inherit !important;
+  transition: all 0.2s ease !important;
+}
+html.cgpt-ambient-on input[type="text"]:focus,
+html.cgpt-ambient-on input[type="search"]:focus,
+html.cgpt-ambient-on textarea:not(#prompt-textarea):focus {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+}
+html.cgpt-ambient-on.cgpt-light-mode input[type="text"],
+html.cgpt-ambient-on.cgpt-light-mode input[type="search"],
+html.cgpt-ambient-on.cgpt-light-mode textarea:not(#prompt-textarea) {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 3. KaTeX Math Formulas - Remove solid backgrounds */
+html.cgpt-ambient-on .katex-display {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* 4. Unified Glass Scrollbars */
+html.cgpt-ambient-on ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background-color: transparent;
+}
+html.cgpt-ambient-on ::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+html.cgpt-ambient-on ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+html.cgpt-ambient-on ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+html.cgpt-ambient-on.cgpt-light-mode ::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+html.cgpt-ambient-on.cgpt-light-mode ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+/* --- Aurora Glass Switches (Unified) --- */
+html.cgpt-ambient-on button[role="switch"] {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.3s ease !important;
+}
+
+html.cgpt-ambient-on button[role="switch"][aria-checked="true"],
+html.cgpt-ambient-on button[role="switch"][data-state="checked"] {
+  background-color: rgba(59, 130, 246, 0.5) !important;
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+html.cgpt-ambient-on button[role="switch"] > span {
+  background-color: #fff !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+
+/* --- Welcome Screen Buttons (Unified Aurora) --- */
+#aurora-welcome-overlay .welcome-btn.primary {
+  background: rgba(79, 140, 255, 0.25) !important;
+  border: 1px solid rgba(79, 140, 255, 0.4) !important;
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  color: white !important;
+  box-shadow: 0 4px 15px rgba(79, 140, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+#aurora-welcome-overlay .welcome-btn.primary:hover {
+  background: rgba(79, 140, 255, 0.45) !important;
+  border-color: rgba(79, 140, 255, 0.6) !important;
+  box-shadow: 0 6px 20px rgba(79, 140, 255, 0.3);
+  transform: translateY(-1px) scale(1.01);
+}
+
+/* --- START OF NEW ADDITIONS --- */
+
+/* 1. Activity Flyout (History Search Popup) - Glass Treatment */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] {
+  background-color: var(--sidebar-glass-bg) !important;
+  border-inline-start: 1px solid var(--sidebar-glass-stroke);
+  border-radius: var(--glass-radius);
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat));
+  box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+}
+
+/* Remove solid backgrounds inside the flyout */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] :is(.bg-token-bg-elevated-secondary, [class*="bg-token-"], .bg-primary) {
+  background-color: transparent !important;
+}
+
+/* 2. Unified Glass Scrollbars (Chrome/Webkit) */
+html.cgpt-ambient-on ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background-color: transparent;
+}
+html.cgpt-ambient-on ::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+html.cgpt-ambient-on ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+html.cgpt-ambient-on ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+/* Light Mode Scrollbar adjustments */
+html.cgpt-ambient-on.cgpt-light-mode ::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+html.cgpt-ambient-on.cgpt-light-mode ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* 3. Markdown Tables - Make transparent */
+html.cgpt-ambient-on table, 
+html.cgpt-ambient-on table :is(thead, tbody, tr, th, td) {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+html.cgpt-ambient-on.cgpt-light-mode table :is(th, td) {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 4. Form Inputs & Search Bars - Glass Effect */
+html.cgpt-ambient-on :is(input[type="text"], input[type="search"], textarea:not(#prompt-textarea)) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: inherit !important;
+  transition: all 0.2s ease !important;
+}
+html.cgpt-ambient-on :is(input[type="text"], input[type="search"], textarea:not(#prompt-textarea)):focus {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+  outline: none !important;
+}
+/* Light Mode Inputs */
+html.cgpt-ambient-on.cgpt-light-mode :is(input[type="text"], input[type="search"], textarea:not(#prompt-textarea)) {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 5. KaTeX Math - Remove solid background */
+html.cgpt-ambient-on .katex-display {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* --- FIX: New Sidebar Solid Panel --- */
+/* Hides the solid gray layer covering the blurred sidebar */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) .bg-\(--sidebar-bg\,var\(--bg-elevated-secondary\)\) {
+  background-color: transparent !important;
+}
+
+/* === NEW: Header & Navigation Cleanups === */
+
+/* 1. Make Black Box Header Transparent (Keep content visible) */
+div.h-header-height.bg-token-bg-primary.flex.items-center.gap-8.p-2.select-none.max-md\:hidden {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* 2. Remove Specific Side Gradients */
+div.absolute.start-0.top-0.z-10.from-token-bg-primary,
+div.absolute.end-0.top-0.z-10.to-token-bg-primary {
+  display: none !important;
+}
+
+/* Make arrow containers transparent (remove gradient) but visible */
+div.absolute.start-0.top-2.hidden.h-full.items-end.bg-linear-to-r.from-white,
+div.absolute.end-0.top-2.hidden.h-full.bg-linear-to-l.from-white {
+  background: transparent !important;
+  display: flex !important; /* Force visible */
+  align-items: center;
+  top: -8px !important; /* Move arrows higher up */
+  height: 100% !important;
+}
+
+/* Style the Arrow Buttons to match Glass Theme */
+div.absolute.start-0.top-2.hidden.h-full.items-end.bg-linear-to-r.from-white button,
+div.absolute.end-0.top-2.hidden.h-full.bg-linear-to-l.from-white button {
+  background: var(--switch-bg) !important;
+  border: 1px solid var(--switch-border) !important;
+  backdrop-filter: blur(4px) !important;
+  color: var(--theme-text-primary) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 50% !important;
+}
+
+div.absolute.start-0.top-2.hidden.h-full.items-end.bg-linear-to-r.from-white button:hover,
+div.absolute.end-0.top-2.hidden.h-full.bg-linear-to-l.from-white button:hover {
+  background: var(--switch-glider-bg) !important;
+}
+
+/* === NEW: Project & Modal Glass Effects === */
+
+/* 3. Glass Effect for Project Header */
+/* Targeting the container that holds the project modal trigger */
+div.flex.justify-between.max-md\:flex-col.max-md\:gap-4:has([data-testid="project-modal-trigger"]) {
+  background: var(--switch-bg) !important;
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+  border: 1px solid var(--switch-border) !important;
+  box-shadow: var(--switch-shadow) !important;
+  border-radius: 12px !important;
+  padding: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+/* 4. Glass Effect for Dropdowns (Recently Used & Suggestions) */
+/* Apply Glass to the main container only */
+div[data-radix-popper-content-wrapper] > div[role="dialog"] {
+  background-color: var(--switch-bg) !important;
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+  border: 1px solid var(--switch-border) !important;
+  box-shadow: var(--switch-shadow) !important;
+  border-radius: 16px !important; /* Softer rounded corners */
+  overflow: hidden !important; /* Clip children */
+}
+
+/* Remove "boxy" layers from children */
+div[role="dialog"] ul[role="listbox"],
+div[role="dialog"] li[role="option"],
+div[role="dialog"] button[role="tab"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Add hover effect to list items instead */
+div[role="dialog"] li[role="option"]:hover {
+  background: var(--menu-item-hover) !important;
+}
+
+/* === NEW: Search Bar & Button Styling === */
+
+/* 5. Glass Effect for Search Input */
+/* We make the input itself transparent and apply the glass to the wrapper to avoid double-glass issues */
+input#search,
+input[name="search"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: var(--theme-text-primary) !important;
+}
+
+/* Apply glass to the wrapper */
+div.relative.z-10.grow div.rounded-md,
+div:has(> div > input#search) {
+  background: var(--switch-bg) !important;
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Override any specific solid backgrounds on the input's ancestors */
+div.bg-token-main-surface-primary:has(input#search) {
+  background-color: transparent !important;
+}
+
+/* 6. Glass Effect for "See More" Button */
+button.btn.relative.btn-secondary.w-full {
+  background: var(--switch-bg) !important;
+  border: 1px solid var(--switch-border) !important;
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+}
+
+button.btn.relative.btn-secondary.w-full:hover {
+  background: var(--switch-glider-bg) !important;
+  opacity: 0.9;
+}
+
+/* === NEW: Sticky Tabs & Filters === */
+
+/* 7. Glass Effect for Sticky Search/Tabs Container */
+/* Outer sticky wrapper containing search and category tabs */
+div.bg-token-bg-primary.sticky.top-14.z-30 {
+  background: var(--switch-bg) !important;
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  /* Subtle separator instead of Box */
+  border-bottom: 1px solid var(--switch-border) !important;
+}
+
+/* Ensure the relative z-0 wrapper inside is also transparent */
+div.bg-token-bg-primary.sticky.top-14.z-30 > div.relative.z-0,
+div.bg-token-bg-primary.sticky.top-14.z-30 div.rounded-md {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Force the inner list container to be transparent to avoid double-boxing */
+div.bg-token-main-surface-primary.sticky.top-14.z-10 {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding-bottom: 0 !important;
+}
+
+/* 7b. Uniform Glass Pills for Filter Items */
+/* Target all filter items (both active tab-style and chips) and unify them */
+div.bg-token-main-surface-primary.sticky.top-14.z-10 div.cursor-pointer,
+div.bg-token-main-surface-primary.sticky.top-14.z-10 div.cursor-pointer.border-b-2 {
+  background: var(--switch-bg) !important;
+  border: 1px solid var(--switch-border) !important;
+  border-radius: 9999px !important; /* Force pill shape */
+  padding: 6px 16px !important;
+  margin-right: 6px !important;
+  backdrop-filter: blur(8px) !important;
+  color: var(--theme-text-primary) !important;
+  box-shadow: none !important;
+  
+  /* Reset specific tab styles */
+  border-bottom: 1px solid var(--switch-border) !important;
+}
+
+div.bg-token-main-surface-primary.sticky.top-14.z-10 div.cursor-pointer:hover {
+  background: var(--switch-glider-bg) !important;
+}
+
+/* Position the scroll arrow comfortably */
+/* Target BOTH start (left) and end (right) scroll arrows */
+div.bg-token-main-surface-primary.sticky.top-14.z-10 .absolute.end-0,
+div.bg-token-main-surface-primary.sticky.top-14.z-10 .absolute.start-0 {
+  background: transparent !important;
+  top: 0 !important; /* Align with top */
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  z-index: 50 !important; /* Force on top of list */
+}
+
+div.bg-token-main-surface-primary.sticky.top-14.z-10 .absolute.end-0 button,
+div.bg-token-main-surface-primary.sticky.top-14.z-10 .absolute.start-0 button {
+  background: var(--switch-bg) !important;
+  backdrop-filter: blur(4px) !important;
+  border: 1px solid var(--switch-border) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* === NEW: Cards & Grids === */
+
+/* 8. Glass Effect for GPT/Gizmo Cards */
+a.gizmo-link,
+a[class*="gizmo-link"],
+div.grid a.group {
+  background: var(--switch-bg) !important;
+  backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
+  border: 1px solid var(--switch-border) !important;
+  box-shadow: var(--switch-shadow) !important;
+  border-radius: 16px !important;
+  transition: background 0.2s ease, transform 0.2s ease !important;
+}
+
+a.gizmo-link:hover,
+a[class*="gizmo-link"]:hover,
+div.grid a.group:hover {
+  background: var(--switch-glider-bg) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Category tabs container background */
+div.bg-token-main-surface-primary.sticky.top-14.z-10 .no-scrollbar {
+  background: transparent !important;
+}
+
+div.bg-token-main-surface-primary.sticky.top-14.z-10 div[class*="cursor-pointer"]:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* === NEW: Deeper GPT Search Logic === */
+
+/* FIX: GPT Search Input Container - Glass Effect */
+/* Override the actual CSS variable used by the bg-token-main-surface-primary class */
+html.cgpt-ambient-on {
+  --token-main-surface-primary: transparent !important;
+  --main-surface-primary: transparent !important;
+}
+
+/* Target the container that has the label for search */
+html.cgpt-ambient-on div:has(> label[for="search"]),
+html.cgpt-ambient-on div.rounded-md:has(label[for="search"]),
+html.cgpt-ambient-on .rounded-md.border:has(#search) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
+}
+
+/* Target the search input directly by ID */
+html.cgpt-ambient-on input#search,
+html.cgpt-ambient-on input[role="combobox"][aria-label*="GPT"],
+html.cgpt-ambient-on input[aria-label*="Search"],
+html.cgpt-ambient-on input[aria-label*="Wyszukaj"] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Target container using parent structure */
+html.cgpt-ambient-on div:has(> div > input#search),
+html.cgpt-ambient-on div:has(> label[for="search"] + div > input#search) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
+}
+
+/* Target any element with bg-token-main-surface-primary class pattern */
+html.cgpt-ambient-on [class*="bg-token-main-surface-primary"] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Light mode adjustments for GPT search */
+html.cgpt-ambient-on.cgpt-light-mode div:has(> label[for="search"]),
+html.cgpt-ambient-on.cgpt-light-mode div.rounded-md:has(label[for="search"]),
+html.cgpt-ambient-on.cgpt-light-mode .rounded-md.border:has(#search) {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode input#search,
+html.cgpt-ambient-on.cgpt-light-mode [class*="bg-token-main-surface-primary"] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* FIX: GPT Search Dropdown/Popover - Glass Effect */
+/* Makes the GPT search results dropdown transparent/glass */
+
+/* Target the radix popover by role and data attributes */
+html.cgpt-ambient-on [role="dialog"][data-state="open"][class*="bg-token-main-surface"],
+html.cgpt-ambient-on div[id^="radix-"][role="dialog"],
+html.cgpt-ambient-on [class*="bg-token-main-surface-secondary"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+}
+
+/* Ensure nested elements with surface backgrounds are transparent */
+html.cgpt-ambient-on [role="dialog"][data-state="open"] [class*="bg-token-main-surface"],
+html.cgpt-ambient-on div[id^="radix-"] [class*="bg-token-main-surface"] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Style the listbox items hover state */
+html.cgpt-ambient-on [role="dialog"] li[role="option"]:hover,
+html.cgpt-ambient-on [role="dialog"] .dark\:hover\:bg-white\/10:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Light mode adjustments for dropdown */
+html.cgpt-ambient-on.cgpt-light-mode [role="dialog"][data-state="open"][class*="bg-token-main-surface"],
+html.cgpt-ambient-on.cgpt-light-mode div[id^="radix-"][role="dialog"],
+html.cgpt-ambient-on.cgpt-light-mode [class*="bg-token-main-surface-secondary"] {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html.cgpt-ambient-on.cgpt-light-mode [role="dialog"] li[role="option"]:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ========================================================================
+   CINEMA MODE - Full Width Chat Layout
+   ======================================================================== */
+html.cgpt-cinema-mode [class*="xl:max-w-"],
+html.cgpt-cinema-mode [class*="max-w-3xl"],
+html.cgpt-cinema-mode main [class*="max-w-"] {
+  max-width: 100% !important;
+}
+html.cgpt-cinema-mode .mx-auto[class*="max-w-"] {
+  max-width: 95vw !important;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+/* Ensure code blocks expand properly in Cinema Mode */
+html.cgpt-cinema-mode pre,
+html.cgpt-cinema-mode code {
+  max-width: 100% !important;
+}
+/* Keep composer at a reasonable max-width for usability */
+html.cgpt-cinema-mode form[data-type="unified-composer"] {
+  max-width: min(95vw, 1200px) !important;
+  margin-left: auto;
+  margin-right: auto;
+}

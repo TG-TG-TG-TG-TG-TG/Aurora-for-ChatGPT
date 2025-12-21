@@ -1,111 +1,581 @@
 {
-  "extensionName": { "message": "Aurora for ChatGPT" },
-  "extensionDescription": { "message": "ChatGPT界面下的环境模糊背景，带有聊天可见性切换和传统编辑器选项。与OpenAI无关联。" },
-  "actionTitle": { "message": "Aurora for ChatGPT — 设置" },
-  "buttonChooseFile": { "message": "使用本地文件" },
-  "popupTitle": { "message": "aurora for chatgpt 设置" },
-  "tabStyle": { "message": "样式" },
-  "tabAppearance": { "message": "外观" },
-  "tabInterface": { "message": "界面" },
-  "tabElements": { "message": "元素" },
-  "tabVoice": { "message": "语音" },
-  "tabBehavior": { "message": "行为" },
-  "tabVisibility": { "message": "可见性" },
-  "sectionBackground": { "message": "背景" },
-  "labelPreset": { "message": "预设" },
-  "placeholderBgUrl": { "message": "粘贴图片或视频URL" },
-  "buttonReset": { "message": "重置" },
-  "labelBlur": { "message": "模糊" },
-  "labelScaling": { "message": "缩放" },
-  "sectionAppearance": { "message": "外观" },
-  "labelTheme": { "message": "主题" },
-  "labelLegacyComposer": { "message": "传统编辑器" },
-  "tooltipLegacyComposer": { "message": "使用网站的标准编辑器样式" },
-  "sectionAnimations": { "message": "动画" },
-  "labelDisableBgAnimation": { "message": "禁用背景动画" },
-  "tooltipDisableBgAnimation": { "message": "使背景立即出现，无淡入效果。" },
-  "labelDisableAnimations": { "message": "禁用菜单动画" },
-  "tooltipDisableAnimations": { "message": "禁用菜单打开/关闭动画" },
-  "labelGlassStyle": { "message": "玻璃样式" },
-  "sectionInterface": { "message": "界面" },
-  "labelFocusMode": { "message": "专注模式" },
-  "tooltipFocusMode": { "message": "隐藏侧边栏和标题" },
-  "labelHideQuickSettings": { "message": "隐藏快速设置" },
-  "tooltipHideQuickSettings": { "message": "隐藏页面内设置图标" },
-  "labelShowInNewChatsOnly": { "message": "仅在新聊天中显示" },
-  "tooltipShowInNewChatsOnly": { "message": "背景在现有聊天中隐藏" },
-  "sectionVoiceUi": { "message": "语音界面" },
-  "labelVoiceColor": { "message": "颜色" },
-  "labelCuteVoice": { "message": "可爱界面（猫耳朵）" },
-  "tooltipCuteVoice": { "message": "为语音界面添加可爱的耳朵" },
-  "sectionHideElements": { "message": "隐藏元素" },
-  "labelHideGpt5Limit": { "message": "GPT-5限制消息" },
-  "tooltipHideGpt5Limit": { "message": "在GPT-5限制弹出窗口出现5分钟后隐藏它" },
-  "labelHideUpgradeButtons": { "message": "\"升级计划\"元素" },
-  "tooltipHideUpgradeButtons": { "message": "隐藏所有\"升级您的计划\"按钮和部分" },
-  "labelHideGptsButton": { "message": "\"探索GPTs\"按钮" },
-  "tooltipHideGptsButton": { "message": "隐藏侧边栏中的\"探索GPTs\"按钮" },
-  "labelHideSoraButton": { "message": "\"Sora\"按钮" },
-  "tooltipHideSoraButton": { "message": "隐藏侧边栏中的\"Sora\"按钮" },
-  "voiceColorOptionDefault": { "message": "默认（蓝色）" },
-  "voiceColorOptionOrange": { "message": "日落橙" },
-  "voiceColorOptionYellow": { "message": "太阳黄" },
-  "voiceColorOptionPink": { "message": "樱花粉" },
-  "voiceColorOptionGreen": { "message": "极光绿" },
-  "voiceColorOptionDark": { "message": "玛瑙黑" },
-  "bgPresetOptionDefault": { "message": "默认壁纸" },
-  "bgPresetOptionGpt5Animated": { "message": "动画渐变" },
-  "bgPresetOptionBlue": { "message": "蓝色壁纸" },
-  "bgPresetOptionGrokHorizon": { "message": "Grok地平线" },
-  "bgPresetOptionCustom": { "message": "自定义" },
-  "bgScalingOptionContain": { "message": "包含（适应）" },
-  "bgScalingOptionCover": { "message": "覆盖（填充）" },
-  "themeOptionAuto": { "message": "自动" },
-  "themeOptionLight": { "message": "浅色" },
-  "themeOptionDark": { "message": "深色" },
-  "glassAppearanceOptionDimmed": { "message": "变暗" },
-  "glassAppearanceOptionClear": { "message": "透明" },
-  "alertFileTooLarge": { "message": "文件太大！请选择小于$1MB的文件。" },
-  "statusLocalFileInUse": { "message": "正在使用本地文件" },
-  "statusAnimatedBackground": { "message": "动画背景已激活" },
-  "creditPrefix": { "message": "制作者" },
-  "creditSuffix": { "message": "在X上" },
-  "placeholderSearch": { "message": "搜索设置..." },
-  "tooltipClearSearch": { "message": "清除搜索" },
-  "noResults": { "message": "未找到设置" },
-  "quickSettingsButtonTitle": { "message": "快速设置" },
-  "quickSettingsSectionVisibility": { "message": "可见性" },
-  "quickSettingsSectionVoice": { "message": "语音界面" },
-  "quickSettingsLabelHideUpgradeButtons": { "message": "隐藏升级元素" },
-  "quickSettingsLabelHideGptsButton": { "message": "隐藏\"探索GPTs\"" },
-  "quickSettingsLabelDisableBgAnimation": { "message": "禁用背景动画" },
-  "quickSettingsLabelCuteVoice": { "message": "可爱界面（耳朵）" },
-  "quickSettingsLabelVoiceColor": { "message": "语音颜色" },
-  "quickSettingsLabelGlassStyle": { "message": "玻璃样式" },
-  "errorLoadingSettings": { "message": "错误：无法加载设置。请尝试重新加载页面。" },
-  "welcomeTooltipPreview": { "message": "预览主题" },
-  "welcomeTitle": { "message": "欢迎使用Aurora" },
-  "welcomeDescription": { "message": "一个美丽的、可定制的ChatGPT界面，旨在通过环境背景、玻璃效果等增强您的体验。" },
-  "welcomeBtnGetStarted": { "message": "开始使用" },
-  "welcomeTitleSetup": { "message": "选择您的外观" },
-  "welcomeDescriptionSetup": { "message": "选择背景和样式以个性化您的体验。您可以随时更改。" },
-  "welcomeLabelBgPreset": { "message": "背景预设" },
-  "welcomePresetDefault": { "message": "默认" },
-  "welcomePresetAnimated": { "message": "动画" },
-  "welcomePresetHorizon": { "message": "地平线" },
-  "welcomePresetBlue": { "message": "蓝色" },
-  "welcomeLabelGlassStyle": { "message": "玻璃样式" },
-  "welcomeGlassClear": { "message": "透明" },
-  "welcomeGlassDimmed": { "message": "变暗" },
-  "welcomeBtnFinish": { "message": "完成设置" },
-  "welcomeBtnNext": { "message": "下一步" },
-  "welcomeLabelVoice": { "message": "语音自定义" },
-  "welcomeBtnListen": { "message": "收听语音" },
-  "labelDefaultModel": { "message": "默认模型" },
-  "tooltipDefaultModel": { "message": "在新聊天中自动选择模型。可能不适用于所有模型或A/B测试。" },
-  "placeholderDefaultModel": { "message": "输入自定义模型slug（例如gpt-4-turbo）" },
-  "defaultModelOptionNone": { "message": "无（已禁用）" },
-  "defaultModelOptionCustom": { "message": "自定义..." },
-  "defaultModelOptionCustomLabel": { "message": "自定义" }
+  "extensionName": {
+    "message": "Aurora for ChatGPT"
+  },
+  "extensionDescription": {
+    "message": "ChatGPT界面下的环境模糊背景，带有聊天可见性切换和传统编辑器选项。与OpenAI无关联。"
+  },
+  "actionTitle": {
+    "message": "Aurora for ChatGPT — 设置"
+  },
+  "buttonChooseFile": {
+    "message": "使用本地文件"
+  },
+  "popupTitle": {
+    "message": "aurora for chatgpt 设置"
+  },
+  "tabStyle": {
+    "message": "样式"
+  },
+  "tabAppearance": {
+    "message": "外观"
+  },
+  "tabInterface": {
+    "message": "界面"
+  },
+  "tabElements": {
+    "message": "元素"
+  },
+  "tabVoice": {
+    "message": "语音"
+  },
+  "tabBehavior": {
+    "message": "行为"
+  },
+  "tabVisibility": {
+    "message": "可见性"
+  },
+  "sectionBackground": {
+    "message": "背景"
+  },
+  "labelPreset": {
+    "message": "预设"
+  },
+  "placeholderBgUrl": {
+    "message": "粘贴图片或视频URL"
+  },
+  "buttonReset": {
+    "message": "重置"
+  },
+  "labelBlur": {
+    "message": "模糊"
+  },
+  "labelScaling": {
+    "message": "缩放"
+  },
+  "sectionAppearance": {
+    "message": "外观"
+  },
+  "labelTheme": {
+    "message": "主题"
+  },
+  "labelLegacyComposer": {
+    "message": "传统编辑器"
+  },
+  "tooltipLegacyComposer": {
+    "message": "使用网站的标准编辑器样式"
+  },
+  "sectionHolidayEffects": {
+    "message": "节日特效"
+  },
+  "labelSnowfall": {
+    "message": "下雪吧"
+  },
+  "tooltipSnowfall": {
+    "message": "启用下雪动画"
+  },
+  "labelNewYear": {
+    "message": "新年 '26"
+  },
+  "tooltipNewYear": {
+    "message": "启用新年彩灯串"
+  },
+  "labelHolidayMode": {
+    "message": "节日模式"
+  },
+  "tooltipHolidayMode": {
+    "message": "雪花、彩灯和节日背景"
+  },
+  "labelCinemaMode": {
+    "message": "影院模式"
+  },
+  "tooltipCinemaMode": {
+    "message": "全宽聊天，更好地查看代码"
+  },
+  "sectionAnimations": {
+    "message": "动画"
+  },
+  "labelDisableBgAnimation": {
+    "message": "禁用背景动画"
+  },
+  "tooltipDisableBgAnimation": {
+    "message": "使背景立即出现，无淡入效果。"
+  },
+  "labelDisableAnimations": {
+    "message": "禁用菜单动画"
+  },
+  "tooltipDisableAnimations": {
+    "message": "禁用菜单打开/关闭动画"
+  },
+  "labelGlassStyle": {
+    "message": "玻璃样式"
+  },
+  "sectionInterface": {
+    "message": "界面"
+  },
+  "labelFocusMode": {
+    "message": "专注模式"
+  },
+  "tooltipFocusMode": {
+    "message": "隐藏侧边栏和标题"
+  },
+  "labelHideQuickSettings": {
+    "message": "隐藏快速设置"
+  },
+  "tooltipHideQuickSettings": {
+    "message": "隐藏页面内设置图标"
+  },
+  "labelShowInNewChatsOnly": {
+    "message": "仅在新聊天中显示"
+  },
+  "tooltipShowInNewChatsOnly": {
+    "message": "背景在现有聊天中隐藏"
+  },
+  "sectionVoiceUi": {
+    "message": "语音界面"
+  },
+  "labelVoiceColor": {
+    "message": "颜色"
+  },
+  "labelCuteVoice": {
+    "message": "可爱界面（猫耳朵）"
+  },
+  "tooltipCuteVoice": {
+    "message": "为语音界面添加可爱的耳朵"
+  },
+  "sectionHideElements": {
+    "message": "隐藏元素"
+  },
+  "labelHideGpt5Limit": {
+    "message": "GPT-5限制消息"
+  },
+  "tooltipHideGpt5Limit": {
+    "message": "在GPT-5限制弹出窗口出现5分钟后隐藏它"
+  },
+  "labelHideUpgradeButtons": {
+    "message": "\"升级计划\"元素"
+  },
+  "tooltipHideUpgradeButtons": {
+    "message": "隐藏所有\"升级您的计划\"按钮和部分"
+  },
+  "labelHideGptsButton": {
+    "message": "\"探索GPTs\"按钮"
+  },
+  "tooltipHideGptsButton": {
+    "message": "隐藏侧边栏中的\"探索GPTs\"按钮"
+  },
+  "labelHideSoraButton": {
+    "message": "\"Sora\"按钮"
+  },
+  "tooltipHideSoraButton": {
+    "message": "隐藏侧边栏中的\"Sora\"按钮"
+  },
+  "voiceColorOptionDefault": {
+    "message": "默认（蓝色）"
+  },
+  "voiceColorOptionOrange": {
+    "message": "日落橙"
+  },
+  "voiceColorOptionYellow": {
+    "message": "太阳黄"
+  },
+  "voiceColorOptionPink": {
+    "message": "樱花粉"
+  },
+  "voiceColorOptionGreen": {
+    "message": "极光绿"
+  },
+  "voiceColorOptionDark": {
+    "message": "玛瑙黑"
+  },
+  "bgPresetOptionDefault": {
+    "message": "默认壁纸"
+  },
+  "bgPresetOptionGpt5Animated": {
+    "message": "动画渐变"
+  },
+  "bgPresetOptionBlue": {
+    "message": "蓝色壁纸"
+  },
+  "bgPresetOptionGrokHorizon": {
+    "message": "Grok地平线"
+  },
+  "bgPresetOptionChristmas": {
+    "message": "🎄 圣诞"
+  },
+  "bgPresetOptionCustom": {
+    "message": "自定义"
+  },
+  "bgScalingOptionContain": {
+    "message": "包含（适应）"
+  },
+  "bgScalingOptionCover": {
+    "message": "覆盖（填充）"
+  },
+  "themeOptionAuto": {
+    "message": "自动"
+  },
+  "themeOptionLight": {
+    "message": "浅色"
+  },
+  "themeOptionDark": {
+    "message": "深色"
+  },
+  "glassAppearanceOptionDimmed": {
+    "message": "变暗"
+  },
+  "glassAppearanceOptionClear": {
+    "message": "透明"
+  },
+  "alertFileTooLarge": {
+    "message": "文件太大！请选择小于$1MB的文件。"
+  },
+  "statusLocalFileInUse": {
+    "message": "正在使用本地文件"
+  },
+  "statusAnimatedBackground": {
+    "message": "动画背景已激活"
+  },
+  "creditPrefix": {
+    "message": "制作者"
+  },
+  "creditSuffix": {
+    "message": "在X上"
+  },
+  "placeholderSearch": {
+    "message": "搜索设置..."
+  },
+  "tooltipClearSearch": {
+    "message": "清除搜索"
+  },
+  "noResults": {
+    "message": "未找到设置"
+  },
+  "quickSettingsButtonTitle": {
+    "message": "快速设置"
+  },
+  "quickSettingsSectionVisibility": {
+    "message": "可见性"
+  },
+  "quickSettingsSectionVoice": {
+    "message": "语音界面"
+  },
+  "quickSettingsLabelHideUpgradeButtons": {
+    "message": "隐藏升级元素"
+  },
+  "quickSettingsLabelHideGptsButton": {
+    "message": "隐藏\"探索GPTs\""
+  },
+  "quickSettingsLabelDisableBgAnimation": {
+    "message": "禁用背景动画"
+  },
+  "quickSettingsLabelCuteVoice": {
+    "message": "可爱界面（耳朵）"
+  },
+  "quickSettingsLabelVoiceColor": {
+    "message": "语音颜色"
+  },
+  "quickSettingsLabelGlassStyle": {
+    "message": "玻璃样式"
+  },
+  "errorLoadingSettings": {
+    "message": "错误：无法加载设置。请尝试重新加载页面。"
+  },
+  "welcomeTooltipPreview": {
+    "message": "预览主题"
+  },
+  "welcomeTitle": {
+    "message": "节日快乐！🎄"
+  },
+  "welcomeDescription": {
+    "message": "Aurora祝您节日快乐。使用环境背景、玻璃效果和节日氛围来个性化您的ChatGPT。"
+  },
+  "welcomeBtnGetStarted": {
+    "message": "开始使用"
+  },
+  "welcomeTitleSetup": {
+    "message": "选择您的外观"
+  },
+  "welcomeDescriptionSetup": {
+    "message": "选择背景和样式以个性化您的体验。您可以随时更改。"
+  },
+  "welcomeLabelBgPreset": {
+    "message": "背景预设"
+  },
+  "welcomePresetDefault": {
+    "message": "默认"
+  },
+  "welcomePresetAnimated": {
+    "message": "动画"
+  },
+  "welcomePresetHorizon": {
+    "message": "地平线"
+  },
+  "welcomePresetBlue": {
+    "message": "蓝色"
+  },
+  "welcomeLabelGlassStyle": {
+    "message": "玻璃样式"
+  },
+  "welcomeGlassClear": {
+    "message": "透明"
+  },
+  "welcomeGlassDimmed": {
+    "message": "变暗"
+  },
+  "welcomeBtnFinish": {
+    "message": "完成设置"
+  },
+  "welcomeBtnNext": {
+    "message": "下一步"
+  },
+  "welcomeBtnSkip": {
+    "message": "暂时跳过"
+  },
+  "welcomeSupportTitle": {
+    "message": "支持 Aurora"
+  },
+  "welcomeSupportDescription": {
+    "message": "Aurora 是免费且开源的。如果您喜欢它，请考虑通过小额捐赠或在 GitHub 上给我们加星来支持开发！"
+  },
+  "welcomeSupportDonate": {
+    "message": "请我喝咖啡"
+  },
+  "welcomeSupportStar": {
+    "message": "在 GitHub 上加星"
+  },
+  "welcomeLabelVoice": {
+    "message": "语音自定义"
+  },
+  "welcomeBtnListen": {
+    "message": "收听语音"
+  },
+  "labelDefaultModel": {
+    "message": "默认模型"
+  },
+  "tooltipDefaultModel": {
+    "message": "在新聊天中自动选择模型。可能不适用于所有模型或A/B测试。"
+  },
+  "placeholderDefaultModel": {
+    "message": "输入自定义模型slug（例如gpt-4-turbo）"
+  },
+  "defaultModelOptionNone": {
+    "message": "无（已禁用）"
+  },
+  "defaultModelOptionCustom": {
+    "message": "自定义..."
+  },
+  "defaultModelOptionCustomLabel": {
+    "message": "自定义"
+  },
+  "labelCustomFont": {
+    "message": "自定义字体"
+  },
+  "tooltipCustomFont": {
+    "message": "为ChatGPT界面选择字体"
+  },
+  "fontOptionSystem": {
+    "message": "系统默认"
+  },
+  "fontOptionInter": {
+    "message": "Inter"
+  },
+  "fontOptionRoboto": {
+    "message": "Roboto"
+  },
+  "fontOptionMontserrat": {
+    "message": "Montserrat"
+  },
+  "fontOptionOpenSans": {
+    "message": "Open Sans"
+  },
+  "fontOptionPoppins": {
+    "message": "Poppins"
+  },
+  "labelShowTokenCounter": {
+    "message": "显示令牌/字数统计"
+  },
+  "tooltipShowTokenCounter": {
+    "message": "显示消息中字数和估计令牌数的计数器"
+  },
+  "tokenCounterWords": {
+    "message": "字"
+  },
+  "tokenCounterTokens": {
+    "message": "~令牌"
+  },
+  "tokenCounterInput": {
+    "message": "输入"
+  },
+  "tokenCounterResponse": {
+    "message": "回复"
+  },
+  "labelAutoScroll": {
+    "message": "自动滚动"
+  },
+  "tooltipAutoScroll": {
+    "message": "当ChatGPT写长回复时自动滚动到底部"
+  },
+  "autoScrollEnabled": {
+    "message": "自动滚动已启用"
+  },
+  "autoScrollDisabled": {
+    "message": "自动滚动已禁用"
+  },
+  "labelBlurChatHistory": {
+    "message": "模糊聊天历史（主播模式）"
+  },
+  "tooltipBlurChatHistory": {
+    "message": "在流式传输或录制时模糊聊天历史侧边栏以保护隐私"
+  },
+  "labelBlurAvatar": {
+    "message": "模糊用户头像"
+  },
+  "tooltipBlurAvatar": {
+    "message": "模糊您的个人资料图片以保护隐私"
+  },
+  "quickSettingsLabelStreamerMode": {
+    "message": "主播模式"
+  },
+  "labelExportChat": {
+    "message": "导出聊天为PNG"
+  },
+  "tooltipExportChat": {
+    "message": "将当前聊天导出为精美样式的PNG图像"
+  },
+  "exportChatButton": {
+    "message": "导出聊天"
+  },
+  "exportDialogTitle": {
+    "message": "导出聊天为PNG"
+  },
+  "exportDialogDescription": {
+    "message": "选择要导出的内容："
+  },
+  "exportOptionEntireChat": {
+    "message": "整个聊天"
+  },
+  "exportOptionVisibleMessages": {
+    "message": "仅可见消息"
+  },
+  "exportOptionCustomRange": {
+    "message": "自定义范围"
+  },
+  "exportButtonExport": {
+    "message": "导出"
+  },
+  "exportButtonCancel": {
+    "message": "取消"
+  },
+  "exportingProgress": {
+    "message": "导出中..."
+  },
+  "exportComplete": {
+    "message": "导出完成！"
+  },
+  "exportError": {
+    "message": "导出失败。请重试。"
+  },
+  "sectionImportExport": {
+    "message": "导入/导出设置"
+  },
+  "buttonExportSettings": {
+    "message": "导出设置"
+  },
+  "buttonImportSettings": {
+    "message": "导入设置"
+  },
+  "alertSettingsExported": {
+    "message": "设置已复制到剪贴板！"
+  },
+  "alertSettingsImported": {
+    "message": "设置导入成功！"
+  },
+  "alertInvalidJson": {
+    "message": "无效的JSON格式"
+  },
+  "sectionAudio": {
+    "message": "音频"
+  },
+  "labelHapticSound": {
+    "message": "界面音效"
+  },
+  "tooltipHapticSound": {
+    "message": "交互时播放微妙的玻璃音效"
+  },
+  "labelAutoContrast": {
+    "message": "自动对比度（图片）"
+  },
+  "tooltipAutoContrast": {
+    "message": "根据背景亮度自动调整叠加层暗度"
+  },
+  "labelSmartSelectors": {
+    "message": "智能选择器修复"
+  },
+  "tooltipSmartSelectors": {
+    "message": "如果ChatGPT更新，自动查找元素"
+  },
+  "feedbackLink": {
+    "message": "有反馈或发现了bug？"
+  },
+  "feedbackPlaceholder": {
+    "message": "告诉我们您的想法..."
+  },
+  "feedbackSend": {
+    "message": "发送反馈"
+  },
+  "feedbackSuccess": {
+    "message": "反馈已发送！谢谢。"
+  },
+  "feedbackError": {
+    "message": "发送失败。请重试。"
+  },
+  "feedbackSending": {
+    "message": "发送中..."
+  },
+  "feedbackReportSent": {
+    "message": "报告已发送！"
+  },
+  "feedbackQueuedMessage": {
+    "message": "您的反馈已排队。"
+  },
+  "feedbackYourTicketId": {
+    "message": "您的工单 ID"
+  },
+  "feedbackCopyIdTooltip": {
+    "message": "复制 ID"
+  },
+  "feedbackCopied": {
+    "message": "已复制！"
+  },
+  "feedbackPrioritizeTitle": {
+    "message": "想要优先处理？"
+  },
+  "feedbackDonatePre": {
+    "message": "捐赠以支持开发并附上您的 "
+  },
+  "feedbackDonatePost": {
+    "message": " 以加速此请求。"
+  },
+  "feedbackSupportKofi": {
+    "message": "☕ 在 Ko-fi 上支持"
+  },
+  "feedbackClose": {
+    "message": "不用了，关闭"
+  },
+  "ticketIdLabel": {
+    "message": "工单 ID"
+  },
+  "feedbackServerError": {
+    "message": "服务器错误"
+  },
+  "buttonCopied": {
+    "message": "✓ 已复制！"
+  },
+  "buttonImported": {
+    "message": "✓ 已导入！"
+  },
+  "sectionStreamerMode": {
+    "message": "主播模式"
+  }
 }
-

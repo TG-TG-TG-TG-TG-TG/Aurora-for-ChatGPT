@@ -1,0 +1,396 @@
+/* === Aurora Extension - New Features CSS === */
+
+/* Custom Fonts Support */
+html.cgpt-ambient-on[data-custom-font="inter"] * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+html.cgpt-ambient-on[data-custom-font="roboto"] * {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+html.cgpt-ambient-on[data-custom-font="montserrat"] * {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+html.cgpt-ambient-on[data-custom-font="opensans"] * {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+html.cgpt-ambient-on[data-custom-font="poppins"] * {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* Google Fonts imported in styles.css - do not duplicate here */
+
+/* ===== STREAMER MODE - IMPROVED BLUR EFFECTS ===== */
+
+/* Blur chat history - sidebar will be blurred by default */
+html.cgpt-ambient-on.cgpt-blur-chat-history .flex-shrink-0[class*="bg-token-sidebar-surface-primary"] nav,
+html.cgpt-ambient-on.cgpt-blur-chat-history #stage-slideover-sidebar nav {
+    filter: blur(12px);
+    transition: filter 0.2s ease;
+}
+
+/* Remove blur completely when hovering over sidebar */
+html.cgpt-ambient-on.cgpt-blur-chat-history .flex-shrink-0[class*="bg-token-sidebar-surface-primary"]:hover nav,
+html.cgpt-ambient-on.cgpt-blur-chat-history #stage-slideover-sidebar:hover nav {
+    filter: blur(0px);
+}
+
+/* Spotlight effect - show only area under cursor (advanced implementation) */
+html.cgpt-ambient-on.cgpt-blur-chat-history .flex-shrink-0[class*="bg-token-sidebar-surface-primary"] nav>*,
+html.cgpt-ambient-on.cgpt-blur-chat-history #stage-slideover-sidebar nav>* {
+    position: relative;
+}
+
+/* Blur individual chat items */
+html.cgpt-ambient-on.cgpt-blur-chat-history nav a,
+html.cgpt-ambient-on.cgpt-blur-chat-history nav [role="listitem"],
+html.cgpt-ambient-on.cgpt-blur-chat-history nav li {
+    filter: blur(8px);
+    transition: filter 0.15s ease;
+}
+
+/* Clear blur on hover for individual items */
+html.cgpt-ambient-on.cgpt-blur-chat-history nav a:hover,
+html.cgpt-ambient-on.cgpt-blur-chat-history nav li:hover,
+html.cgpt-ambient-on.cgpt-blur-chat-history nav [role="listitem"]:hover {
+    filter: blur(0px) !important;
+}
+
+/* Blur Avatar */
+html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"] img,
+html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"] [class*="avatar"],
+html.cgpt-ambient-on.cgpt-blur-avatar [class*="profile"] img,
+html.cgpt-ambient-on.cgpt-blur-chat-history [data-testid="accounts-profile-button"] img,
+html.cgpt-ambient-on.cgpt-blur-chat-history [data-testid="accounts-profile-button"] [class*="avatar"],
+html.cgpt-ambient-on.cgpt-blur-chat-history [class*="profile"] img {
+    filter: blur(12px);
+    transition: filter 0.3s ease;
+}
+
+html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"]:hover img,
+html.cgpt-ambient-on.cgpt-blur-avatar [data-testid="accounts-profile-button"]:hover [class*="avatar"],
+html.cgpt-ambient-on.cgpt-blur-chat-history [data-testid="accounts-profile-button"]:hover img,
+html.cgpt-ambient-on.cgpt-blur-chat-history [data-testid="accounts-profile-button"]:hover [class*="avatar"] {
+    filter: blur(0px);
+}
+
+/* ===== TOKEN/WORD COUNTER ===== */
+#aurora-token-counter {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    z-index: 99996;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--composer-bg);
+    border: 1px solid var(--composer-border);
+    box-shadow: var(--composer-shadow);
+    -webkit-backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--composer-blur)) saturate(var(--glass-saturate));
+    color: var(--theme-text-primary);
+    font-size: 12px;
+    font-weight: 500;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.token-counter-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#aurora-token-counter.visible {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+html.cgpt-light-mode #aurora-token-counter {
+    background: rgba(242, 242, 247, 0.85);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #000;
+}
+
+html.cgpt-appearance-clear #aurora-token-counter {
+    background: var(--clear-bg);
+    border: 1px solid var(--clear-border);
+    box-shadow: inset 0 0 2px 0 var(--clear-glow), var(--clear-shadow);
+    -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+    backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate));
+}
+
+.token-counter-label {
+    opacity: 0.7;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.token-counter-value {
+    font-weight: 600;
+    font-size: 13px;
+    color: #4f8cff;
+}
+
+html.cgpt-light-mode .token-counter-value {
+    color: #3b7ce8;
+}
+
+.token-counter-separator {
+    width: 1px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+html.cgpt-light-mode .token-counter-separator {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* ===== TOKEN BUDGET BAR ===== */
+.token-budget-bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.token-budget-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+html.cgpt-light-mode .token-budget-bar {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.token-budget-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.token-budget-fill.has-usage {
+    min-width: 6px;
+}
+
+/* Animated gradient effect */
+.token-budget-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+/* Color states for budget bar */
+.token-budget-fill.normal {
+    background: linear-gradient(90deg, #4f8cff 0%, #3b7ce8 100%);
+}
+
+.token-budget-fill.warning {
+    background: linear-gradient(90deg, #ff9500 0%, #ff7700 100%);
+}
+
+.token-budget-fill.critical {
+    background: linear-gradient(90deg, #ff453a 0%, #ff3b30 100%);
+}
+
+html.cgpt-light-mode .token-budget-fill.normal {
+    background: linear-gradient(90deg, #007aff 0%, #0051d5 100%);
+}
+
+html.cgpt-light-mode .token-budget-fill.warning {
+    background: linear-gradient(90deg, #ff9500 0%, #e68000 100%);
+}
+
+html.cgpt-light-mode .token-budget-fill.critical {
+    background: linear-gradient(90deg, #ff3b30 0%, #d70015 100%);
+}
+
+.token-budget-text {
+    font-size: 10px;
+    opacity: 0.8;
+    text-align: center;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+/* ===== HOLIDAY EFFECTS (GPU-Optimized) ===== */
+
+/* 1. Snowfall Animation - GPU Accelerated */
+.aurora-snow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity 0.8s ease-out;
+    contain: strict; /* Isolate from layout recalculations */
+}
+
+.aurora-snow-container.exiting {
+    opacity: 0;
+}
+
+/* Pause animations when tab is hidden or animations disabled */
+html.cgpt-tab-hidden .aurora-snow-container,
+html.cgpt-no-animations .aurora-snow-container {
+    animation-play-state: paused !important;
+}
+
+html.cgpt-tab-hidden .aurora-snowflake,
+html.cgpt-no-animations .aurora-snowflake {
+    animation-play-state: paused !important;
+}
+
+.aurora-snowflake {
+    position: absolute;
+    top: -10px;
+    background: white;
+    border-radius: 50%;
+    /* GPU acceleration hints */
+    will-change: transform;
+    transform: translateZ(0); /* Force GPU layer */
+    backface-visibility: hidden;
+    animation: aurora-snow-fall linear infinite;
+    /* Contain each snowflake */
+    contain: layout style;
+}
+
+/* Optimized keyframes: pure transform, no opacity mid-animation for less repaints */
+@keyframes aurora-snow-fall {
+    0% { 
+        transform: translate3d(0, -10vh, 0);
+        opacity: 0;
+    }
+    5% {
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% { 
+        transform: translate3d(15px, 110vh, 0);
+        opacity: 0;
+    }
+}
+
+/* 1b. Santa Hat on OpenAI Home icon (snow toggle) */
+html.cgpt-snow-on a[data-sidebar-item="true"][href="/"]:has(svg use[href$="#55180d"]) {
+    position: relative;
+    overflow: visible;
+}
+
+html.cgpt-snow-on a[data-sidebar-item="true"][href="/"]:has(svg use[href$="#55180d"])::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 59%;
+    width: 24px;
+    height: 16px;
+    transform: translateX(-50%);
+    background-image: var(--aurora-santa-hat-image, none);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 2. New Year Garland (Lights) - GPU Accelerated */
+.aurora-garland-container {
+    position: fixed;
+    top: -10px; /* Hide top wire curve */
+    left: 0;
+    width: 100%;
+    height: 60px;
+    pointer-events: none;
+    z-index: 100002;
+    display: flex;
+    justify-content: space-between;
+    overflow: hidden;
+    white-space: nowrap;
+    contain: strict; /* Isolate from layout recalculations */
+}
+
+/* Pause garland when tab hidden or animations disabled */
+html.cgpt-tab-hidden .aurora-garland-container .aurora-bulb,
+html.cgpt-no-animations .aurora-garland-container .aurora-bulb {
+    animation-play-state: paused !important;
+}
+
+.aurora-garland-wire-segment {
+    position: relative;
+    flex: 1;
+    height: 20px;
+    border-bottom: 2px solid rgba(50, 50, 50, 0.8);
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    margin: 0 -5px; /* Overlap wires */
+    contain: layout style;
+}
+
+.aurora-bulb {
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%) translateZ(0); /* GPU layer */
+    width: 12px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--bulb-color, #ff0);
+    /* Optimized: smaller initial shadow, animated via opacity for less work */
+    box-shadow: 0 0 8px var(--bulb-color, #ff0);
+    will-change: opacity;
+    backface-visibility: hidden;
+    animation: aurora-bulb-flash 2s infinite alternate;
+    contain: layout style;
+}
+
+.aurora-bulb::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+}
+
+/* Optimized: animate only opacity, not box-shadow (very expensive) */
+@keyframes aurora-bulb-flash {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}

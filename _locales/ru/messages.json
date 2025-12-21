@@ -1,111 +1,623 @@
 {
-  "extensionName": { "message": "Aurora for ChatGPT" },
-  "extensionDescription": { "message": "Размытый фон под интерфейсом ChatGPT с переключателем видимости чата и опцией классического редактора. Не связано с OpenAI." },
-  "actionTitle": { "message": "Aurora for ChatGPT — Настройки" },
-  "buttonChooseFile": { "message": "Использовать локальный файл" },
-  "popupTitle": { "message": "настройки aurora для chatgpt" },
-  "tabStyle": { "message": "Стиль" },
-  "tabAppearance": { "message": "Внешний вид" },
-  "tabInterface": { "message": "Интерфейс" },
-  "tabElements": { "message": "Элементы" },
-  "tabVoice": { "message": "Голос" },
-  "tabBehavior": { "message": "Поведение" },
-  "tabVisibility": { "message": "Видимость" },
-  "sectionBackground": { "message": "Фон" },
-  "labelPreset": { "message": "Пресет" },
-  "placeholderBgUrl": { "message": "Вставьте URL изображения или видео" },
-  "buttonReset": { "message": "Сбросить" },
-  "labelBlur": { "message": "Размытие" },
-  "labelScaling": { "message": "Масштабирование" },
-  "sectionAppearance": { "message": "Внешний вид" },
-  "labelTheme": { "message": "Тема" },
-  "labelLegacyComposer": { "message": "Классический редактор" },
-  "tooltipLegacyComposer": { "message": "Использовать стандартный стиль редактора сайта" },
-  "sectionAnimations": { "message": "Анимации" },
-  "labelDisableBgAnimation": { "message": "Отключить анимацию фона" },
-  "tooltipDisableBgAnimation": { "message": "Фон появляется мгновенно без эффекта плавного появления." },
-  "labelDisableAnimations": { "message": "Отключить анимации меню" },
-  "tooltipDisableAnimations": { "message": "Отключить анимации открытия/закрытия меню" },
-  "labelGlassStyle": { "message": "Стиль стекла" },
-  "sectionInterface": { "message": "Интерфейс" },
-  "labelFocusMode": { "message": "Режим фокусировки" },
-  "tooltipFocusMode": { "message": "Скрывает боковую панель и заголовок" },
-  "labelHideQuickSettings": { "message": "Скрыть быстрые настройки" },
-  "tooltipHideQuickSettings": { "message": "Скрывает значок настроек на странице" },
-  "labelShowInNewChatsOnly": { "message": "Показывать только в новых чатах" },
-  "tooltipShowInNewChatsOnly": { "message": "Фон скрыт в существующих чатах" },
-  "sectionVoiceUi": { "message": "Голосовой интерфейс" },
-  "labelVoiceColor": { "message": "Цвет" },
-  "labelCuteVoice": { "message": "Милый интерфейс (Кошачьи ушки)" },
-  "tooltipCuteVoice": { "message": "Добавляет милые ушки в голосовой интерфейс" },
-  "sectionHideElements": { "message": "Скрыть элементы" },
-  "labelHideGpt5Limit": { "message": "Сообщение о лимите GPT-5" },
-  "tooltipHideGpt5Limit": { "message": "Скрывает всплывающее окно о лимите GPT-5 через 5 минут после появления" },
-  "labelHideUpgradeButtons": { "message": "Элементы \"Улучшить план\"" },
-  "tooltipHideUpgradeButtons": { "message": "Скрыть все кнопки и разделы \"Улучшить ваш план\"" },
-  "labelHideGptsButton": { "message": "Кнопка \"Обзор GPTs\"" },
-  "tooltipHideGptsButton": { "message": "Скрыть кнопку \"Обзор GPTs\" в боковой панели" },
-  "labelHideSoraButton": { "message": "Кнопка \"Sora\"" },
-  "tooltipHideSoraButton": { "message": "Скрыть кнопку \"Sora\" в боковой панели" },
-  "voiceColorOptionDefault": { "message": "По умолчанию (Синий)" },
-  "voiceColorOptionOrange": { "message": "Закатный оранжевый" },
-  "voiceColorOptionYellow": { "message": "Солнечный жёлтый" },
-  "voiceColorOptionPink": { "message": "Розовая сакура" },
-  "voiceColorOptionGreen": { "message": "Зелёная аврора" },
-  "voiceColorOptionDark": { "message": "Тёмный оникс" },
-  "bgPresetOptionDefault": { "message": "Обои по умолчанию" },
-  "bgPresetOptionGpt5Animated": { "message": "Анимированный градиент" },
-  "bgPresetOptionBlue": { "message": "Синие обои" },
-  "bgPresetOptionGrokHorizon": { "message": "Горизонт Grok" },
-  "bgPresetOptionCustom": { "message": "Пользовательский" },
-  "bgScalingOptionContain": { "message": "Вписать" },
-  "bgScalingOptionCover": { "message": "Заполнить" },
-  "themeOptionAuto": { "message": "Авто" },
-  "themeOptionLight": { "message": "Светлая" },
-  "themeOptionDark": { "message": "Тёмная" },
-  "glassAppearanceOptionDimmed": { "message": "Затемнённый" },
-  "glassAppearanceOptionClear": { "message": "Прозрачный" },
-  "alertFileTooLarge": { "message": "Файл слишком большой! Пожалуйста, выберите файл размером менее $1 МБ." },
-  "statusLocalFileInUse": { "message": "Используется локальный файл" },
-  "statusAnimatedBackground": { "message": "Анимированный фон активен" },
-  "creditPrefix": { "message": "Создано" },
-  "creditSuffix": { "message": "в X" },
-  "placeholderSearch": { "message": "Поиск настроек..." },
-  "tooltipClearSearch": { "message": "Очистить поиск" },
-  "noResults": { "message": "Настройки не найдены" },
-  "quickSettingsButtonTitle": { "message": "Быстрые настройки" },
-  "quickSettingsSectionVisibility": { "message": "Видимость" },
-  "quickSettingsSectionVoice": { "message": "Голосовой интерфейс" },
-  "quickSettingsLabelHideUpgradeButtons": { "message": "Скрыть элементы улучшения" },
-  "quickSettingsLabelHideGptsButton": { "message": "Скрыть \"Обзор GPTs\"" },
-  "quickSettingsLabelDisableBgAnimation": { "message": "Отключить анимацию фона" },
-  "quickSettingsLabelCuteVoice": { "message": "Милый интерфейс (Ушки)" },
-  "quickSettingsLabelVoiceColor": { "message": "Цвет голоса" },
-  "quickSettingsLabelGlassStyle": { "message": "Стиль стекла" },
-  "errorLoadingSettings": { "message": "Ошибка: Не удалось загрузить настройки. Пожалуйста, попробуйте перезагрузить страницу." },
-  "welcomeTooltipPreview": { "message": "Предпросмотр темы" },
-  "welcomeTitle": { "message": "Добро пожаловать в Aurora" },
-  "welcomeDescription": { "message": "Красивый настраиваемый интерфейс для ChatGPT, разработанный для улучшения вашего опыта с фоновыми изображениями, эффектами стекла и многим другим." },
-  "welcomeBtnGetStarted": { "message": "Начать" },
-  "welcomeTitleSetup": { "message": "Выберите свой стиль" },
-  "welcomeDescriptionSetup": { "message": "Выберите фон и стиль для персонализации вашего опыта. Вы всегда можете изменить это позже." },
-  "welcomeLabelBgPreset": { "message": "Пресет фона" },
-  "welcomePresetDefault": { "message": "По умолчанию" },
-  "welcomePresetAnimated": { "message": "Анимированный" },
-  "welcomePresetHorizon": { "message": "Горизонт" },
-  "welcomePresetBlue": { "message": "Синий" },
-  "welcomeLabelGlassStyle": { "message": "Стиль стекла" },
-  "welcomeGlassClear": { "message": "Прозрачный" },
-  "welcomeGlassDimmed": { "message": "Затемнённый" },
-  "welcomeBtnFinish": { "message": "Завершить настройку" },
-  "welcomeBtnNext": { "message": "Далее" },
-  "welcomeLabelVoice": { "message": "Настройка голоса" },
-  "welcomeBtnListen": { "message": "Послушать голоса" },
-  "labelDefaultModel": { "message": "Модель по умолчанию" },
-  "tooltipDefaultModel": { "message": "Автоматически выбирать модель в новых чатах. Может не работать со всеми моделями или A/B тестами." },
-  "placeholderDefaultModel": { "message": "Введите slug модели (например, gpt-4-turbo)" },
-  "defaultModelOptionNone": { "message": "Нет (Отключено)" },
-  "defaultModelOptionCustom": { "message": "Пользовательская..." },
-  "defaultModelOptionCustomLabel": { "message": "Пользовательская" }
+  "extensionName": {
+    "message": "Aurora for ChatGPT"
+  },
+  "extensionDescription": {
+    "message": "Размытый фон под интерфейсом ChatGPT с переключателем видимости чата и опцией классического редактора. Не связано с OpenAI."
+  },
+  "actionTitle": {
+    "message": "Aurora for ChatGPT — Настройки"
+  },
+  "buttonChooseFile": {
+    "message": "Использовать локальный файл"
+  },
+  "popupTitle": {
+    "message": "настройки aurora для chatgpt"
+  },
+  "tabStyle": {
+    "message": "Стиль"
+  },
+  "tabAppearance": {
+    "message": "Внешний вид"
+  },
+  "tabInterface": {
+    "message": "Интерфейс"
+  },
+  "tabElements": {
+    "message": "Элементы"
+  },
+  "tabVoice": {
+    "message": "Голос"
+  },
+  "tabBehavior": {
+    "message": "Поведение"
+  },
+  "tabVisibility": {
+    "message": "Видимость"
+  },
+  "sectionBackground": {
+    "message": "Фон"
+  },
+  "labelPreset": {
+    "message": "Пресет"
+  },
+  "placeholderBgUrl": {
+    "message": "Вставьте URL изображения или видео"
+  },
+  "buttonReset": {
+    "message": "Сбросить"
+  },
+  "labelBlur": {
+    "message": "Размытие"
+  },
+  "labelScaling": {
+    "message": "Масштабирование"
+  },
+  "sectionAppearance": {
+    "message": "Внешний вид"
+  },
+  "labelTheme": {
+    "message": "Тема"
+  },
+  "labelLegacyComposer": {
+    "message": "Классический редактор"
+  },
+  "tooltipLegacyComposer": {
+    "message": "Использовать стандартный стиль редактора сайта"
+  },
+  "sectionHolidayEffects": {
+    "message": "Праздничные эффекты"
+  },
+  "labelSnowfall": {
+    "message": "Снегопад"
+  },
+  "tooltipSnowfall": {
+    "message": "Включить анимацию снегопада"
+  },
+  "labelNewYear": {
+    "message": "Новый год '26"
+  },
+  "tooltipNewYear": {
+    "message": "Включить новогоднюю гирлянду"
+  },
+  "labelHolidayMode": {
+    "message": "Праздничный режим"
+  },
+  "tooltipHolidayMode": {
+    "message": "Снег, огни и праздничный фон"
+  },
+  "labelCinemaMode": {
+    "message": "Режим кино"
+  },
+  "tooltipCinemaMode": {
+    "message": "Чат на всю ширину для удобного просмотра кода"
+  },
+  "sectionAnimations": {
+    "message": "Анимации"
+  },
+  "labelDisableBgAnimation": {
+    "message": "Отключить анимацию фона"
+  },
+  "tooltipDisableBgAnimation": {
+    "message": "Фон появляется мгновенно без эффекта плавного появления."
+  },
+  "labelDisableAnimations": {
+    "message": "Отключить анимации меню"
+  },
+  "tooltipDisableAnimations": {
+    "message": "Отключить анимации открытия/закрытия меню"
+  },
+  "labelGlassStyle": {
+    "message": "Стиль стекла"
+  },
+  "sectionInterface": {
+    "message": "Интерфейс"
+  },
+  "labelFocusMode": {
+    "message": "Режим фокусировки"
+  },
+  "tooltipFocusMode": {
+    "message": "Скрывает боковую панель и заголовок"
+  },
+  "labelHideQuickSettings": {
+    "message": "Скрыть быстрые настройки"
+  },
+  "tooltipHideQuickSettings": {
+    "message": "Скрывает значок настроек на странице"
+  },
+  "labelShowInNewChatsOnly": {
+    "message": "Показывать только в новых чатах"
+  },
+  "tooltipShowInNewChatsOnly": {
+    "message": "Фон скрыт в существующих чатах"
+  },
+  "sectionVoiceUi": {
+    "message": "Голосовой интерфейс"
+  },
+  "labelVoiceColor": {
+    "message": "Цвет"
+  },
+  "labelCuteVoice": {
+    "message": "Милый интерфейс (Кошачьи ушки)"
+  },
+  "tooltipCuteVoice": {
+    "message": "Добавляет милые ушки в голосовой интерфейс"
+  },
+  "sectionHideElements": {
+    "message": "Скрыть элементы"
+  },
+  "labelHideGpt5Limit": {
+    "message": "Сообщение о лимите GPT-5"
+  },
+  "tooltipHideGpt5Limit": {
+    "message": "Скрывает всплывающее окно о лимите GPT-5 через 5 минут после появления"
+  },
+  "labelHideUpgradeButtons": {
+    "message": "Элементы \"Улучшить план\""
+  },
+  "tooltipHideUpgradeButtons": {
+    "message": "Скрыть все кнопки и разделы \"Улучшить ваш план\""
+  },
+  "labelHideGptsButton": {
+    "message": "Кнопка \"Обзор GPTs\""
+  },
+  "tooltipHideGptsButton": {
+    "message": "Скрыть кнопку \"Обзор GPTs\" в боковой панели"
+  },
+  "labelHideSoraButton": {
+    "message": "Кнопка \"Sora\""
+  },
+  "tooltipHideSoraButton": {
+    "message": "Скрыть кнопку \"Sora\" в боковой панели"
+  },
+  "voiceColorOptionDefault": {
+    "message": "По умолчанию (Синий)"
+  },
+  "voiceColorOptionOrange": {
+    "message": "Закатный оранжевый"
+  },
+  "voiceColorOptionYellow": {
+    "message": "Солнечный жёлтый"
+  },
+  "voiceColorOptionPink": {
+    "message": "Розовая сакура"
+  },
+  "voiceColorOptionGreen": {
+    "message": "Зелёная аврора"
+  },
+  "voiceColorOptionDark": {
+    "message": "Тёмный оникс"
+  },
+  "bgPresetOptionDefault": {
+    "message": "Обои по умолчанию"
+  },
+  "bgPresetOptionGpt5Animated": {
+    "message": "Анимированный градиент"
+  },
+  "bgPresetOptionBlue": {
+    "message": "Синие обои"
+  },
+  "bgPresetOptionGrokHorizon": {
+    "message": "Горизонт Grok"
+  },
+  "bgPresetOptionChristmas": {
+    "message": "🎄 Рождество"
+  },
+  "bgPresetOptionCustom": {
+    "message": "Пользовательский"
+  },
+  "bgScalingOptionContain": {
+    "message": "Вписать"
+  },
+  "bgScalingOptionCover": {
+    "message": "Заполнить"
+  },
+  "themeOptionAuto": {
+    "message": "Авто"
+  },
+  "themeOptionLight": {
+    "message": "Светлая"
+  },
+  "themeOptionDark": {
+    "message": "Тёмная"
+  },
+  "glassAppearanceOptionDimmed": {
+    "message": "Затемнённый"
+  },
+  "glassAppearanceOptionClear": {
+    "message": "Прозрачный"
+  },
+  "alertFileTooLarge": {
+    "message": "Файл слишком большой! Пожалуйста, выберите файл размером менее $1 МБ."
+  },
+  "statusLocalFileInUse": {
+    "message": "Используется локальный файл"
+  },
+  "statusAnimatedBackground": {
+    "message": "Анимированный фон активен"
+  },
+  "creditPrefix": {
+    "message": "Создано"
+  },
+  "creditSuffix": {
+    "message": "в X"
+  },
+  "placeholderSearch": {
+    "message": "Поиск настроек..."
+  },
+  "tooltipClearSearch": {
+    "message": "Очистить поиск"
+  },
+  "noResults": {
+    "message": "Настройки не найдены"
+  },
+  "quickSettingsButtonTitle": {
+    "message": "Быстрые настройки"
+  },
+  "quickSettingsSectionVisibility": {
+    "message": "Видимость"
+  },
+  "quickSettingsSectionVoice": {
+    "message": "Голосовой интерфейс"
+  },
+  "quickSettingsLabelHideUpgradeButtons": {
+    "message": "Скрыть элементы улучшения"
+  },
+  "quickSettingsLabelHideGptsButton": {
+    "message": "Скрыть \"Обзор GPTs\""
+  },
+  "quickSettingsLabelDisableBgAnimation": {
+    "message": "Отключить анимацию фона"
+  },
+  "quickSettingsLabelCuteVoice": {
+    "message": "Милый интерфейс (Ушки)"
+  },
+  "quickSettingsLabelVoiceColor": {
+    "message": "Цвет голоса"
+  },
+  "quickSettingsLabelGlassStyle": {
+    "message": "Стиль стекла"
+  },
+  "errorLoadingSettings": {
+    "message": "Ошибка: Не удалось загрузить настройки. Пожалуйста, попробуйте перезагрузить страницу."
+  },
+  "welcomeTooltipPreview": {
+    "message": "Предпросмотр темы"
+  },
+  "welcomeTitle": {
+    "message": "С Праздниками! 🎄"
+  },
+  "welcomeDescription": {
+    "message": "Aurora желает вам волшебного сезона. Настройте свой ChatGPT с фонами, эффектами стекла и праздничным настроением."
+  },
+  "welcomeBtnGetStarted": {
+    "message": "Начать"
+  },
+  "welcomeTitleSetup": {
+    "message": "Выберите свой стиль"
+  },
+  "welcomeDescriptionSetup": {
+    "message": "Выберите фон и стиль для персонализации вашего опыта. Вы всегда можете изменить это позже."
+  },
+  "welcomeLabelBgPreset": {
+    "message": "Пресет фона"
+  },
+  "welcomePresetDefault": {
+    "message": "По умолчанию"
+  },
+  "welcomePresetAnimated": {
+    "message": "Анимированный"
+  },
+  "welcomePresetHorizon": {
+    "message": "Горизонт"
+  },
+  "welcomePresetBlue": {
+    "message": "Синий"
+  },
+  "welcomeLabelGlassStyle": {
+    "message": "Стиль стекла"
+  },
+  "welcomeGlassClear": {
+    "message": "Прозрачный"
+  },
+  "welcomeGlassDimmed": {
+    "message": "Затемнённый"
+  },
+  "welcomeBtnFinish": {
+    "message": "Завершить настройку"
+  },
+  "welcomeBtnNext": {
+    "message": "Далее"
+  },
+  "welcomeBtnSkip": {
+    "message": "Пропустить"
+  },
+  "welcomeSupportTitle": {
+    "message": "Поддержите Aurora"
+  },
+  "welcomeSupportDescription": {
+    "message": "Aurora бесплатна и имеет открытый исходный код. Если вам нравится, рассмотрите возможность поддержки разработки небольшим пожертвованием или поставьте звезду на GitHub!"
+  },
+  "welcomeSupportDonate": {
+    "message": "Купите мне кофе"
+  },
+  "welcomeSupportStar": {
+    "message": "Звезда на GitHub"
+  },
+  "welcomeLabelVoice": {
+    "message": "Настройка голоса"
+  },
+  "welcomeBtnListen": {
+    "message": "Послушать голоса"
+  },
+  "labelDefaultModel": {
+    "message": "Модель по умолчанию"
+  },
+  "tooltipDefaultModel": {
+    "message": "Автоматически выбирать модель в новых чатах. Может не работать со всеми моделями или A/B тестами."
+  },
+  "placeholderDefaultModel": {
+    "message": "Введите slug модели (например, gpt-4-turbo)"
+  },
+  "defaultModelOptionNone": {
+    "message": "Нет (Отключено)"
+  },
+  "defaultModelOptionCustom": {
+    "message": "Пользовательская..."
+  },
+  "defaultModelOptionCustomLabel": {
+    "message": "Пользовательская"
+  },
+  "labelCustomFont": {
+    "message": "Пользовательский шрифт"
+  },
+  "tooltipCustomFont": {
+    "message": "Выберите шрифт для интерфейса ChatGPT"
+  },
+  "fontOptionSystem": {
+    "message": "Системный"
+  },
+  "fontOptionInter": {
+    "message": "Inter"
+  },
+  "fontOptionRoboto": {
+    "message": "Roboto"
+  },
+  "fontOptionMontserrat": {
+    "message": "Montserrat"
+  },
+  "fontOptionOpenSans": {
+    "message": "Open Sans"
+  },
+  "fontOptionPoppins": {
+    "message": "Poppins"
+  },
+  "labelShowTokenCounter": {
+    "message": "Показывать счетчик токенов/слов"
+  },
+  "tooltipShowTokenCounter": {
+    "message": "Отображать счетчик слов и приблизительного количества токенов в ваших сообщениях"
+  },
+  "tokenCounterWords": {
+    "message": "слов"
+  },
+  "tokenCounterTokens": {
+    "message": "~токенов"
+  },
+  "tokenCounterInput": {
+    "message": "Запрос"
+  },
+  "tokenCounterResponse": {
+    "message": "Ответ"
+  },
+  "labelAutoScroll": {
+    "message": "Автопрокрутка"
+  },
+  "tooltipAutoScroll": {
+    "message": "Автоматически прокручивать вниз при написании ChatGPT длинных ответов"
+  },
+  "autoScrollEnabled": {
+    "message": "Автопрокрутка включена"
+  },
+  "autoScrollDisabled": {
+    "message": "Автопрокрутка отключена"
+  },
+  "labelBlurChatHistory": {
+    "message": "Размыть историю чатов (Режим стримера)"
+  },
+  "tooltipBlurChatHistory": {
+    "message": "Размыть боковую панель с историей чатов для приватности при стриминге или записи"
+  },
+  "labelBlurAvatar": {
+    "message": "Размыть аватар пользователя"
+  },
+  "tooltipBlurAvatar": {
+    "message": "Размыть вашу фотографию профиля для приватности"
+  },
+  "quickSettingsLabelStreamerMode": {
+    "message": "Режим стримера"
+  },
+  "labelExportChat": {
+    "message": "Экспорт чата в PNG"
+  },
+  "tooltipExportChat": {
+    "message": "Экспортировать текущую беседу в красиво оформленное PNG изображение"
+  },
+  "exportChatButton": {
+    "message": "Экспорт чата"
+  },
+  "exportDialogTitle": {
+    "message": "Экспорт чата в PNG"
+  },
+  "exportDialogDescription": {
+    "message": "Выберите что экспортировать:"
+  },
+  "exportOptionEntireChat": {
+    "message": "Весь чат"
+  },
+  "exportOptionVisibleMessages": {
+    "message": "Только видимые сообщения"
+  },
+  "exportOptionCustomRange": {
+    "message": "Пользовательский диапазон"
+  },
+  "exportButtonExport": {
+    "message": "Экспортировать"
+  },
+  "exportButtonCancel": {
+    "message": "Отмена"
+  },
+  "exportingProgress": {
+    "message": "Экспортируется..."
+  },
+  "exportComplete": {
+    "message": "Экспорт завершен!"
+  },
+  "exportError": {
+    "message": "Ошибка экспорта. Попробуйте снова."
+  },
+  "sectionImportExport": {
+    "message": "Импорт/Экспорт настроек"
+  },
+  "buttonExportSettings": {
+    "message": "Экспорт настроек"
+  },
+  "buttonImportSettings": {
+    "message": "Импорт настроек"
+  },
+  "alertSettingsExported": {
+    "message": "Настройки скопированы в буфер обмена!"
+  },
+  "alertSettingsImported": {
+    "message": "Настройки успешно импортированы!"
+  },
+  "alertInvalidJson": {
+    "message": "Неверный формат JSON"
+  },
+  "sectionAudio": {
+    "message": "Аудио"
+  },
+  "labelHapticSound": {
+    "message": "Звуки интерфейса"
+  },
+  "tooltipHapticSound": {
+    "message": "Воспроизводить тонкие стеклянные звуки при взаимодействии"
+  },
+  "labelAutoContrast": {
+    "message": "Авто-контраст (Изображения)"
+  },
+  "tooltipAutoContrast": {
+    "message": "Автоматически регулировать затемнение оверлея на основе яркости фона"
+  },
+  "labelSmartSelectors": {
+    "message": "Умное восстановление селекторов"
+  },
+  "tooltipSmartSelectors": {
+    "message": "Автоматически находить элементы, если ChatGPT обновится"
+  },
+  "tabPrivacy": {
+    "message": "Приватность"
+  },
+  "sectionDataMasking": {
+    "message": "Замыливание данных"
+  },
+  "labelEnableDataMasking": {
+    "message": "Включить замыливание данных"
+  },
+  "tooltipEnableDataMasking": {
+    "message": "Автоматически скрывать чувствительные данные на экране"
+  },
+  "labelRandomGeneration": {
+    "message": "Использовать случайную генерацию"
+  },
+  "tooltipRandomGeneration": {
+    "message": "Заменять данные случайными значениями вместо звездочек"
+  },
+  "sectionMaskingTypes": {
+    "message": "Типы данных для маскирования"
+  },
+  "labelMaskEmails": {
+    "message": "Email адреса"
+  },
+  "labelMaskPhones": {
+    "message": "Номера телефонов"
+  },
+  "labelMaskCards": {
+    "message": "Номера карт"
+  },
+  "labelMaskIP": {
+    "message": "IP адреса"
+  },
+  "labelMaskSSN": {
+    "message": "SSN (США)"
+  },
+  "labelMaskINN": {
+    "message": "ИНН (Россия)"
+  },
+  "labelMaskPassport": {
+    "message": "Паспорт"
+  },
+  "feedbackLink": {
+    "message": "Есть отзыв или нашли ошибку?"
+  },
+  "feedbackPlaceholder": {
+    "message": "Расскажите, что вы думаете..."
+  },
+  "feedbackSend": {
+    "message": "Отправить Отзыв"
+  },
+  "feedbackSuccess": {
+    "message": "Отзыв отправлен! Спасибо."
+  },
+  "feedbackError": {
+    "message": "Не удалось отправить. Попробуйте снова."
+  },
+  "feedbackSending": {
+    "message": "Отправка..."
+  },
+  "feedbackReportSent": {
+    "message": "Отчет отправлен!"
+  },
+  "feedbackQueuedMessage": {
+    "message": "Ваш отзыв добавлен в очередь."
+  },
+  "feedbackYourTicketId": {
+    "message": "Ваш ID тикета"
+  },
+  "feedbackCopyIdTooltip": {
+    "message": "Скопировать ID"
+  },
+  "feedbackCopied": {
+    "message": "Скопировано!"
+  },
+  "feedbackPrioritizeTitle": {
+    "message": "Хотите ускорить это?"
+  },
+  "feedbackDonatePre": {
+    "message": "Пожертвуйте на развитие и укажите ваш "
+  },
+  "feedbackDonatePost": {
+    "message": ", чтобы ускорить этот запрос."
+  },
+  "feedbackSupportKofi": {
+    "message": "☕ Поддержать на Ko-fi"
+  },
+  "feedbackClose": {
+    "message": "Нет, просто закрыть"
+  },
+  "ticketIdLabel": {
+    "message": "ID тикета"
+  },
+  "feedbackServerError": {
+    "message": "Ошибка сервера"
+  },
+  "buttonCopied": {
+    "message": "✓ Скопировано!"
+  },
+  "buttonImported": {
+    "message": "✓ Импортировано!"
+  },
+  "sectionStreamerMode": {
+    "message": "Режим стримера"
+  }
 }
-

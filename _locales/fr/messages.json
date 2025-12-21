@@ -1,111 +1,581 @@
 {
-  "extensionName": { "message": "Aurora for ChatGPT" },
-  "extensionDescription": { "message": "Arrière-plan flou ambiant sous l'interface ChatGPT avec un bouton de visibilité du chat et une option d'éditeur classique. Non affilié à OpenAI." },
-  "actionTitle": { "message": "Aurora for ChatGPT — Paramètres" },
-  "buttonChooseFile": { "message": "Utiliser un fichier local" },
-  "popupTitle": { "message": "paramètres aurora pour chatgpt" },
-  "tabStyle": { "message": "Style" },
-  "tabAppearance": { "message": "Apparence" },
-  "tabInterface": { "message": "Interface" },
-  "tabElements": { "message": "Éléments" },
-  "tabVoice": { "message": "Voix" },
-  "tabBehavior": { "message": "Comportement" },
-  "tabVisibility": { "message": "Visibilité" },
-  "sectionBackground": { "message": "Arrière-plan" },
-  "labelPreset": { "message": "Préréglage" },
-  "placeholderBgUrl": { "message": "Collez l'URL d'une image ou d'une vidéo" },
-  "buttonReset": { "message": "Réinitialiser" },
-  "labelBlur": { "message": "Flou" },
-  "labelScaling": { "message": "Mise à l'échelle" },
-  "sectionAppearance": { "message": "Apparence" },
-  "labelTheme": { "message": "Thème" },
-  "labelLegacyComposer": { "message": "Éditeur classique" },
-  "tooltipLegacyComposer": { "message": "Utiliser le style d'éditeur standard du site" },
-  "sectionAnimations": { "message": "Animations" },
-  "labelDisableBgAnimation": { "message": "Désactiver l'animation d'arrière-plan" },
-  "tooltipDisableBgAnimation": { "message": "L'arrière-plan apparaît instantanément sans effet de fondu." },
-  "labelDisableAnimations": { "message": "Désactiver les animations de menu" },
-  "tooltipDisableAnimations": { "message": "Désactiver les animations d'ouverture/fermeture du menu" },
-  "labelGlassStyle": { "message": "Style de verre" },
-  "sectionInterface": { "message": "Interface" },
-  "labelFocusMode": { "message": "Mode Focus" },
-  "tooltipFocusMode": { "message": "Masque la barre latérale et l'en-tête" },
-  "labelHideQuickSettings": { "message": "Masquer les paramètres rapides" },
-  "tooltipHideQuickSettings": { "message": "Masque l'icône des paramètres dans la page" },
-  "labelShowInNewChatsOnly": { "message": "Afficher uniquement dans les nouveaux chats" },
-  "tooltipShowInNewChatsOnly": { "message": "L'arrière-plan est masqué dans les chats existants" },
-  "sectionVoiceUi": { "message": "Interface vocale" },
-  "labelVoiceColor": { "message": "Couleur" },
-  "labelCuteVoice": { "message": "Interface mignonne (Oreilles de chat)" },
-  "tooltipCuteVoice": { "message": "Ajoute des oreilles mignonnes à l'interface vocale" },
-  "sectionHideElements": { "message": "Masquer les éléments" },
-  "labelHideGpt5Limit": { "message": "Message de limite GPT-5" },
-  "tooltipHideGpt5Limit": { "message": "Masque la fenêtre contextuelle de limite GPT-5 5 minutes après son apparition" },
-  "labelHideUpgradeButtons": { "message": "Éléments \"Mettre à niveau le plan\"" },
-  "tooltipHideUpgradeButtons": { "message": "Masquer tous les boutons et sections \"Mettre à niveau votre plan\"" },
-  "labelHideGptsButton": { "message": "Bouton \"Explorer les GPTs\"" },
-  "tooltipHideGptsButton": { "message": "Masquer le bouton \"Explorer les GPTs\" dans la barre latérale" },
-  "labelHideSoraButton": { "message": "Bouton \"Sora\"" },
-  "tooltipHideSoraButton": { "message": "Masquer le bouton \"Sora\" dans la barre latérale" },
-  "voiceColorOptionDefault": { "message": "Par défaut (Bleu)" },
-  "voiceColorOptionOrange": { "message": "Orange coucher de soleil" },
-  "voiceColorOptionYellow": { "message": "Jaune solaire" },
-  "voiceColorOptionPink": { "message": "Rose sakura" },
-  "voiceColorOptionGreen": { "message": "Vert aurore" },
-  "voiceColorOptionDark": { "message": "Onyx foncé" },
-  "bgPresetOptionDefault": { "message": "Fond d'écran par défaut" },
-  "bgPresetOptionGpt5Animated": { "message": "Dégradé animé" },
-  "bgPresetOptionBlue": { "message": "Fond d'écran bleu" },
-  "bgPresetOptionGrokHorizon": { "message": "Horizon Grok" },
-  "bgPresetOptionCustom": { "message": "Personnalisé" },
-  "bgScalingOptionContain": { "message": "Contenir (ajuster)" },
-  "bgScalingOptionCover": { "message": "Couvrir (remplir)" },
-  "themeOptionAuto": { "message": "Auto" },
-  "themeOptionLight": { "message": "Clair" },
-  "themeOptionDark": { "message": "Sombre" },
-  "glassAppearanceOptionDimmed": { "message": "Assombri" },
-  "glassAppearanceOptionClear": { "message": "Transparent" },
-  "alertFileTooLarge": { "message": "Le fichier est trop volumineux ! Veuillez choisir un fichier de moins de $1 Mo." },
-  "statusLocalFileInUse": { "message": "Un fichier local est utilisé" },
-  "statusAnimatedBackground": { "message": "L'arrière-plan animé est actif" },
-  "creditPrefix": { "message": "Créé par" },
-  "creditSuffix": { "message": "sur X" },
-  "placeholderSearch": { "message": "Rechercher des paramètres..." },
-  "tooltipClearSearch": { "message": "Effacer la recherche" },
-  "noResults": { "message": "Aucun paramètre trouvé" },
-  "quickSettingsButtonTitle": { "message": "Paramètres rapides" },
-  "quickSettingsSectionVisibility": { "message": "Visibilité" },
-  "quickSettingsSectionVoice": { "message": "Interface vocale" },
-  "quickSettingsLabelHideUpgradeButtons": { "message": "Masquer les éléments de mise à niveau" },
-  "quickSettingsLabelHideGptsButton": { "message": "Masquer \"Explorer les GPTs\"" },
-  "quickSettingsLabelDisableBgAnimation": { "message": "Désactiver l'animation d'arrière-plan" },
-  "quickSettingsLabelCuteVoice": { "message": "Interface mignonne (Oreilles)" },
-  "quickSettingsLabelVoiceColor": { "message": "Couleur de la voix" },
-  "quickSettingsLabelGlassStyle": { "message": "Style de verre" },
-  "errorLoadingSettings": { "message": "Erreur : Impossible de charger les paramètres. Veuillez essayer de recharger la page." },
-  "welcomeTooltipPreview": { "message": "Aperçu du thème" },
-  "welcomeTitle": { "message": "Bienvenue dans Aurora" },
-  "welcomeDescription": { "message": "Une belle interface personnalisable pour ChatGPT, conçue pour améliorer votre expérience avec des arrière-plans ambiants, des effets de verre et plus encore." },
-  "welcomeBtnGetStarted": { "message": "Commencer" },
-  "welcomeTitleSetup": { "message": "Choisissez votre apparence" },
-  "welcomeDescriptionSetup": { "message": "Sélectionnez un arrière-plan et un style pour personnaliser votre expérience. Vous pouvez toujours le modifier plus tard." },
-  "welcomeLabelBgPreset": { "message": "Préréglage d'arrière-plan" },
-  "welcomePresetDefault": { "message": "Par défaut" },
-  "welcomePresetAnimated": { "message": "Animé" },
-  "welcomePresetHorizon": { "message": "Horizon" },
-  "welcomePresetBlue": { "message": "Bleu" },
-  "welcomeLabelGlassStyle": { "message": "Style de verre" },
-  "welcomeGlassClear": { "message": "Transparent" },
-  "welcomeGlassDimmed": { "message": "Assombri" },
-  "welcomeBtnFinish": { "message": "Terminer la configuration" },
-  "welcomeBtnNext": { "message": "Suivant" },
-  "welcomeLabelVoice": { "message": "Personnalisation de la voix" },
-  "welcomeBtnListen": { "message": "Écouter les voix" },
-  "labelDefaultModel": { "message": "Modèle par défaut" },
-  "tooltipDefaultModel": { "message": "Sélectionner automatiquement un modèle dans les nouveaux chats. Peut ne pas fonctionner avec tous les modèles ou tests A/B." },
-  "placeholderDefaultModel": { "message": "Entrez le slug du modèle (par ex. gpt-4-turbo)" },
-  "defaultModelOptionNone": { "message": "Aucun (Désactivé)" },
-  "defaultModelOptionCustom": { "message": "Personnalisé..." },
-  "defaultModelOptionCustomLabel": { "message": "Personnalisé" }
+  "extensionName": {
+    "message": "Aurora for ChatGPT"
+  },
+  "extensionDescription": {
+    "message": "Arrière-plan flou ambiant sous l'interface ChatGPT avec un bouton de visibilité du chat et une option d'éditeur classique. Non affilié à OpenAI."
+  },
+  "actionTitle": {
+    "message": "Aurora for ChatGPT — Paramètres"
+  },
+  "buttonChooseFile": {
+    "message": "Utiliser un fichier local"
+  },
+  "popupTitle": {
+    "message": "paramètres aurora pour chatgpt"
+  },
+  "tabStyle": {
+    "message": "Style"
+  },
+  "tabAppearance": {
+    "message": "Apparence"
+  },
+  "tabInterface": {
+    "message": "Interface"
+  },
+  "tabElements": {
+    "message": "Éléments"
+  },
+  "tabVoice": {
+    "message": "Voix"
+  },
+  "tabBehavior": {
+    "message": "Comportement"
+  },
+  "tabVisibility": {
+    "message": "Visibilité"
+  },
+  "sectionBackground": {
+    "message": "Arrière-plan"
+  },
+  "labelPreset": {
+    "message": "Préréglage"
+  },
+  "placeholderBgUrl": {
+    "message": "Collez l'URL d'une image ou d'une vidéo"
+  },
+  "buttonReset": {
+    "message": "Réinitialiser"
+  },
+  "labelBlur": {
+    "message": "Flou"
+  },
+  "labelScaling": {
+    "message": "Mise à l'échelle"
+  },
+  "sectionAppearance": {
+    "message": "Apparence"
+  },
+  "labelTheme": {
+    "message": "Thème"
+  },
+  "labelLegacyComposer": {
+    "message": "Éditeur classique"
+  },
+  "tooltipLegacyComposer": {
+    "message": "Utiliser le style d'éditeur standard du site"
+  },
+  "sectionHolidayEffects": {
+    "message": "Effets des fêtes"
+  },
+  "labelSnowfall": {
+    "message": "Qu'il neige"
+  },
+  "tooltipSnowfall": {
+    "message": "Activer l'animation de neige"
+  },
+  "labelNewYear": {
+    "message": "Nouvel An '26"
+  },
+  "tooltipNewYear": {
+    "message": "Activer la guirlande du Nouvel An"
+  },
+  "labelHolidayMode": {
+    "message": "Mode Fêtes"
+  },
+  "tooltipHolidayMode": {
+    "message": "Neige, lumières et arrière-plan festif"
+  },
+  "labelCinemaMode": {
+    "message": "Mode Cinéma"
+  },
+  "tooltipCinemaMode": {
+    "message": "Chat pleine largeur pour mieux voir le code"
+  },
+  "sectionAnimations": {
+    "message": "Animations"
+  },
+  "labelDisableBgAnimation": {
+    "message": "Désactiver l'animation d'arrière-plan"
+  },
+  "tooltipDisableBgAnimation": {
+    "message": "L'arrière-plan apparaît instantanément sans effet de fondu."
+  },
+  "labelDisableAnimations": {
+    "message": "Désactiver les animations de menu"
+  },
+  "tooltipDisableAnimations": {
+    "message": "Désactiver les animations d'ouverture/fermeture du menu"
+  },
+  "labelGlassStyle": {
+    "message": "Style de verre"
+  },
+  "sectionInterface": {
+    "message": "Interface"
+  },
+  "labelFocusMode": {
+    "message": "Mode Focus"
+  },
+  "tooltipFocusMode": {
+    "message": "Masque la barre latérale et l'en-tête"
+  },
+  "labelHideQuickSettings": {
+    "message": "Masquer les paramètres rapides"
+  },
+  "tooltipHideQuickSettings": {
+    "message": "Masque l'icône des paramètres dans la page"
+  },
+  "labelShowInNewChatsOnly": {
+    "message": "Afficher uniquement dans les nouveaux chats"
+  },
+  "tooltipShowInNewChatsOnly": {
+    "message": "L'arrière-plan est masqué dans les chats existants"
+  },
+  "sectionVoiceUi": {
+    "message": "Interface vocale"
+  },
+  "labelVoiceColor": {
+    "message": "Couleur"
+  },
+  "labelCuteVoice": {
+    "message": "Interface mignonne (Oreilles de chat)"
+  },
+  "tooltipCuteVoice": {
+    "message": "Ajoute des oreilles mignonnes à l'interface vocale"
+  },
+  "sectionHideElements": {
+    "message": "Masquer les éléments"
+  },
+  "labelHideGpt5Limit": {
+    "message": "Message de limite GPT-5"
+  },
+  "tooltipHideGpt5Limit": {
+    "message": "Masque la fenêtre contextuelle de limite GPT-5 5 minutes après son apparition"
+  },
+  "labelHideUpgradeButtons": {
+    "message": "Éléments \"Mettre à niveau le plan\""
+  },
+  "tooltipHideUpgradeButtons": {
+    "message": "Masquer tous les boutons et sections \"Mettre à niveau votre plan\""
+  },
+  "labelHideGptsButton": {
+    "message": "Bouton \"Explorer les GPTs\""
+  },
+  "tooltipHideGptsButton": {
+    "message": "Masquer le bouton \"Explorer les GPTs\" dans la barre latérale"
+  },
+  "labelHideSoraButton": {
+    "message": "Bouton \"Sora\""
+  },
+  "tooltipHideSoraButton": {
+    "message": "Masquer le bouton \"Sora\" dans la barre latérale"
+  },
+  "voiceColorOptionDefault": {
+    "message": "Par défaut (Bleu)"
+  },
+  "voiceColorOptionOrange": {
+    "message": "Orange coucher de soleil"
+  },
+  "voiceColorOptionYellow": {
+    "message": "Jaune solaire"
+  },
+  "voiceColorOptionPink": {
+    "message": "Rose sakura"
+  },
+  "voiceColorOptionGreen": {
+    "message": "Vert aurore"
+  },
+  "voiceColorOptionDark": {
+    "message": "Onyx foncé"
+  },
+  "bgPresetOptionDefault": {
+    "message": "Fond d'écran par défaut"
+  },
+  "bgPresetOptionGpt5Animated": {
+    "message": "Dégradé animé"
+  },
+  "bgPresetOptionBlue": {
+    "message": "Fond d'écran bleu"
+  },
+  "bgPresetOptionGrokHorizon": {
+    "message": "Horizon Grok"
+  },
+  "bgPresetOptionChristmas": {
+    "message": "🎄 Noël"
+  },
+  "bgPresetOptionCustom": {
+    "message": "Personnalisé"
+  },
+  "bgScalingOptionContain": {
+    "message": "Contenir (ajuster)"
+  },
+  "bgScalingOptionCover": {
+    "message": "Couvrir (remplir)"
+  },
+  "themeOptionAuto": {
+    "message": "Auto"
+  },
+  "themeOptionLight": {
+    "message": "Clair"
+  },
+  "themeOptionDark": {
+    "message": "Sombre"
+  },
+  "glassAppearanceOptionDimmed": {
+    "message": "Assombri"
+  },
+  "glassAppearanceOptionClear": {
+    "message": "Transparent"
+  },
+  "alertFileTooLarge": {
+    "message": "Le fichier est trop volumineux ! Veuillez choisir un fichier de moins de $1 Mo."
+  },
+  "statusLocalFileInUse": {
+    "message": "Un fichier local est utilisé"
+  },
+  "statusAnimatedBackground": {
+    "message": "L'arrière-plan animé est actif"
+  },
+  "creditPrefix": {
+    "message": "Créé par"
+  },
+  "creditSuffix": {
+    "message": "sur X"
+  },
+  "placeholderSearch": {
+    "message": "Rechercher des paramètres..."
+  },
+  "tooltipClearSearch": {
+    "message": "Effacer la recherche"
+  },
+  "noResults": {
+    "message": "Aucun paramètre trouvé"
+  },
+  "quickSettingsButtonTitle": {
+    "message": "Paramètres rapides"
+  },
+  "quickSettingsSectionVisibility": {
+    "message": "Visibilité"
+  },
+  "quickSettingsSectionVoice": {
+    "message": "Interface vocale"
+  },
+  "quickSettingsLabelHideUpgradeButtons": {
+    "message": "Masquer les éléments de mise à niveau"
+  },
+  "quickSettingsLabelHideGptsButton": {
+    "message": "Masquer \"Explorer les GPTs\""
+  },
+  "quickSettingsLabelDisableBgAnimation": {
+    "message": "Désactiver l'animation d'arrière-plan"
+  },
+  "quickSettingsLabelCuteVoice": {
+    "message": "Interface mignonne (Oreilles)"
+  },
+  "quickSettingsLabelVoiceColor": {
+    "message": "Couleur de la voix"
+  },
+  "quickSettingsLabelGlassStyle": {
+    "message": "Style de verre"
+  },
+  "errorLoadingSettings": {
+    "message": "Erreur : Impossible de charger les paramètres. Veuillez essayer de recharger la page."
+  },
+  "welcomeTooltipPreview": {
+    "message": "Aperçu du thème"
+  },
+  "welcomeTitle": {
+    "message": "Joyeuses Fêtes ! 🎄"
+  },
+  "welcomeDescription": {
+    "message": "Aurora vous souhaite une saison magique. Personnalisez votre ChatGPT avec des arrière-plans ambiants, des effets de verre et une ambiance festive."
+  },
+  "welcomeBtnGetStarted": {
+    "message": "Commencer"
+  },
+  "welcomeTitleSetup": {
+    "message": "Choisissez votre apparence"
+  },
+  "welcomeDescriptionSetup": {
+    "message": "Sélectionnez un arrière-plan et un style pour personnaliser votre expérience. Vous pouvez toujours le modifier plus tard."
+  },
+  "welcomeLabelBgPreset": {
+    "message": "Préréglage d'arrière-plan"
+  },
+  "welcomePresetDefault": {
+    "message": "Par défaut"
+  },
+  "welcomePresetAnimated": {
+    "message": "Animé"
+  },
+  "welcomePresetHorizon": {
+    "message": "Horizon"
+  },
+  "welcomePresetBlue": {
+    "message": "Bleu"
+  },
+  "welcomeLabelGlassStyle": {
+    "message": "Style de verre"
+  },
+  "welcomeGlassClear": {
+    "message": "Transparent"
+  },
+  "welcomeGlassDimmed": {
+    "message": "Assombri"
+  },
+  "welcomeBtnFinish": {
+    "message": "Terminer la configuration"
+  },
+  "welcomeBtnNext": {
+    "message": "Suivant"
+  },
+  "welcomeBtnSkip": {
+    "message": "Passer pour l'instant"
+  },
+  "welcomeSupportTitle": {
+    "message": "Soutenir Aurora"
+  },
+  "welcomeSupportDescription": {
+    "message": "Aurora est gratuit et open source. Si vous l'appréciez, envisagez de soutenir le développement avec un petit don ou en nous donnant une étoile sur GitHub !"
+  },
+  "welcomeSupportDonate": {
+    "message": "Offrez-moi un café"
+  },
+  "welcomeSupportStar": {
+    "message": "Étoile sur GitHub"
+  },
+  "welcomeLabelVoice": {
+    "message": "Personnalisation de la voix"
+  },
+  "welcomeBtnListen": {
+    "message": "Écouter les voix"
+  },
+  "labelDefaultModel": {
+    "message": "Modèle par défaut"
+  },
+  "tooltipDefaultModel": {
+    "message": "Sélectionner automatiquement un modèle dans les nouveaux chats. Peut ne pas fonctionner avec tous les modèles ou tests A/B."
+  },
+  "placeholderDefaultModel": {
+    "message": "Entrez le slug du modèle (par ex. gpt-4-turbo)"
+  },
+  "defaultModelOptionNone": {
+    "message": "Aucun (Désactivé)"
+  },
+  "defaultModelOptionCustom": {
+    "message": "Personnalisé..."
+  },
+  "defaultModelOptionCustomLabel": {
+    "message": "Personnalisé"
+  },
+  "labelCustomFont": {
+    "message": "Police personnalisée"
+  },
+  "tooltipCustomFont": {
+    "message": "Choisissez une police pour l'interface ChatGPT"
+  },
+  "fontOptionSystem": {
+    "message": "Système par défaut"
+  },
+  "fontOptionInter": {
+    "message": "Inter"
+  },
+  "fontOptionRoboto": {
+    "message": "Roboto"
+  },
+  "fontOptionMontserrat": {
+    "message": "Montserrat"
+  },
+  "fontOptionOpenSans": {
+    "message": "Open Sans"
+  },
+  "fontOptionPoppins": {
+    "message": "Poppins"
+  },
+  "labelShowTokenCounter": {
+    "message": "Afficher le compteur de tokens/mots"
+  },
+  "tooltipShowTokenCounter": {
+    "message": "Afficher un compteur de mots et de tokens estimés dans vos messages"
+  },
+  "tokenCounterWords": {
+    "message": "mots"
+  },
+  "tokenCounterTokens": {
+    "message": "~tokens"
+  },
+  "tokenCounterInput": {
+    "message": "Entrée"
+  },
+  "tokenCounterResponse": {
+    "message": "Réponse"
+  },
+  "labelAutoScroll": {
+    "message": "Défilement automatique"
+  },
+  "tooltipAutoScroll": {
+    "message": "Faire défiler automatiquement vers le bas lorsque ChatGPT écrit de longues réponses"
+  },
+  "autoScrollEnabled": {
+    "message": "Défilement automatique activé"
+  },
+  "autoScrollDisabled": {
+    "message": "Défilement automatique désactivé"
+  },
+  "labelBlurChatHistory": {
+    "message": "Flouter l'historique des chats (Mode streamer)"
+  },
+  "tooltipBlurChatHistory": {
+    "message": "Flouter la barre latérale de l'historique des chats pour la confidentialité lors du streaming ou de l'enregistrement"
+  },
+  "labelBlurAvatar": {
+    "message": "Flouter l'avatar de l'utilisateur"
+  },
+  "tooltipBlurAvatar": {
+    "message": "Flouter votre photo de profil pour la confidentialité"
+  },
+  "quickSettingsLabelStreamerMode": {
+    "message": "Mode Streamer"
+  },
+  "labelExportChat": {
+    "message": "Exporter le chat en PNG"
+  },
+  "tooltipExportChat": {
+    "message": "Exporter la conversation actuelle sous forme d'image PNG magnifiquement stylisée"
+  },
+  "exportChatButton": {
+    "message": "Exporter le Chat"
+  },
+  "exportDialogTitle": {
+    "message": "Exporter le Chat en PNG"
+  },
+  "exportDialogDescription": {
+    "message": "Choisissez quoi exporter :"
+  },
+  "exportOptionEntireChat": {
+    "message": "Chat complet"
+  },
+  "exportOptionVisibleMessages": {
+    "message": "Messages visibles uniquement"
+  },
+  "exportOptionCustomRange": {
+    "message": "Plage personnalisée"
+  },
+  "exportButtonExport": {
+    "message": "Exporter"
+  },
+  "exportButtonCancel": {
+    "message": "Annuler"
+  },
+  "exportingProgress": {
+    "message": "Exportation..."
+  },
+  "exportComplete": {
+    "message": "Exportation terminée !"
+  },
+  "exportError": {
+    "message": "Échec de l'exportation. Veuillez réessayer."
+  },
+  "sectionImportExport": {
+    "message": "Importer/Exporter les paramètres"
+  },
+  "buttonExportSettings": {
+    "message": "Exporter les paramètres"
+  },
+  "buttonImportSettings": {
+    "message": "Importer les paramètres"
+  },
+  "alertSettingsExported": {
+    "message": "Paramètres exportés dans le presse-papiers !"
+  },
+  "alertSettingsImported": {
+    "message": "Paramètres importés avec succès !"
+  },
+  "alertInvalidJson": {
+    "message": "Format JSON invalide"
+  },
+  "sectionAudio": {
+    "message": "Audio"
+  },
+  "labelHapticSound": {
+    "message": "Sons d'interface"
+  },
+  "tooltipHapticSound": {
+    "message": "Jouer des sons subtils de verre lors des interactions"
+  },
+  "labelAutoContrast": {
+    "message": "Contraste automatique (Images)"
+  },
+  "tooltipAutoContrast": {
+    "message": "Ajuster automatiquement l'obscurité de la superposition en fonction de la luminosité de l'arrière-plan"
+  },
+  "labelSmartSelectors": {
+    "message": "Récupération intelligente des sélecteurs"
+  },
+  "tooltipSmartSelectors": {
+    "message": "Trouver automatiquement les éléments si ChatGPT se met à jour"
+  },
+  "feedbackLink": {
+    "message": "Vous avez des commentaires ou trouvé un bug ?"
+  },
+  "feedbackPlaceholder": {
+    "message": "Dites-nous ce que vous pensez..."
+  },
+  "feedbackSend": {
+    "message": "Envoyer le Commentaire"
+  },
+  "feedbackSuccess": {
+    "message": "Commentaire envoyé ! Merci."
+  },
+  "feedbackError": {
+    "message": "Échec de l'envoi. Veuillez réessayer."
+  },
+  "feedbackSending": {
+    "message": "Envoi en cours..."
+  },
+  "feedbackReportSent": {
+    "message": "Rapport envoyé !"
+  },
+  "feedbackQueuedMessage": {
+    "message": "Votre commentaire a été mis en file d'attente."
+  },
+  "feedbackYourTicketId": {
+    "message": "Votre ID de Ticket"
+  },
+  "feedbackCopyIdTooltip": {
+    "message": "Copier l'ID"
+  },
+  "feedbackCopied": {
+    "message": "Copié !"
+  },
+  "feedbackPrioritizeTitle": {
+    "message": "Voulez-vous prioriser ceci ?"
+  },
+  "feedbackDonatePre": {
+    "message": "Faites un don pour soutenir le développement et incluez votre "
+  },
+  "feedbackDonatePost": {
+    "message": " pour accélérer cette demande."
+  },
+  "feedbackSupportKofi": {
+    "message": "☕ Soutenir sur Ko-fi"
+  },
+  "feedbackClose": {
+    "message": "Non merci, fermer"
+  },
+  "ticketIdLabel": {
+    "message": "ID de Ticket"
+  },
+  "feedbackServerError": {
+    "message": "Erreur du serveur"
+  },
+  "buttonCopied": {
+    "message": "✓ Copié !"
+  },
+  "buttonImported": {
+    "message": "✓ Importé !"
+  },
+  "sectionStreamerMode": {
+    "message": "Mode Streamer"
+  }
 }
-
