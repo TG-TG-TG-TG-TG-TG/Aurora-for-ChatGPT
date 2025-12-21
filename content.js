@@ -854,6 +854,7 @@
     document.documentElement.classList.toggle(CLEAR_APPEARANCE_CLASS, settings.appearance === 'clear');
     document.documentElement.classList.toggle('cgpt-cute-voice-on', !!settings.cuteVoiceUI);
     document.documentElement.classList.toggle('cgpt-focus-mode-on', !!settings.focusMode);
+  document.documentElement.classList.toggle('cgpt-cinema-mode', !!settings.cinemaMode);
 
     // NEW: Custom Font Support
     const customFont = settings.customFont || 'system';
@@ -1852,69 +1853,50 @@
       if (area === 'sync') {
         const changedKeys = Object.keys(changes);
         
-        // --- 1. INSTANT UPDATES (Bypass Background Roundtrip) ---
-        // Handle visual toggles immediately for 0ms latency
-        let handledLocally = false;
+        // --- INSTANT UPDATES: Apply all changes immediately ---
+        // Update settings object with new values first
+        changedKeys.forEach(key => {
+          if (changes[key]) {
+            settings[key] = changes[key].newValue;
+          }
+        });
 
-        // Holiday Effects
+        // Holiday Effects (instant)
         if (changes.enableSnowfall || changes.enableNewYear) {
-            if (changes.enableSnowfall) settings.enableSnowfall = changes.enableSnowfall.newValue;
-            if (changes.enableNewYear) settings.enableNewYear = changes.enableNewYear.newValue;
-            manageHolidayEffects();
-            handledLocally = true;
+          manageHolidayEffects();
         }
 
-        // Toggles that utilize CSS classes on <html> (applyRootFlags)
-        const rootFlagKeys = ['legacyComposer', 'disableAnimations', 'focusMode', 'cuteVoiceUI', 'blurChatHistory', 'blurAvatar', 'theme', 'customFont', 'voiceColor'];
-        const hasRootFlagChange = changedKeys.some(k => rootFlagKeys.includes(k));
-        
-        if (hasRootFlagChange) {
-            rootFlagKeys.forEach(k => {
-                if (changes[k]) settings[k] = changes[k].newValue;
-            });
-            applyRootFlags();
-            handledLocally = true;
+        // Root flags (CSS classes on <html>) - includes appearance, cinemaMode
+        const rootFlagKeys = ['legacyComposer', 'disableAnimations', 'focusMode', 'cuteVoiceUI', 
+                              'blurChatHistory', 'blurAvatar', 'theme', 'customFont', 'voiceColor',
+                              'appearance', 'cinemaMode'];
+        if (changedKeys.some(k => rootFlagKeys.includes(k))) {
+          applyRootFlags();
         }
 
-        // If the ONLY changes were things we just handled locally, stop here.
-        // This prevents the slow "refreshSettingsAndApply" loop.
-        const instantKeys = [...rootFlagKeys, 'enableSnowfall', 'enableNewYear'];
-        const isOnlyInstant = changedKeys.every(k => instantKeys.includes(k));
-        
-        if (isOnlyInstant) return;
-
-        // --- 2. HEAVY UPDATES (Background Check Required) ---
-        // For complex settings (Bg Image, Token Limits) we still do the safe roundtrip
-        const backgroundKeys = ['customBgUrl', 'backgroundBlur', 'backgroundScaling'];
-        const isOnlyNonBackgroundChange = changedKeys.every(key => !backgroundKeys.includes(key));
-
-        if (isOnlyNonBackgroundChange && changedKeys.length > 0) {
-          // Lightweight update for non-background settings
-          chrome.runtime.sendMessage({ type: 'GET_SETTINGS' }, (freshSettings) => {
-            if (chrome.runtime.lastError) return;
-            settings = freshSettings;
-
-            // Run specific managers
-            manageGpt5LimitPopup();
-            manageUpgradeButtons();
-            if (!settings.hideQuickSettings) {
-              manageQuickSettingsUI();
-            }
-            maybeApplyDefaultModel();
-            if (window.AuroraTokenCounter) {
-              window.AuroraTokenCounter.manage(!!settings.showTokenCounter);
-            }
-            if (settings.soundEnabled) AudioEngine.attachListeners();
-            
-            // Ensure holiday effects match (idempotent)
-            manageHolidayEffects();
-          });
-        } else {
-          // Full refresh (Background image changes, etc)
-          refreshSettingsAndApply();
+        // Background changes (instant via BackgroundManager)
+        if (changes.customBgUrl || changes.backgroundBlur || changes.backgroundScaling) {
+          updateBackgroundImage();
+          applyCustomStyles();
         }
+
+        // UI managers (lightweight, run instantly)
+        if (changes.hideGpt5Limit) manageGpt5LimitPopup();
+        if (changes.hideUpgradeButtons) manageUpgradeButtons();
+        if (changes.hideQuickSettings !== undefined) {
+          if (!settings.hideQuickSettings) manageQuickSettingsUI();
+        }
+        if (changes.defaultModel) maybeApplyDefaultModel();
+        if (changes.showTokenCounter && window.AuroraTokenCounter) {
+          window.AuroraTokenCounter.manage(!!settings.showTokenCounter);
+        }
+        if (changes.soundEnabled && settings.soundEnabled) {
+          AudioEngine.attachListeners();
+        }
+
       } else if (area === 'local' && changes[LOCAL_BG_KEY]) {
-        refreshSettingsAndApply();
+        // Local background data changed - trigger background update
+        updateBackgroundImage();
       }
     });
   }

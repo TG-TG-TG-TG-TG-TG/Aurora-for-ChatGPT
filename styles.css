@@ -1653,3 +1653,28 @@ html.cgpt-ambient-on.cgpt-light-mode [role="dialog"] li[role="option"]:hover {
   background-color: rgba(0, 0, 0, 0.06) !important;
   background: rgba(0, 0, 0, 0.06) !important;
 }
+
+/* ========================================================================
+   CINEMA MODE - Full Width Chat Layout
+   ======================================================================== */
+html.cgpt-cinema-mode [class*="xl:max-w-"],
+html.cgpt-cinema-mode [class*="max-w-3xl"],
+html.cgpt-cinema-mode main [class*="max-w-"] {
+  max-width: 100% !important;
+}
+html.cgpt-cinema-mode .mx-auto[class*="max-w-"] {
+  max-width: 95vw !important;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+/* Ensure code blocks expand properly in Cinema Mode */
+html.cgpt-cinema-mode pre,
+html.cgpt-cinema-mode code {
+  max-width: 100% !important;
+}
+/* Keep composer at a reasonable max-width for usability */
+html.cgpt-cinema-mode form[data-type="unified-composer"] {
+  max-width: min(95vw, 1200px) !important;
+  margin-left: auto;
+  margin-right: auto;
+}

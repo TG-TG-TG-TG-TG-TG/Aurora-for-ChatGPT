@@ -92,6 +92,12 @@
   "tooltipHolidayMode": {
     "message": "Nieve, luces y fondo festivo"
   },
+  "labelCinemaMode": {
+    "message": "Modo Cine"
+  },
+  "tooltipCinemaMode": {
+    "message": "Chat a ancho completo para ver código mejor"
+  },
   "labelDisableAnimations": {
     "message": "Desactivar animaciones de menú"
   },

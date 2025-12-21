@@ -25,7 +25,8 @@ const DEFAULTS = {
   dataMaskingEnabled: false,
   maskingRandomMode: false,
   enableSnowfall: false,
-  enableNewYear: false
+  enableNewYear: false,
+  cinemaMode: false
 };
 
 // --- Settings Cache for Instant Popup Response ---

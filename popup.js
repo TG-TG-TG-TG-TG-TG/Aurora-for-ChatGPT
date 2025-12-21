@@ -19,14 +19,14 @@ const DEFAULTS = {
   showTokenCounter: false, blurChatHistory: false, blurAvatar: false,
   soundEnabled: false, soundVolume: 'low', autoContrast: false,
   smartSelectors: true, dataMaskingEnabled: false, maskingRandomMode: false,
-  enableSnowfall: false, enableNewYear: false
+  enableSnowfall: false, enableNewYear: false, cinemaMode: false
 };
 
 const TOGGLE_KEYS = [
   'legacyComposer', 'hideGpt5Limit', 'hideUpgradeButtons', 'disableAnimations',
   'focusMode', 'hideQuickSettings', 'showTokenCounter', 'blurChatHistory',
   'blurAvatar', 'soundEnabled', 'autoContrast', 'dataMaskingEnabled',
-  'maskingRandomMode', 'enableSnowfall', 'enableNewYear', 'cuteVoiceUI'
+  'maskingRandomMode', 'enableSnowfall', 'enableNewYear', 'cuteVoiceUI', 'cinemaMode'
 ];
 
 // --- Element Cache (populated once on DOMContentLoaded) ---

@@ -86,6 +86,12 @@
   "tooltipHolidayMode": {
     "message": "Neige, lumières et arrière-plan festif"
   },
+  "labelCinemaMode": {
+    "message": "Mode Cinéma"
+  },
+  "tooltipCinemaMode": {
+    "message": "Chat pleine largeur pour mieux voir le code"
+  },
   "sectionAnimations": {
     "message": "Animations"
   },

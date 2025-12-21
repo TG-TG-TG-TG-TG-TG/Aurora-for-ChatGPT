@@ -86,6 +86,12 @@
   "tooltipHolidayMode": {
     "message": "Снег, огни и праздничный фон"
   },
+  "labelCinemaMode": {
+    "message": "Режим кино"
+  },
+  "tooltipCinemaMode": {
+    "message": "Чат на всю ширину для удобного просмотра кода"
+  },
   "sectionAnimations": {
     "message": "Анимации"
   },

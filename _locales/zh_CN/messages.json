@@ -86,6 +86,12 @@
   "tooltipHolidayMode": {
     "message": "雪花、彩灯和节日背景"
   },
+  "labelCinemaMode": {
+    "message": "影院模式"
+  },
+  "tooltipCinemaMode": {
+    "message": "全宽聊天，更好地查看代码"
+  },
   "sectionAnimations": {
     "message": "动画"
   },
