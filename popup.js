@@ -258,7 +258,8 @@ const SELECT_CONFIGS = [
       { value: 'roboto', labelKey: 'fontOptionRoboto' },
       { value: 'montserrat', labelKey: 'fontOptionMontserrat' },
       { value: 'opensans', labelKey: 'fontOptionOpenSans' },
-      { value: 'poppins', labelKey: 'fontOptionPoppins' }
+      { value: 'poppins', labelKey: 'fontOptionPoppins' },
+      { value: 'firacode', labelKey: 'fontOptionFiraCode', label: 'Fira Code (Dev)' }
     ]
   },
   {

@@ -21,6 +21,14 @@ html.cgpt-ambient-on[data-custom-font="poppins"] * {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
+html.cgpt-ambient-on[data-custom-font="firacode"] * {
+    font-family: 'Fira Code', monospace !important;
+}
+/* Enable ligatures for Fira Code */
+html.cgpt-ambient-on[data-custom-font="firacode"] {
+    font-variant-ligatures: normal;
+}
+
 /* Google Fonts imported in styles.css - do not duplicate here */
 
 /* ===== STREAMER MODE - IMPROVED BLUR EFFECTS ===== */
