@@ -36,6 +36,8 @@
   const GROK_HORIZON_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
   const SANTA_HAT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('santa_hat_cutout_v2.png') : 'santa_hat_cutout_v2.png';
   const CHRISTMAS_BG_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/christmas-bg.webp') : 'Aurora/christmas-bg.webp';
+  const SNOWDRIFT_LEFT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Left.png') : 'Left.png';
+  const SNOWDRIFT_RIGHT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Right.png') : 'Right.png';
 
   // Group DOM selectors for easier maintenance.
   const SELECTORS = {
@@ -85,9 +87,9 @@
 
   const safeRequestIdleCallback = (callback, options) => {
     if (window.requestIdleCallback) {
-        window.requestIdleCallback(callback, options);
+      window.requestIdleCallback(callback, options);
     } else {
-        setTimeout(callback, 1);
+      setTimeout(callback, 1);
     }
   };
 
@@ -144,14 +146,14 @@
         hasCheckedTimestamp = true; // Prevent spamming GET
         chrome.storage.local.get([TIMESTAMP_KEY], (result) => {
           if (chrome.runtime.lastError) {
-             hasCheckedTimestamp = false; // Retry next time
-             return;
+            hasCheckedTimestamp = false; // Retry next time
+            return;
           }
           if (result[TIMESTAMP_KEY]) {
             cachedLimitTimestamp = result[TIMESTAMP_KEY];
-             if (Date.now() - cachedLimitTimestamp > FIVE_MINUTES_MS) {
-               popup.classList.add(HIDE_LIMIT_CLASS);
-             }
+            if (Date.now() - cachedLimitTimestamp > FIVE_MINUTES_MS) {
+              popup.classList.add(HIDE_LIMIT_CLASS);
+            }
           } else {
             // No timestamp exists, set one
             const now = Date.now();
@@ -167,15 +169,15 @@
         isTimestampCleared = true;
         cachedLimitTimestamp = null;
         hasCheckedTimestamp = false; // Reset so we fetch again next time it appears
-        
+
         // Check if it actually needs removal to avoid IPC if already empty? 
         // Chrome optimizes this but good to be explicit.
         // We just call remove once.
         chrome.storage.local.remove([TIMESTAMP_KEY], () => {
-            if (chrome.runtime.lastError) {
-                // validation fail or something, reset flag to try again?
-                // ignoring for now to avoid loops
-            }
+          if (chrome.runtime.lastError) {
+            // validation fail or something, reset flag to try again?
+            // ignoring for now to avoid loops
+          }
         });
       }
     }
@@ -305,11 +307,11 @@
     cleanLayer(layer) {
       if (!layer) return;
       layer.classList.remove('active', 'gpt5-active');
-      
+
       const img = layer.querySelector('img');
       const video = layer.querySelector('video');
       const source = layer.querySelector('source');
-      
+
       if (img) {
         img.src = '';
         img.srcset = '';
@@ -380,7 +382,7 @@
         if (isVideoUrl) {
           img.style.display = 'none';
           video.style.display = 'block';
-          
+
           const onReady = () => {
             video.removeEventListener('loadeddata', onReady);
             video.removeEventListener('error', onError);
@@ -393,20 +395,20 @@
             cleanup();
             if (!abortController.signal.aborted) resolve(); // Still transition on error
           };
-          
+
           video.addEventListener('loadeddata', onReady, { once: true });
           video.addEventListener('error', onError, { once: true });
           video.src = url;
           video.load();
-          video.play().catch(() => {}); // Ignore autoplay errors
-          
+          video.play().catch(() => { }); // Ignore autoplay errors
+
           img.src = '';
           img.srcset = '';
           source.srcset = '';
         } else {
           video.style.display = 'none';
           img.style.display = 'block';
-          
+
           const onReady = () => {
             img.removeEventListener('load', onReady);
             img.removeEventListener('error', onError);
@@ -424,13 +426,13 @@
             cleanup();
             if (!abortController.signal.aborted) resolve();
           };
-          
+
           img.addEventListener('load', onReady, { once: true });
           img.addEventListener('error', onError, { once: true });
           img.src = url;
           img.srcset = '';
           source.srcset = '';
-          
+
           video.src = '';
         }
       });
@@ -463,7 +465,7 @@
 
         img.addEventListener('load', onReady, { once: true });
         img.addEventListener('error', onReady, { once: true });
-        
+
         img.src = this.DEFAULT_SRC;
         img.srcset = this.DEFAULT_SRCSET;
         source.srcset = this.DEFAULT_SRCSET;
@@ -549,7 +551,7 @@
                 }
               });
             });
-            
+
             if (localData) {
               await this.loadMedia(inactiveLayer, localData);
             } else {
@@ -610,12 +612,12 @@
 
     const blurPx = `${settings.backgroundBlur || '60'}px`;
     const scaling = settings.backgroundScaling || 'cover';
-    
+
     // Apply dynamic values directly to the container
     bgNode.style.setProperty('--cgpt-bg-blur-radius', blurPx);
     // Used in CSS via var(--cgpt-object-fit)
     bgNode.style.setProperty('--cgpt-object-fit', scaling);
-    
+
     // Static styles moved to styles.css
   }
 
@@ -796,10 +798,10 @@
     const qsHolidayMode = document.getElementById('qs-holidayMode');
     if (qsHolidayMode) {
       // Set initial state: on if all holiday features are enabled
-      const isHolidayMode = settings.enableSnowfall && settings.enableNewYear && 
-                            settings.customBgUrl === CHRISTMAS_BG_URL;
+      const isHolidayMode = settings.enableSnowfall && settings.enableNewYear &&
+        settings.customBgUrl === CHRISTMAS_BG_URL;
       qsHolidayMode.checked = isHolidayMode;
-      
+
       qsHolidayMode.addEventListener('change', () => {
         const isOn = qsHolidayMode.checked;
         chrome.storage.sync.set({
@@ -854,7 +856,7 @@
     document.documentElement.classList.toggle(CLEAR_APPEARANCE_CLASS, settings.appearance === 'clear');
     document.documentElement.classList.toggle('cgpt-cute-voice-on', !!settings.cuteVoiceUI);
     document.documentElement.classList.toggle('cgpt-focus-mode-on', !!settings.focusMode);
-  document.documentElement.classList.toggle('cgpt-cinema-mode', !!settings.cinemaMode);
+    document.documentElement.classList.toggle('cgpt-cinema-mode', !!settings.cinemaMode);
 
     // NEW: Custom Font Support
     const customFont = settings.customFont || 'system';
@@ -1131,7 +1133,7 @@
   function applyGlassEffects(root = document) {
     // If root itself matches, tag it (rare but possible for dynamic inserts)
     if (root.nodeType === 1 && root.matches && root.matches(UNTAGGED_GLASS_SELECTOR)) {
-        root.dataset.auroraGlass = 'true';
+      root.dataset.auroraGlass = 'true';
     }
 
     // Find children
@@ -1248,18 +1250,18 @@
     canvas: null,
     ctx: null,
     init() {
-        if (!this.canvas) {
-            this.canvas = document.createElement('canvas');
-            this.canvas.width = 50;
-            this.canvas.height = 50;
-            // WillReadFrequently optimization hint
-            this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
-        }
+      if (!this.canvas) {
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = 50;
+        this.canvas.height = 50;
+        // WillReadFrequently optimization hint
+        this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+      }
     },
     analyze(imgElement) {
       if (!settings.autoContrast) return;
       this.init(); // Constant check, cheap
-      
+
       try {
         // Handle cross-origin if possible (won't work for all external URLs)
         if (imgElement.src.startsWith('http') && !imgElement.src.includes(location.host)) {
@@ -1333,34 +1335,40 @@
     if (SANTA_HAT_URL) {
       document.documentElement.style.setProperty('--aurora-santa-hat-image', `url("${SANTA_HAT_URL}")`);
     }
+    if (SNOWDRIFT_LEFT_URL) {
+      document.documentElement.style.setProperty('--aurora-snowdrift-left-image', `url("${SNOWDRIFT_LEFT_URL}")`);
+    }
+    if (SNOWDRIFT_RIGHT_URL) {
+      document.documentElement.style.setProperty('--aurora-snowdrift-right-image', `url("${SNOWDRIFT_RIGHT_URL}")`);
+    }
     document.documentElement.classList.toggle('cgpt-snow-on', !!settings.enableSnowfall);
 
     // 1. Snowfall Logic (Optimized: fewer elements, CSS-driven properties)
     let snowContainer = document.getElementById('aurora-snow-container');
-    
+
     if (settings.enableSnowfall) {
       if (!snowContainer) {
         snowContainer = document.createElement('div');
         snowContainer.id = 'aurora-snow-container';
         snowContainer.className = 'aurora-snow-container';
-        
+
         // Use template for faster cloning (40 snowflakes - reduced from 60)
         const template = document.createElement('div');
         template.className = 'aurora-snowflake';
-        
+
         const frag = document.createDocumentFragment();
-        
+
         // Pre-generate all random values for consistency
         for (let i = 0; i < 40; i++) {
           const f = template.cloneNode(true);
-          
+
           // Use CSS custom properties for GPU-optimized values
           const left = Math.random() * 100;
           const duration = Math.random() * 6 + 6; // 6-12s (slower = less CPU)
           const delay = Math.random() * 8;
           const opacity = Math.random() * 0.5 + 0.4; // 0.4-0.9
           const size = Math.random() * 3 + 2; // 2-5px
-          
+
           // Batch style assignments via cssText for fewer reflows
           f.style.cssText = `
             left: ${left}vw;
@@ -1370,16 +1378,16 @@
             width: ${size}px;
             height: ${size}px;
           `;
-          
+
           frag.appendChild(f);
         }
-        
+
         snowContainer.appendChild(frag);
         document.body.appendChild(snowContainer);
       }
       // Ensure it's visible if it was exiting
       snowContainer.classList.remove('exiting');
-      
+
     } else if (snowContainer && !snowContainer.classList.contains('exiting')) {
       // Fade out animation
       snowContainer.classList.add('exiting');
@@ -1394,37 +1402,37 @@
 
     // 2. New Year Garland Logic (Optimized: fixed count, pre-defined colors)
     let garlandContainer = document.getElementById('aurora-garland-container');
-    
+
     if (settings.enableNewYear) {
       if (!garlandContainer) {
         garlandContainer = document.createElement('div');
         garlandContainer.id = 'aurora-garland-container';
         garlandContainer.className = 'aurora-garland-container';
-        
+
         // Fixed count of 30 bulbs (good balance for most screens)
         const BULB_COUNT = 30;
         const colors = ['#f00', '#0f0', '#00f', '#ff0', '#f0f', '#0ff'];
-        
+
         // Use template for faster cloning
         const wireTemplate = document.createElement('div');
         wireTemplate.className = 'aurora-garland-wire-segment';
         const bulbTemplate = document.createElement('div');
         bulbTemplate.className = 'aurora-bulb';
-        
+
         const frag = document.createDocumentFragment();
-        
+
         for (let i = 0; i < BULB_COUNT; i++) {
           const s = wireTemplate.cloneNode(true);
           const b = bulbTemplate.cloneNode(true);
-          
+
           // Pre-compute color index for deterministic pattern
           b.style.setProperty('--bulb-color', colors[i % colors.length]);
           b.style.animationDelay = (i * 0.15) + 's'; // Staggered timing
-          
+
           s.appendChild(b);
           frag.appendChild(s);
         }
-        
+
         garlandContainer.appendChild(frag);
         document.body.appendChild(garlandContainer);
       }
@@ -1523,10 +1531,10 @@
     window.addEventListener('focus', applyAllSettings, { passive: true });
     let lastUrl = location.href;
     // Debounce navigation checks to prevent trashing on rapid state changes
-    const checkUrl = debounce(() => { 
-        if (location.href === lastUrl) return; 
-        lastUrl = location.href; 
-        applyAllSettings(); 
+    const checkUrl = debounce(() => {
+      if (location.href === lastUrl) return;
+      lastUrl = location.href;
+      applyAllSettings();
     }, 50);
     window.addEventListener('popstate', checkUrl, { passive: true });
     const originalPushState = history.pushState;
@@ -1543,7 +1551,7 @@
 
     // Optimization: Use Idle Callback for full document scans
     const runGlassEffectsFull = () => {
-        safeRequestIdleCallback(() => applyGlassEffects(document), { timeout: 1000 });
+      safeRequestIdleCallback(() => applyGlassEffects(document), { timeout: 1000 });
     };
     const debouncedGlassEffects = debounce(runGlassEffectsFull, 200);
 
@@ -1561,10 +1569,10 @@
           if (n.nodeType === 1) { // Element node
             newNodesToProcess.push(n);
             // Check for popovers, dialogs, or menus
-            if (n.classList.contains('popover') || 
-                n.getAttribute('role') === 'dialog' || 
-                n.getAttribute('role') === 'menu' ||
-                n.querySelector?.('.popover, [role="dialog"], [role="menu"]')) {
+            if (n.classList.contains('popover') ||
+              n.getAttribute('role') === 'dialog' ||
+              n.getAttribute('role') === 'menu' ||
+              n.querySelector?.('.popover, [role="dialog"], [role="menu"]')) {
               urgentUiUpdate = true;
             }
           }
@@ -1577,16 +1585,16 @@
 
         // 2. Glass Effects - Optimized
         if (urgentUiUpdate) {
-            // Instant apply ONLY to new nodes for performance
-            newNodesToProcess.forEach(node => applyGlassEffects(node));
+          // Instant apply ONLY to new nodes for performance
+          newNodesToProcess.forEach(node => applyGlassEffects(node));
         } else {
-            // Regular debounced full scan for lower priority updates
-            debouncedGlassEffects(); 
+          // Regular debounced full scan for lower priority updates
+          debouncedGlassEffects();
         }
 
         // 3. Data Masking
         if (window.DataMaskingEngine && window.DataMaskingEngine.isEnabled()) {
-            newNodesToProcess.forEach(node => window.DataMaskingEngine.maskElement(node));
+          newNodesToProcess.forEach(node => window.DataMaskingEngine.maskElement(node));
         }
 
         renderFrameId = null;
@@ -1866,7 +1874,7 @@
         tempSettings.enableNewYear = isOn;
         settings.enableSnowfall = isOn;
         settings.enableNewYear = isOn;
-        
+
         if (isOn) {
           tempSettings.customBgUrl = CHRISTMAS_BG_URL;
           settings.customBgUrl = CHRISTMAS_BG_URL;
@@ -1949,7 +1957,7 @@
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area === 'sync') {
         const changedKeys = Object.keys(changes);
-        
+
         // --- INSTANT UPDATES: Apply all changes immediately ---
         // Update settings object with new values first
         changedKeys.forEach(key => {
@@ -1964,9 +1972,9 @@
         }
 
         // Root flags (CSS classes on <html>) - includes appearance, cinemaMode
-        const rootFlagKeys = ['legacyComposer', 'disableAnimations', 'focusMode', 'cuteVoiceUI', 
-                              'blurChatHistory', 'blurAvatar', 'theme', 'customFont', 'voiceColor',
-                              'appearance', 'cinemaMode'];
+        const rootFlagKeys = ['legacyComposer', 'disableAnimations', 'focusMode', 'cuteVoiceUI',
+          'blurChatHistory', 'blurAvatar', 'theme', 'customFont', 'voiceColor',
+          'appearance', 'cinemaMode'];
         if (changedKeys.some(k => rootFlagKeys.includes(k))) {
           applyRootFlags();
         }
