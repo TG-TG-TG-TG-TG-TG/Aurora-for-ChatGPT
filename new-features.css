@@ -369,8 +369,8 @@ html.cgpt-snow-on form[data-type="unified-composer"]::after {
     position: fixed;
     top: -10px;
     /* Hide top wire curve */
-    left: 0;
-    width: 100%;
+    left: 80px;
+    width: calc(100% - 80px);
     height: 60px;
     pointer-events: none;
     z-index: 100002;
