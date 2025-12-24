@@ -38,6 +38,7 @@
   const CHRISTMAS_BG_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/christmas-bg.webp') : 'Aurora/christmas-bg.webp';
   const SNOWDRIFT_LEFT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Left.png') : 'Left.png';
   const SNOWDRIFT_RIGHT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Right.png') : 'Right.png';
+  const CHATGPT_LOGO_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('ChatGPT-Logo.svg.png') : 'ChatGPT-Logo.svg.png';
 
   // Group DOM selectors for easier maintenance.
   const SELECTORS = {
@@ -1343,6 +1344,14 @@
     }
     document.documentElement.classList.toggle('cgpt-snow-on', !!settings.enableSnowfall);
 
+    if (settings.snowType === 'chatgpt-logo') {
+      document.documentElement.style.setProperty('--aurora-snow-image', `url("${CHATGPT_LOGO_URL}")`);
+      document.documentElement.classList.add('cgpt-snow-logo');
+    } else {
+      document.documentElement.style.removeProperty('--aurora-snow-image');
+      document.documentElement.classList.remove('cgpt-snow-logo');
+    }
+
     // 1. Snowfall Logic (Optimized: fewer elements, CSS-driven properties)
     let snowContainer = document.getElementById('aurora-snow-container');
 
@@ -1967,7 +1976,7 @@
         });
 
         // Holiday Effects (instant)
-        if (changes.enableSnowfall || changes.enableNewYear) {
+        if (changes.enableSnowfall || changes.enableNewYear || changes.snowType) {
           manageHolidayEffects();
         }
 

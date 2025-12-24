@@ -26,7 +26,8 @@ const DEFAULTS = {
   maskingRandomMode: false,
   enableSnowfall: false,
   enableNewYear: false,
-  cinemaMode: false
+  cinemaMode: false,
+  snowType: 'standard'
 };
 
 // --- Settings Cache for Instant Popup Response ---
@@ -96,7 +97,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return true; // Async response
     }
   }
-  
+
   // GET_SETTINGS_FULL: Returns settings + local data (for popup.js instant open)
   if (request.type === 'GET_SETTINGS_FULL') {
     if (settingsCache) {
@@ -115,7 +116,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return true; // Async response
     }
   }
-  
+
   if (request.type === 'GET_DEFAULTS') {
     sendResponse(DEFAULTS);
     return false;

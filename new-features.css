@@ -441,3 +441,15 @@ html.cgpt-no-animations .aurora-garland-container .aurora-bulb {
         opacity: 1;
     }
 }
+
+/* Chatgptsnow Logo Support */
+html.cgpt-snow-logo .aurora-snowflake {
+    background: transparent !important;
+    background-image: var(--aurora-snow-image) !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}

@@ -67,9 +67,12 @@
       "resources": [
         "Aurora/grok-4.webp",
         "Aurora/christmas-bg.webp",
+        "icons/*",
+        "santa_hat_cutout_v2.png",
         "santa_hat_cutout_v2.png",
         "Left.png",
         "Right.png",
+        "ChatGPT-Logo.svg.png",
         "_locales/*/messages.json",
         "vendor/tiktoken-lite/*",
         "vendor/tiktoken-lite/encoders/*"
