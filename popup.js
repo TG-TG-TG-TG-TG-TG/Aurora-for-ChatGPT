@@ -19,7 +19,7 @@ const DEFAULTS = {
   showTokenCounter: false, blurChatHistory: false, blurAvatar: false,
   soundEnabled: false, soundVolume: 'low', autoContrast: false,
   smartSelectors: true, dataMaskingEnabled: false, maskingRandomMode: false,
-  enableSnowfall: false, enableNewYear: false, cinemaMode: false
+  enableSnowfall: false, enableNewYear: false, cinemaMode: false, snowType: 'standard'
 };
 
 const TOGGLE_KEYS = [
@@ -37,21 +37,31 @@ let listenersAttached = false;
 // --- Helpers ---
 const getMessage = (key) => chrome?.i18n?.getMessage(key) || key;
 
+const normalizeSnowType = (value) => {
+  if (!value) return 'standard';
+  const raw = String(value).toLowerCase();
+  if (raw === 'standard' || raw === 'chatgpt-logo') return raw;
+  const compact = raw.replace(/[^a-z0-9]/g, '');
+  if (compact.includes('chatgpt') && compact.includes('snow')) return 'chatgpt-logo';
+  if (compact.includes('standard')) return 'standard';
+  return 'standard';
+};
+
 // --- Main Initialization (Zero-Latency) ---
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Cache all DOM elements ONCE (eliminates repeated querySelectorAll)
   cacheElements();
-  
+
   // 2. Apply localization immediately (uses cached elements)
   applyLocalization();
-  
+
   // 3. Setup static UI (tabs, feedback) - no data needed
   setupTabs();
   setupFeedbackSystem();
-  
+
   // 4. Render with defaults INSTANTLY (0ms blocking - UI appears immediately)
   renderUi(DEFAULTS, { detectedTheme: 'dark' });
-  
+
   // 5. Hydrate with real data via INSTANT message (cached in background.js)
   chrome.runtime.sendMessage({ type: 'GET_SETTINGS_FULL' }, (response) => {
     if (chrome.runtime.lastError) {
@@ -64,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       return;
     }
-    
+
     const { settings, local } = response || {};
     hydrateWithRealData(settings || DEFAULTS, local || {});
   });
@@ -73,14 +83,14 @@ document.addEventListener('DOMContentLoaded', () => {
 function hydrateWithRealData(settings, localData) {
   // Re-render with actual user data
   renderUi(settings, localData);
-  
+
   // Attach event listeners ONCE (after real data is loaded)
   if (!listenersAttached) {
     setupChangeListeners();
     setupImportExport();
     listenersAttached = true;
   }
-  
+
   // Build search index in idle time (low priority, non-blocking)
   if (window.requestIdleCallback) {
     requestIdleCallback(buildSearchableData, { timeout: 2000 });
@@ -93,7 +103,7 @@ function hydrateWithRealData(settings, localData) {
 function cacheElements() {
   // Toggle elements
   TOGGLE_KEYS.forEach(key => { $.toggles = $.toggles || {}; $.toggles[key] = document.getElementById(key); });
-  
+
   // Individual elements
   $.blurSlider = document.getElementById('blurSlider');
   $.blurValue = document.getElementById('blurValue');
@@ -109,7 +119,7 @@ function cacheElements() {
   $.settingsJson = document.getElementById('settingsJson');
   $.importExportRow = document.getElementById('importExportTextAreaRow');
   $.holidayMode = document.getElementById('holidayMode');
-  
+
   // Feedback elements
   $.feedbackTrigger = document.getElementById('feedbackTrigger');
   $.feedbackBox = document.getElementById('feedbackBox');
@@ -122,7 +132,7 @@ function cacheElements() {
   $.ticketIdDisplay = document.getElementById('ticketIdDisplay');
   $.copyTicketBtn = document.getElementById('copyTicketBtn');
   $.copyFeedback = document.getElementById('copyFeedback');
-  
+
   // Collections (cached once)
   $.tabs = document.querySelectorAll('.tab-link');
   $.panes = document.querySelectorAll('.tab-pane');
@@ -131,7 +141,7 @@ function cacheElements() {
   $.i18nPlaceholders = document.querySelectorAll('[data-i18n-placeholder]');
   $.i18nTitles = document.querySelectorAll('[data-i18n-title]');
   $.rows = document.querySelectorAll('.row');
-  
+
   // Custom selects (containers)
   $.selects = {
     bgPreset: document.getElementById('bgPreset'),
@@ -140,7 +150,8 @@ function cacheElements() {
     appearanceSelector: document.getElementById('appearanceSelector'),
     fontSelector: document.getElementById('fontSelector'),
     voiceColorSelector: document.getElementById('voiceColorSelector'),
-    defaultModelSelector: document.getElementById('defaultModelSelector')
+    defaultModelSelector: document.getElementById('defaultModelSelector'),
+    snowTypeSelector: document.getElementById('snowTypeSelector')
   };
 }
 
@@ -161,8 +172,8 @@ function renderUi(settings, localData = {}) {
 
   // Holiday Mode toggle state (on if all holiday features are enabled)
   if ($.holidayMode) {
-    const isHolidayMode = settings.enableSnowfall && settings.enableNewYear && 
-                          settings.customBgUrl === CHRISTMAS_BG_URL;
+    const isHolidayMode = settings.enableSnowfall && settings.enableNewYear &&
+      settings.customBgUrl === CHRISTMAS_BG_URL;
     $.holidayMode.checked = isHolidayMode;
   }
 
@@ -188,9 +199,9 @@ function renderUi(settings, localData = {}) {
   }
 
   // Custom Model Input
-  const knownModels = ['gpt-5','gpt-5-thinking','gpt-5-thinking-mini','gpt-5-thinking-instant','gpt-4o','gpt-4.1','o3','o4-mini',''];
+  const knownModels = ['gpt-5', 'gpt-5-thinking', 'gpt-5-thinking-mini', 'gpt-5-thinking-instant', 'gpt-4o', 'gpt-4.1', 'o3', 'o4-mini', ''];
   const isCustomModel = settings.defaultModel && !knownModels.includes(settings.defaultModel);
-  
+
   if ($.modelRow) $.modelRow.hidden = !isCustomModel;
   if ($.modelInput && isCustomModel) $.modelInput.value = settings.defaultModel;
 
@@ -288,7 +299,7 @@ const SELECT_CONFIGS = [
     ],
     mapVal: (v) => {
       if (!v) return '';
-      const known = ['gpt-5','gpt-5-thinking','gpt-5-thinking-mini','gpt-5-thinking-instant','gpt-4o','gpt-4.1','o3','o4-mini',''];
+      const known = ['gpt-5', 'gpt-5-thinking', 'gpt-5-thinking-mini', 'gpt-5-thinking-instant', 'gpt-4o', 'gpt-4.1', 'o3', 'o4-mini', ''];
       return known.includes(v) ? v : '__custom__';
     },
     onSelect: (val) => {
@@ -301,6 +312,17 @@ const SELECT_CONFIGS = [
         chrome.storage.sync.set({ defaultModel: val });
       }
     }
+  },
+  {
+    id: 'snowTypeSelector', key: 'snowType',
+    options: [
+      { value: 'standard', label: 'Standard' },
+      { value: 'chatgpt-logo', label: 'Chatgptsnow' }
+    ],
+    mapVal: (v) => normalizeSnowType(v),
+    onSelect: (val) => {
+      chrome.storage.sync.set({ snowType: normalizeSnowType(val) });
+    }
   }
 ];
 
@@ -308,40 +330,40 @@ function initOrUpdateSelects(settings) {
   SELECT_CONFIGS.forEach(cfg => {
     const container = $.selects[cfg.id];
     if (!container) return;
-    
+
     const trigger = container.querySelector('.select-trigger');
     const label = container.querySelector('.select-label');
     const optsContainer = container.querySelector('.select-options');
     const dot = trigger?.querySelector('.color-dot');
-    
+
     if (!trigger || !optsContainer) return;
-    
+
     const val = settings[cfg.key];
     const effectiveVal = cfg.mapVal ? cfg.mapVal(val) : val;
     const activeOpt = cfg.options.find(o => o.value === effectiveVal) || cfg.options[0];
-    
+
     // Update trigger label
     if (label) {
       label.textContent = activeOpt.labelKey ? getMessage(activeOpt.labelKey) : (activeOpt.label || activeOpt.value);
     }
-    
+
     // Update color dot if present
     if (dot) {
       dot.style.display = activeOpt.color ? 'block' : 'none';
       if (activeOpt.color) dot.style.backgroundColor = activeOpt.color;
     }
-    
+
     // Build options ONLY ONCE (check if already built)
     if (!container.dataset.built) {
       container.dataset.built = 'true';
-      
+
       // Build options HTML
       optsContainer.innerHTML = cfg.options.filter(o => !o.hidden).map(opt => {
         const txt = opt.labelKey ? getMessage(opt.labelKey) : (opt.label || opt.value);
         const dotHtml = opt.color ? `<span class="color-dot" style="background-color:${opt.color};display:block;"></span>` : '';
         return `<div class="select-option" data-value="${opt.value}">${dotHtml}<span>${txt}</span></div>`;
       }).join('');
-      
+
       // Attach trigger click listener ONCE
       trigger.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -350,25 +372,25 @@ function initOrUpdateSelects(settings) {
         optsContainer.style.display = 'block';
         trigger.setAttribute('aria-expanded', 'true');
       });
-      
+
       // Attach option click listeners ONCE using event delegation
       optsContainer.addEventListener('click', (e) => {
         const option = e.target.closest('.select-option');
         if (!option) return;
-        
+
         const selectedVal = option.dataset.value;
         if (cfg.onSelect) {
           cfg.onSelect(selectedVal);
         } else {
           chrome.storage.sync.set({ [cfg.key]: selectedVal });
         }
-        
+
         // Update label immediately (optimistic)
         if (label) label.textContent = option.textContent.trim();
         closeAllSelects();
       });
     }
-    
+
     // Update selected state on options
     optsContainer.querySelectorAll('.select-option').forEach(el => {
       el.setAttribute('aria-selected', el.dataset.value === effectiveVal);

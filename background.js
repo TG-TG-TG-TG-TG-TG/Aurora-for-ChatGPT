@@ -26,7 +26,24 @@ const DEFAULTS = {
   maskingRandomMode: false,
   enableSnowfall: false,
   enableNewYear: false,
-  cinemaMode: false
+  cinemaMode: false,
+  snowType: 'standard'
+};
+
+const normalizeSnowType = (value) => {
+  if (!value) return 'standard';
+  const raw = String(value).toLowerCase();
+  if (raw === 'standard' || raw === 'chatgpt-logo') return raw;
+  const compact = raw.replace(/[^a-z0-9]/g, '');
+  if (compact.includes('chatgpt') && compact.includes('snow')) return 'chatgpt-logo';
+  if (compact.includes('standard')) return 'standard';
+  return 'standard';
+};
+
+const normalizeSettings = (settings) => {
+  const normalizedSnowType = normalizeSnowType(settings.snowType);
+  if (normalizedSnowType === settings.snowType) return settings;
+  return { ...settings, snowType: normalizedSnowType };
 };
 
 // --- Settings Cache for Instant Popup Response ---
@@ -35,7 +52,7 @@ let localCache = {};
 
 // Pre-cache settings on service worker startup
 chrome.storage.sync.get(DEFAULTS, (settings) => {
-  settingsCache = { ...DEFAULTS, ...settings };
+  settingsCache = normalizeSettings({ ...DEFAULTS, ...settings });
 });
 chrome.storage.local.get(['customBgData', 'detectedTheme'], (local) => {
   localCache = local || {};
@@ -51,6 +68,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
         settingsCache[key] = DEFAULTS[key];
       }
     }
+    settingsCache = normalizeSettings(settingsCache);
   }
   if (area === 'local') {
     for (const [key, { newValue }] of Object.entries(changes)) {
@@ -90,13 +108,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else {
       // Fallback: cache not ready yet (rare edge case)
       chrome.storage.sync.get(DEFAULTS, (settings) => {
-        settingsCache = { ...DEFAULTS, ...settings };
+        settingsCache = normalizeSettings({ ...DEFAULTS, ...settings });
         sendResponse(settingsCache);
       });
       return true; // Async response
     }
   }
-  
+
   // GET_SETTINGS_FULL: Returns settings + local data (for popup.js instant open)
   if (request.type === 'GET_SETTINGS_FULL') {
     if (settingsCache) {
@@ -108,14 +126,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         chrome.storage.sync.get(DEFAULTS),
         chrome.storage.local.get(['customBgData', 'detectedTheme'])
       ]).then(([sync, local]) => {
-        settingsCache = { ...DEFAULTS, ...sync };
+        settingsCache = normalizeSettings({ ...DEFAULTS, ...sync });
         localCache = local || {};
         sendResponse({ settings: settingsCache, local: localCache });
       });
       return true; // Async response
     }
   }
-  
+
   if (request.type === 'GET_DEFAULTS') {
     sendResponse(DEFAULTS);
     return false;
