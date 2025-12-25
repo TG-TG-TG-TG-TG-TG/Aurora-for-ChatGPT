@@ -73,6 +73,7 @@
         "Left.png",
         "Right.png",
         "ChatGPT-Logo.svg.png",
+        "Santa.mp4",
         "_locales/*/messages.json",
         "vendor/tiktoken-lite/*",
         "vendor/tiktoken-lite/encoders/*"

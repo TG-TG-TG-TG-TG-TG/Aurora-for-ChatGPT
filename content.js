@@ -39,6 +39,7 @@
   const SNOWDRIFT_LEFT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Left.png') : 'Left.png';
   const SNOWDRIFT_RIGHT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Right.png') : 'Right.png';
   const CHATGPT_LOGO_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('ChatGPT-Logo.svg.png') : 'ChatGPT-Logo.svg.png';
+  const SANTA_VIDEO_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Santa.mp4') : 'Santa.mp4';
 
   // Group DOM selectors for easier maintenance.
   const SELECTORS = {
@@ -1457,6 +1458,52 @@
       }
     } else if (garlandContainer) {
       garlandContainer.remove();
+    }
+
+    // 3. Santa Flyby (once per minute)
+    let santaFlyby = document.getElementById('aurora-santa-flyby');
+    if (settings.enableSnowfall) {
+      if (!santaFlyby) {
+        santaFlyby = document.createElement('div');
+        santaFlyby.id = 'aurora-santa-flyby';
+        santaFlyby.className = 'aurora-santa-flyby';
+
+        santaFlyby.insertAdjacentHTML('beforeend', `
+          <svg class="aurora-santa-filter" aria-hidden="true" width="0" height="0" xmlns="http://www.w3.org/2000/svg">
+            <filter id="aurora-santa-key" color-interpolation-filters="sRGB">
+              <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -0.333 -0.333 -0.333 1 0"></feColorMatrix>
+            </filter>
+          </svg>
+        `);
+
+        const video = document.createElement('video');
+        video.src = SANTA_VIDEO_URL;
+        video.muted = true;
+        video.loop = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.setAttribute('playsinline', '');
+        video.setAttribute('muted', '');
+        video.setAttribute('loop', '');
+        video.setAttribute('autoplay', '');
+        video.setAttribute('aria-hidden', 'true');
+        santaFlyby.appendChild(video);
+
+        document.body.appendChild(santaFlyby);
+
+        const restartVideo = () => {
+          try {
+            video.currentTime = 0;
+          } catch (e) {
+            // Ignore seek errors
+          }
+          video.play().catch(() => { });
+        };
+        santaFlyby.addEventListener('animationiteration', restartVideo);
+        restartVideo();
+      }
+    } else if (santaFlyby) {
+      santaFlyby.remove();
     }
   }
 

@@ -364,6 +364,63 @@ html.cgpt-snow-on form[data-type="unified-composer"]::after {
     background-position: right bottom;
 }
 
+/* 1d. Santa Flyby */
+.aurora-santa-flyby {
+    position: fixed;
+    left: -30vw;
+    bottom: -30vh;
+    width: clamp(90px, 16vw, 220px);
+    pointer-events: none;
+    z-index: 100001;
+    opacity: 0;
+    will-change: transform, opacity;
+    animation: aurora-santa-flyby 300s linear infinite;
+}
+
+.aurora-santa-flyby video {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+    filter: url(#aurora-santa-key);
+}
+
+.aurora-santa-filter {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+html.cgpt-tab-hidden .aurora-santa-flyby,
+html.cgpt-animations-disabled .aurora-santa-flyby {
+    animation-play-state: paused !important;
+    opacity: 0 !important;
+}
+
+@keyframes aurora-santa-flyby {
+    0% {
+        transform: translate3d(0, 0, 0) rotate(-12deg);
+        opacity: 0;
+    }
+    2% {
+        opacity: 1;
+    }
+    12% {
+        transform: translate3d(140vw, -140vh, 0) rotate(-12deg);
+        opacity: 1;
+    }
+    13% {
+        opacity: 0;
+    }
+    100% {
+        transform: translate3d(140vw, -140vh, 0) rotate(-12deg);
+        opacity: 0;
+    }
+}
+
 /* 2. New Year Garland (Lights) - GPU Accelerated */
 .aurora-garland-container {
     position: fixed;
