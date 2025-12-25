@@ -111,6 +111,16 @@
     return key;
   };
 
+  const normalizeSnowType = (value) => {
+    if (!value) return 'standard';
+    const raw = String(value).toLowerCase();
+    if (raw === 'standard' || raw === 'chatgpt-logo') return raw;
+    const compact = raw.replace(/[^a-z0-9]/g, '');
+    if (compact.includes('chatgpt') && compact.includes('snow')) return 'chatgpt-logo';
+    if (compact.includes('standard')) return 'standard';
+    return 'standard';
+  };
+
   let cachedLimitTimestamp = null;
   let hasCheckedTimestamp = false;
   let isTimestampCleared = false;
@@ -1934,6 +1944,7 @@
 
         // Update the global settings object with the fresh, authoritative state.
         settings = freshSettings;
+        settings.snowType = normalizeSnowType(settings.snowType);
         // Apply all visual changes based on the new settings.
         applyAllSettings();
       });
@@ -1974,6 +1985,9 @@
             settings[key] = changes[key].newValue;
           }
         });
+        if (changes.snowType) {
+          settings.snowType = normalizeSnowType(settings.snowType);
+        }
 
         // Holiday Effects (instant)
         if (changes.enableSnowfall || changes.enableNewYear || changes.snowType) {

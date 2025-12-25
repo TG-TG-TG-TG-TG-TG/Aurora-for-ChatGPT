@@ -37,6 +37,16 @@ let listenersAttached = false;
 // --- Helpers ---
 const getMessage = (key) => chrome?.i18n?.getMessage(key) || key;
 
+const normalizeSnowType = (value) => {
+  if (!value) return 'standard';
+  const raw = String(value).toLowerCase();
+  if (raw === 'standard' || raw === 'chatgpt-logo') return raw;
+  const compact = raw.replace(/[^a-z0-9]/g, '');
+  if (compact.includes('chatgpt') && compact.includes('snow')) return 'chatgpt-logo';
+  if (compact.includes('standard')) return 'standard';
+  return 'standard';
+};
+
 // --- Main Initialization (Zero-Latency) ---
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Cache all DOM elements ONCE (eliminates repeated querySelectorAll)
@@ -308,7 +318,11 @@ const SELECT_CONFIGS = [
     options: [
       { value: 'standard', label: 'Standard' },
       { value: 'chatgpt-logo', label: 'Chatgptsnow' }
-    ]
+    ],
+    mapVal: (v) => normalizeSnowType(v),
+    onSelect: (val) => {
+      chrome.storage.sync.set({ snowType: normalizeSnowType(val) });
+    }
   }
 ];
 
