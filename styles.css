@@ -210,16 +210,23 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) [data-aurora-glass="true"] {
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Menu/Popover Opening Animation (same as Quick Settings panel) */
+/* Menu/Popover Opening Animation (smooth, natural feel) */
 html.cgpt-ambient-on:not(.cgpt-animations-disabled):not(.cgpt-legacy-composer) .popover[data-aurora-glass="true"],
 html.cgpt-ambient-on:not(.cgpt-animations-disabled):not(.cgpt-legacy-composer) [role="menu"][data-aurora-glass="true"],
 html.cgpt-ambient-on:not(.cgpt-animations-disabled):not(.cgpt-legacy-composer) [data-radix-menu-content][data-aurora-glass="true"] {
-  animation: menu-pop-open 200ms cubic-bezier(0.16, 1, 0.3, 1);
-  transform-origin: top center;
+  animation: menu-pop-open 280ms cubic-bezier(0.32, 0.72, 0, 1);
+  transform-origin: var(--radix-popper-transform-origin, top center);
+  will-change: transform, opacity;
 }
 @keyframes menu-pop-open {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  0% { 
+    opacity: 0; 
+    transform: scale(0.92) translateY(-4px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) translateY(0);
+  }
 }
 /* --- Element-Specific Overrides & Hover Effects --- */
 
@@ -269,18 +276,17 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="as
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre { border-radius: var(--glass-radius) !important; overflow: hidden !important; }
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="assistant"] pre > div[class*="bg-"] > div[class*="bg-"] { background-color: transparent !important; }
 
-/* Inline Code Blur Effect */
+/* Inline Code Styling (No blur to prevent text distortion) */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .markdown code:not(pre code) {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15) !important;
+  /* No backdrop-filter - prevents blur bleeding into surrounding text */
 }
 
 html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .markdown code:not(pre code) {
-  background: rgba(0, 0, 0, 0.12) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background: rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
 }
 
@@ -364,8 +370,11 @@ html.cgpt-focus-mode-on main .flex.h-full.flex-col { padding-top: 1.25rem; }
 
 .bg-red-500.text-white.border-red-500 { display: none !important; }
 
-/* --- FIX: Hide Duplicated Header (Perplexity Comet) --- */
-div.draggable.h-header-height.bg-token-bg-primary { display: none !important; }
+/* --- FIX: Transparent Duplicated Header (Perplexity Comet) - Do NOT hide, just make transparent --- */
+div.draggable.h-header-height.bg-token-bg-primary { 
+  background: transparent !important; 
+  box-shadow: none !important;
+}
 /* --- FIX: Glass Effect for Custom GPT/Project Header --- */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div.sticky.content-fade-top:has(button[data-testid="project-modal-trigger"]) {
   /* Add padding and rounded corners for better appearance */
@@ -1019,9 +1028,27 @@ html.cgpt-light-mode #cgpt-qs-btn svg { color: #000; }
     box-shadow: 0 0 20px 4px rgba(79, 140, 255, 0.5), 0 0 40px 8px rgba(79, 140, 255, 0.2);
   }
 }
-/* Keyframe animations for the panel */
-@keyframes qs-panel-open { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-@keyframes qs-panel-close { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
+/* Keyframe animations for the Quick Settings panel */
+@keyframes qs-panel-open { 
+  0% { 
+    opacity: 0; 
+    transform: scale(0.92) translateY(8px); 
+  } 
+  100% { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  } 
+}
+@keyframes qs-panel-close { 
+  0% { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  } 
+  100% { 
+    opacity: 0; 
+    transform: scale(0.92) translateY(8px); 
+  } 
+}
 #cgpt-qs-panel {
   position: fixed;
   bottom: 60px;
@@ -1051,24 +1078,24 @@ html.cgpt-light-mode #cgpt-qs-panel {
 /* State-based animation styling */
 #cgpt-qs-panel[data-state="closed"] {
   opacity: 0;
-  transform: scale(0.95);
+  transform: scale(0.92) translateY(8px);
   pointer-events: none;
   visibility: hidden;
 }
 
 #cgpt-qs-panel[data-state="open"] {
   opacity: 1;
-  transform: scale(1);
+  transform: scale(1) translateY(0);
   pointer-events: auto;
   visibility: visible;
-  animation: qs-panel-open 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: qs-panel-open 320ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 #cgpt-qs-panel[data-state="closing"] {
   pointer-events: none;
   visibility: visible;
-  /* `forwards` will hold the `to` state of the animation */
-  animation: qs-panel-close 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  /* `forwards` holds the end state; faster close feels snappier */
+  animation: qs-panel-close 220ms cubic-bezier(0.32, 0, 0.67, 0) forwards;
 }
 .qs-section-title {
   font-size: 11px;
@@ -1625,9 +1652,9 @@ div.h-header-height.bg-token-bg-primary.flex.items-center.gap-8.p-2.select-none.
   border: none !important;
 }
 
-/* 2. Remove Specific Side Gradients */
-div.absolute.start-0.top-0.z-10.from-token-bg-primary,
-div.absolute.end-0.top-0.z-10.to-token-bg-primary {
+/* 2. Remove Specific Side Gradients (only if empty - prevents hiding GPTs/Settings buttons) */
+div.absolute.start-0.top-0.z-10.from-token-bg-primary:not(:has(*)),
+div.absolute.end-0.top-0.z-10.to-token-bg-primary:not(:has(*)) {
   display: none !important;
 }
 

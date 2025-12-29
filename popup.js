@@ -19,7 +19,7 @@ const DEFAULTS = {
   showTokenCounter: false, blurChatHistory: false, blurAvatar: false,
   soundEnabled: false, soundVolume: 'low', autoContrast: false,
   smartSelectors: true, dataMaskingEnabled: false, maskingRandomMode: false,
-  enableSnowfall: false, enableNewYear: false, cinemaMode: false
+  enableSnowfall: false, enableNewYear: false, cinemaMode: false, snowType: 'standard'
 };
 
 const TOGGLE_KEYS = [
@@ -140,7 +140,8 @@ function cacheElements() {
     appearanceSelector: document.getElementById('appearanceSelector'),
     fontSelector: document.getElementById('fontSelector'),
     voiceColorSelector: document.getElementById('voiceColorSelector'),
-    defaultModelSelector: document.getElementById('defaultModelSelector')
+    defaultModelSelector: document.getElementById('defaultModelSelector'),
+    snowTypeSelector: document.getElementById('snowTypeSelector')
   };
 }
 
@@ -302,6 +303,13 @@ const SELECT_CONFIGS = [
         chrome.storage.sync.set({ defaultModel: val });
       }
     }
+  },
+  {
+    id: 'snowTypeSelector', key: 'snowType',
+    options: [
+      { value: 'standard', label: 'Standard' },
+      { value: 'chatgpt-logo', label: 'ChatGPT Snow' }
+    ]
   }
 ];
 

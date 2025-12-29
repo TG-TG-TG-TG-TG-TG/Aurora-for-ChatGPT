@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "default_locale": "en",
   "description": "__MSG_extensionDescription__",
   "background": {
@@ -65,10 +65,14 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "icons/*",
+        "santa_hat_cutout_v2.png",
+        "Left.png",
+        "Right.png",
+        "ChatGPT-Logo.svg.png",
+        "Santa.mp4",
         "Aurora/grok-4.webp",
         "Aurora/christmas-bg.webp",
-        "icons/logo-48.png",
-        "santa_hat_cutout_v2.png",
         "_locales/*/messages.json",
         "vendor/tiktoken-lite/*",
         "vendor/tiktoken-lite/encoders/*"

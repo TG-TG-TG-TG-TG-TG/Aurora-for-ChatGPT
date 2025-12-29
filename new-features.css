@@ -336,12 +336,100 @@ html.cgpt-snow-on a[data-sidebar-item="true"][href="/"]:has(svg use[href$="#5518
     z-index: 1;
 }
 
+/* 1c. Snowdrifts on Input Field (Snow toggle) */
+html.cgpt-snow-on form[data-type="unified-composer"] {
+    position: relative;
+}
+
+html.cgpt-snow-on form[data-type="unified-composer"]::before,
+html.cgpt-snow-on form[data-type="unified-composer"]::after {
+    content: '';
+    position: absolute;
+    top: -45px;
+    width: 200px;
+    height: 80px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    pointer-events: none;
+    z-index: 100;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+
+html.cgpt-snow-on form[data-type="unified-composer"]::before {
+    left: -10px;
+    background-image: var(--aurora-snowdrift-right-image, none);
+    background-position: left bottom;
+}
+
+html.cgpt-snow-on form[data-type="unified-composer"]::after {
+    right: -10px;
+    background-image: var(--aurora-snowdrift-left-image, none);
+    background-position: right bottom;
+}
+
+/* 1d. Santa Flyby */
+.aurora-santa-flyby {
+    position: fixed;
+    left: -30vw;
+    bottom: -30vh;
+    width: clamp(90px, 16vw, 220px);
+    pointer-events: none;
+    z-index: 100001;
+    opacity: 0;
+    will-change: transform, opacity;
+    animation: aurora-santa-flyby 300s linear infinite;
+}
+
+.aurora-santa-flyby video {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+    filter: url(#aurora-santa-key);
+}
+
+.aurora-santa-filter {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+html.cgpt-tab-hidden .aurora-santa-flyby,
+html.cgpt-animations-disabled .aurora-santa-flyby {
+    animation-play-state: paused !important;
+    opacity: 0 !important;
+}
+
+@keyframes aurora-santa-flyby {
+    0% {
+        transform: translate3d(0, 0, 0) rotate(-12deg);
+        opacity: 0;
+    }
+    2% {
+        opacity: 1;
+    }
+    12% {
+        transform: translate3d(140vw, -140vh, 0) rotate(-12deg);
+        opacity: 1;
+    }
+    13% {
+        opacity: 0;
+    }
+    100% {
+        transform: translate3d(140vw, -140vh, 0) rotate(-12deg);
+        opacity: 0;
+    }
+}
+
 /* 2. New Year Garland (Lights) - GPU Accelerated */
 .aurora-garland-container {
     position: fixed;
     top: -10px; /* Hide top wire curve */
-    left: 0;
-    width: 100%;
+    left: 80px;
+    width: calc(100% - 80px);
     height: 60px;
     pointer-events: none;
     z-index: 100002;
@@ -402,3 +490,16 @@ html.cgpt-no-animations .aurora-garland-container .aurora-bulb {
     0%, 100% { opacity: 0.5; }
     50% { opacity: 1; }
 }
+
+/* ChatGPT Logo Snow Support */
+html.cgpt-snow-logo .aurora-snowflake {
+    background: transparent !important;
+    background-image: var(--aurora-snow-image) !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+

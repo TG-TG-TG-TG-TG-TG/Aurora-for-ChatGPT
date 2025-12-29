@@ -36,6 +36,9 @@
   const GROK_HORIZON_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/grok-4.webp') : 'Aurora/grok-4.webp';
   const SANTA_HAT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('santa_hat_cutout_v2.png') : 'santa_hat_cutout_v2.png';
   const CHRISTMAS_BG_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Aurora/christmas-bg.webp') : 'Aurora/christmas-bg.webp';
+  const SNOWDRIFT_LEFT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Left.png') : 'Left.png';
+  const SNOWDRIFT_RIGHT_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('Right.png') : 'Right.png';
+  const CHATGPT_LOGO_URL = chrome?.runtime?.getURL ? chrome.runtime.getURL('ChatGPT-Logo.svg.png') : 'ChatGPT-Logo.svg.png';
 
   // Group DOM selectors for easier maintenance.
   const SELECTORS = {
@@ -1333,7 +1336,20 @@
     if (SANTA_HAT_URL) {
       document.documentElement.style.setProperty('--aurora-santa-hat-image', `url("${SANTA_HAT_URL}")`);
     }
+    // Set snowdrift images
+    if (SNOWDRIFT_LEFT_URL) {
+      document.documentElement.style.setProperty('--aurora-snowdrift-left-image', `url("${SNOWDRIFT_LEFT_URL}")`);
+    }
+    if (SNOWDRIFT_RIGHT_URL) {
+      document.documentElement.style.setProperty('--aurora-snowdrift-right-image', `url("${SNOWDRIFT_RIGHT_URL}")`);
+    }
+    // Set ChatGPT logo for snow
+    if (CHATGPT_LOGO_URL) {
+      document.documentElement.style.setProperty('--aurora-snow-image', `url("${CHATGPT_LOGO_URL}")`);
+    }
     document.documentElement.classList.toggle('cgpt-snow-on', !!settings.enableSnowfall);
+    // Toggle snow logo class based on snowType
+    document.documentElement.classList.toggle('cgpt-snow-logo', settings.snowType === 'chatgpt-logo' && settings.enableSnowfall);
 
     // 1. Snowfall Logic (Optimized: fewer elements, CSS-driven properties)
     let snowContainer = document.getElementById('aurora-snow-container');
