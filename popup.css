@@ -723,3 +723,28 @@ html.theme-light .feedback-send-btn {
   opacity: 0.7;
   color: var(--popup-text);
 }
+
+/* --- Master Toggle Button --- */
+.master-toggle-row {
+  margin: -6px 0 16px;
+}
+
+.master-toggle-btn {
+  width: 100%;
+  font-weight: 600;
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.master-toggle-btn:hover {
+  background: rgba(34, 197, 94, 0.22);
+}
+
+.master-toggle-btn[data-state="disabled"] {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.master-toggle-btn[data-state="disabled"]:hover {
+  background: rgba(239, 68, 68, 0.22);
+}

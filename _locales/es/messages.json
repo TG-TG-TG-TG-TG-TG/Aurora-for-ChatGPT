@@ -11,6 +11,12 @@
   "buttonChooseFile": {
     "message": "Usar archivo local"
   },
+  "labelAuroraActivated": {
+    "message": "Aurora activada"
+  },
+  "labelAuroraDeactivated": {
+    "message": "Aurora desactivada"
+  },
   "popupTitle": {
     "message": "Configuración de Aurora"
   },
