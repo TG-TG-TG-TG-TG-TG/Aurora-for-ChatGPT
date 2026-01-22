@@ -11,6 +11,12 @@
   "buttonChooseFile": {
     "message": "Utiliser un fichier local"
   },
+  "labelAuroraActivated": {
+    "message": "Aurora activée"
+  },
+  "labelAuroraDeactivated": {
+    "message": "Aurora désactivée"
+  },
   "popupTitle": {
     "message": "paramètres aurora pour chatgpt"
   },

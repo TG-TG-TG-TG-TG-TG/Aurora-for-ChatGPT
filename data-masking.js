@@ -61,7 +61,7 @@
         constructor() {
             this.originalData = new Map();
             this.dataIdCounter = 0;
-            this.settings = { dataMaskingEnabled: false, maskingRandomMode: false };
+            this.settings = { dataMaskingEnabled: false, maskingRandomMode: false, extensionEnabled: true };
             this.initialized = false;
             this.observer = null;
             this.pendingNodes = [];
@@ -73,13 +73,14 @@
             try {
                 if (chrome?.storage?.sync) {
                     const result = await new Promise(resolve => {
-                        chrome.storage.sync.get(['dataMaskingEnabled', 'maskingRandomMode'], resolve);
+                        chrome.storage.sync.get(['dataMaskingEnabled', 'maskingRandomMode', 'extensionEnabled'], resolve);
                     });
                     this.settings.dataMaskingEnabled = !!result.dataMaskingEnabled;
                     this.settings.maskingRandomMode = !!result.maskingRandomMode;
+                    this.settings.extensionEnabled = result.extensionEnabled !== false;
                     this.initialized = true;
 
-                    if (this.settings.dataMaskingEnabled) {
+                    if (this.settings.dataMaskingEnabled && this.settings.extensionEnabled) {
                         this.startObserver();
                         if (document.body) {
                             this.maskElement(document.body);
@@ -90,7 +91,7 @@
                         if (area === 'sync') {
                             if (changes.dataMaskingEnabled !== undefined) {
                                 this.settings.dataMaskingEnabled = !!changes.dataMaskingEnabled.newValue;
-                                if (this.settings.dataMaskingEnabled) {
+                                if (this.settings.dataMaskingEnabled && this.settings.extensionEnabled) {
                                     this.startObserver();
                                     if (document.body) this.maskElement(document.body);
                                 } else {
@@ -99,6 +100,15 @@
                             }
                             if (changes.maskingRandomMode !== undefined) {
                                 this.settings.maskingRandomMode = !!changes.maskingRandomMode.newValue;
+                            }
+                            if (changes.extensionEnabled !== undefined) {
+                                this.settings.extensionEnabled = changes.extensionEnabled.newValue !== false;
+                                if (this.settings.extensionEnabled && this.settings.dataMaskingEnabled) {
+                                    this.startObserver();
+                                    if (document.body) this.maskElement(document.body);
+                                } else {
+                                    this.stopObserver();
+                                }
                             }
                         }
                     });
@@ -110,7 +120,7 @@
             if (this.observer) return;
 
             this.observer = new MutationObserver((mutations) => {
-                if (!this.settings.dataMaskingEnabled) return;
+                if (!this.settings.dataMaskingEnabled || !this.settings.extensionEnabled) return;
 
                 for (const mutation of mutations) {
                     for (const node of mutation.addedNodes) {
@@ -177,6 +187,7 @@
         }
 
         maskTextNode(node) {
+            if (!this.settings.dataMaskingEnabled || !this.settings.extensionEnabled) return;
             if (!node?.textContent?.trim()) return;
             const parent = node.parentElement;
             if (!parent || ['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'INPUT', 'TEXTAREA'].includes(parent.tagName)) return;
@@ -201,7 +212,7 @@
         }
 
         maskElement(element) {
-            if (!element || !this.settings.dataMaskingEnabled) return;
+            if (!element || !this.settings.dataMaskingEnabled || !this.settings.extensionEnabled) return;
 
             const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
                 acceptNode: (node) => {

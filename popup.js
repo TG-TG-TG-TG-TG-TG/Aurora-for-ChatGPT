@@ -19,7 +19,8 @@ const DEFAULTS = {
   showTokenCounter: false, blurChatHistory: false, blurAvatar: false,
   soundEnabled: false, soundVolume: 'low', autoContrast: false,
   smartSelectors: true, dataMaskingEnabled: false, maskingRandomMode: false,
-  enableSnowfall: false, enableNewYear: false, cinemaMode: false, snowType: 'standard'
+  enableSnowfall: false, enableNewYear: false, cinemaMode: false, snowType: 'standard',
+  extensionEnabled: true
 };
 
 const TOGGLE_KEYS = [
@@ -109,6 +110,7 @@ function cacheElements() {
   $.settingsJson = document.getElementById('settingsJson');
   $.importExportRow = document.getElementById('importExportTextAreaRow');
   $.holidayMode = document.getElementById('holidayMode');
+  $.masterToggleBtn = document.getElementById('masterToggleBtn');
   
   // Feedback elements
   $.feedbackTrigger = document.getElementById('feedbackTrigger');
@@ -165,6 +167,14 @@ function renderUi(settings, localData = {}) {
     const isHolidayMode = settings.enableSnowfall && settings.enableNewYear && 
                           settings.customBgUrl === CHRISTMAS_BG_URL;
     $.holidayMode.checked = isHolidayMode;
+  }
+
+  if ($.masterToggleBtn) {
+    const isEnabled = settings.extensionEnabled !== false;
+    const label = isEnabled ? (getMessage('labelAuroraActivated') || 'Aurora activated') : (getMessage('labelAuroraDeactivated') || 'Aurora deactivated');
+    $.masterToggleBtn.textContent = label;
+    $.masterToggleBtn.dataset.state = isEnabled ? 'enabled' : 'disabled';
+    $.masterToggleBtn.setAttribute('aria-pressed', String(!isEnabled));
   }
 
   // Range Sliders
@@ -424,6 +434,40 @@ function setupChangeListeners() {
       // Also update individual toggles visually
       if ($.toggles?.enableSnowfall) $.toggles.enableSnowfall.checked = isOn;
       if ($.toggles?.enableNewYear) $.toggles.enableNewYear.checked = isOn;
+    });
+  }
+
+  if ($.masterToggleBtn) {
+    $.masterToggleBtn.addEventListener('click', () => {
+      const isEnabled = $.masterToggleBtn.dataset.state !== 'disabled';
+      if (isEnabled) {
+        chrome.storage.sync.get(null, (items) => {
+          const backup = { ...items };
+          delete backup.extensionEnabled;
+          delete backup.extensionSettingsBackup;
+
+          const disabledSettings = {
+            ...DEFAULTS,
+            hasSeenWelcomeScreen: items.hasSeenWelcomeScreen ?? DEFAULTS.hasSeenWelcomeScreen,
+            extensionEnabled: false
+          };
+
+          chrome.storage.sync.set({ extensionSettingsBackup: backup }, () => {
+            chrome.storage.sync.set(disabledSettings);
+          });
+        });
+      } else {
+        chrome.storage.sync.get('extensionSettingsBackup', (data) => {
+          const backup = data?.extensionSettingsBackup;
+          if (backup && typeof backup === 'object') {
+            chrome.storage.sync.set({ ...backup, extensionEnabled: true }, () => {
+              chrome.storage.sync.remove('extensionSettingsBackup');
+            });
+          } else {
+            chrome.storage.sync.set({ extensionEnabled: true });
+          }
+        });
+      }
     });
   }
 

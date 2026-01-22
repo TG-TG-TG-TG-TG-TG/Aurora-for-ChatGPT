@@ -11,6 +11,12 @@
   "buttonChooseFile": {
     "message": "使用本地文件"
   },
+  "labelAuroraActivated": {
+    "message": "Aurora 已启用"
+  },
+  "labelAuroraDeactivated": {
+    "message": "Aurora 已停用"
+  },
   "popupTitle": {
     "message": "aurora for chatgpt 设置"
   },

@@ -111,11 +111,83 @@
     return key;
   };
 
+  const isExtensionEnabled = () => settings.extensionEnabled !== false;
+
+  function disableAllFeatures() {
+    const root = document.documentElement;
+    root.classList.remove(
+      HTML_CLASS,
+      LEGACY_CLASS,
+      ANIMATIONS_DISABLED_CLASS,
+      CLEAR_APPEARANCE_CLASS,
+      LIGHT_CLASS,
+      'cgpt-cute-voice-on',
+      'cgpt-focus-mode-on',
+      'cgpt-cinema-mode',
+      'cgpt-blur-chat-history',
+      'cgpt-blur-avatar',
+      'cgpt-snow-on',
+      'cgpt-snow-logo',
+      'cgpt-theme-transitioning',
+      'cgpt-tab-hidden',
+      'cgpt-snapshot-mode'
+    );
+    root.removeAttribute('data-custom-font');
+    root.removeAttribute('data-voice-color');
+    root.style.removeProperty('--cgpt-bg-blur-radius');
+    root.style.removeProperty('--cgpt-object-fit');
+    root.style.removeProperty('--aurora-santa-hat-image');
+    root.style.removeProperty('--aurora-snowdrift-left-image');
+    root.style.removeProperty('--aurora-snowdrift-right-image');
+    root.style.removeProperty('--aurora-snow-image');
+    root.style.removeProperty('--bg-opacity');
+
+    const bgNode = document.getElementById(ID);
+    if (bgNode) bgNode.remove();
+    if (typeof BackgroundManager !== 'undefined') {
+      BackgroundManager.abort();
+      BackgroundManager.currentUrl = null;
+      BackgroundManager.activeLayerId = 'a';
+      BackgroundManager.state = 'idle';
+      BackgroundManager.pendingUrl = null;
+    }
+
+    const qsBtn = document.getElementById(QS_BUTTON_ID);
+    if (qsBtn) qsBtn.remove();
+    const qsPanel = document.getElementById(QS_PANEL_ID);
+    if (qsPanel) qsPanel.remove();
+
+    const snowContainer = document.getElementById('aurora-snow-container');
+    if (snowContainer) snowContainer.remove();
+    const garlandContainer = document.getElementById('aurora-garland-container');
+    if (garlandContainer) garlandContainer.remove();
+
+    const welcomeOverlay = document.getElementById('aurora-welcome-overlay');
+    if (welcomeOverlay) welcomeOverlay.remove();
+    const successOverlay = document.getElementById('aurora-success-overlay');
+    if (successOverlay) successOverlay.remove();
+    const styleBar = document.getElementById('aurora-style-bar');
+    if (styleBar) styleBar.remove();
+    const supportScreen = document.getElementById('aurora-support-screen');
+    if (supportScreen) supportScreen.remove();
+
+    document.querySelectorAll(`.${HIDE_LIMIT_CLASS}`).forEach(el => el.classList.remove(HIDE_LIMIT_CLASS));
+    document.querySelectorAll(`.${HIDE_UPGRADE_CLASS}`).forEach(el => el.classList.remove(HIDE_UPGRADE_CLASS));
+
+    if (window.AuroraTokenCounter) {
+      window.AuroraTokenCounter.manage(false);
+    }
+    if (window.DataMaskingEngine?.stopObserver) {
+      window.DataMaskingEngine.stopObserver();
+    }
+  }
+
   let cachedLimitTimestamp = null;
   let hasCheckedTimestamp = false;
   let isTimestampCleared = false;
 
   function manageGpt5LimitPopup() {
+    if (!isExtensionEnabled()) return;
     const popup = document.querySelector(SELECTORS.GPT5_LIMIT_POPUP);
     const isLimitMsg = popup && popup.textContent.toLowerCase().includes('you\'ve reached the gpt-5 limit');
 
@@ -185,6 +257,7 @@
   }
 
   function manageUpgradeButtons() {
+    if (!isExtensionEnabled()) return;
     if (!settings.hideUpgradeButtons) {
       const hiddenElements = document.getElementsByClassName(HIDE_UPGRADE_CLASS);
       if (hiddenElements.length > 0) {
@@ -604,10 +677,12 @@
 
   // Wrapper function for backward compatibility
   function updateBackgroundImage() {
+    if (!isExtensionEnabled()) return;
     BackgroundManager.update();
   }
 
   function applyCustomStyles() {
+    if (!isExtensionEnabled()) return;
     const bgNode = document.getElementById(ID);
     if (!bgNode) return;
 
@@ -682,6 +757,7 @@
   }
 
   function manageQuickSettingsUI() {
+    if (!isExtensionEnabled()) return;
     if (!document.body) {
       if (!qsInitScheduled) {
         qsInitScheduled = true;
@@ -851,13 +927,14 @@
   }
 
   function applyRootFlags() {
+    if (!isExtensionEnabled()) return;
     document.documentElement.classList.toggle(HTML_CLASS, true);
     document.documentElement.classList.toggle(LEGACY_CLASS, !!settings.legacyComposer);
     document.documentElement.classList.toggle(ANIMATIONS_DISABLED_CLASS, !!settings.disableAnimations);
     document.documentElement.classList.toggle(CLEAR_APPEARANCE_CLASS, settings.appearance === 'clear');
     document.documentElement.classList.toggle('cgpt-cute-voice-on', !!settings.cuteVoiceUI);
     document.documentElement.classList.toggle('cgpt-focus-mode-on', !!settings.focusMode);
-  document.documentElement.classList.toggle('cgpt-cinema-mode', !!settings.cinemaMode);
+    document.documentElement.classList.toggle('cgpt-cinema-mode', !!settings.cinemaMode);
 
     // NEW: Custom Font Support
     const customFont = settings.customFont || 'system';
@@ -1132,6 +1209,7 @@
    * @param {Document|Element} root - The root element to search within.
    */
   function applyGlassEffects(root = document) {
+    if (!isExtensionEnabled()) return;
     // If root itself matches, tag it (rare but possible for dynamic inserts)
     if (root.nodeType === 1 && root.matches && root.matches(UNTAGGED_GLASS_SELECTOR)) {
         root.dataset.auroraGlass = 'true';
@@ -1157,7 +1235,7 @@
       }
     },
     play(type) {
-      if (!settings.soundEnabled || !this.ctx) return;
+      if (!isExtensionEnabled() || !settings.soundEnabled || !this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
 
       const t = this.ctx.currentTime;
@@ -1199,7 +1277,7 @@
       }
     },
     attachListeners() {
-      if (!settings.soundEnabled || this.isListening) return;
+      if (!isExtensionEnabled() || !settings.soundEnabled || this.isListening) return;
       this.isListening = true;
       document.body.addEventListener('mouseenter', (e) => {
         if (e.target.matches && e.target.matches('button, a, [role="button"], input, .btn')) {
@@ -1333,6 +1411,7 @@
 
   // --- Holiday Effects Engine (GPU-Optimized) ---
   function manageHolidayEffects() {
+    if (!isExtensionEnabled()) return;
     if (SANTA_HAT_URL) {
       document.documentElement.style.setProperty('--aurora-santa-hat-image', `url("${SANTA_HAT_URL}")`);
     }
@@ -1450,6 +1529,10 @@
   }
 
   function applyAllSettings() {
+    if (!isExtensionEnabled()) {
+      disableAllFeatures();
+      return;
+    }
     showBg();
 
     if (!settings.hideQuickSettings) {
@@ -1509,6 +1592,10 @@
 
     // Performance: Pause animations and video when tab is not visible.
     document.addEventListener('visibilitychange', () => {
+      if (!isExtensionEnabled()) {
+        document.documentElement.classList.remove('cgpt-tab-hidden');
+        return;
+      }
       const bgNode = document.getElementById(ID);
       document.documentElement.classList.toggle('cgpt-tab-hidden', document.hidden);
       if (!bgNode) return;
@@ -1565,7 +1652,7 @@
 
     let renderFrameId = null;
     const domObserver = new MutationObserver((mutations) => {
-      if (document.hidden) return;
+      if (document.hidden || !isExtensionEnabled()) return;
       if (renderFrameId) return;
 
       // Check if a menu, dialog, or popover was just opened
@@ -1588,6 +1675,10 @@
       }
 
       renderFrameId = requestAnimationFrame(() => {
+        if (!isExtensionEnabled()) {
+          renderFrameId = null;
+          return;
+        }
         // 1. Critical Hiding - moved to debounce unless urgent
         if (urgentUiUpdate) manageUpgradeButtons();
 
@@ -1608,7 +1699,7 @@
         renderFrameId = null;
       });
 
-      debouncedOtherChecks();
+      if (isExtensionEnabled()) debouncedOtherChecks();
     });
 
     domObserver.observe(document.body, { childList: true, subtree: true });
@@ -1925,7 +2016,7 @@
 
         // Check if the welcome screen should be shown, but only once.
         if (!welcomeScreenChecked) {
-          if (!freshSettings.hasSeenWelcomeScreen) {
+          if (freshSettings.extensionEnabled !== false && !freshSettings.hasSeenWelcomeScreen) {
             showWelcomeScreen();
           }
           welcomeScreenChecked = true; // Mark as checked for this session.
@@ -1974,6 +2065,25 @@
           }
         });
 
+        if (changedKeys.includes('extensionEnabled')) {
+          if (!isExtensionEnabled()) {
+            disableAllFeatures();
+            return;
+          }
+          chrome.storage.sync.get(DEFAULTS, (freshSettings) => {
+            if (!chrome.runtime.lastError && freshSettings) {
+              settings = { ...DEFAULTS, ...freshSettings };
+            }
+            if (typeof BackgroundManager !== 'undefined') {
+              BackgroundManager.currentUrl = null;
+            }
+            applyAllSettings();
+          });
+          return;
+        }
+
+        if (!isExtensionEnabled()) return;
+
         // Holiday Effects (instant)
         if (changes.enableSnowfall || changes.enableNewYear) {
           manageHolidayEffects();
@@ -2009,7 +2119,7 @@
 
       } else if (area === 'local' && changes[LOCAL_BG_KEY]) {
         // Local background data changed - trigger background update
-        updateBackgroundImage();
+        if (isExtensionEnabled()) updateBackgroundImage();
       }
     });
   }
