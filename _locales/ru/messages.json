@@ -98,6 +98,30 @@
   "tooltipCinemaMode": {
     "message": "Чат на всю ширину для удобного просмотра кода"
   },
+  "labelQueueWhileGenerating": {
+    "message": "Очередь при генерации"
+  },
+  "tooltipQueueWhileGenerating": {
+    "message": "Отложите следующее сообщение и отправьте его автоматически, когда модель закончит"
+  },
+  "queueButtonTitle": {
+    "message": "Отложить сообщение"
+  },
+  "toastMessageQueued": {
+    "message": "В очереди ($1)"
+  },
+  "queuedPanelTitle": {
+    "message": "Отложенные сообщения"
+  },
+  "queuedPanelSubtitleGenerating": {
+    "message": "Авто-отправка после текущего ответа"
+  },
+  "queuedPanelSubtitleIdle": {
+    "message": "Готово к отправке"
+  },
+  "queuedPanelRemove": {
+    "message": "Удалить"
+  },
   "sectionAnimations": {
     "message": "Анимации"
   },

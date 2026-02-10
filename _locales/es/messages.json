@@ -104,6 +104,30 @@
   "tooltipCinemaMode": {
     "message": "Chat a ancho completo para ver código mejor"
   },
+  "labelQueueWhileGenerating": {
+    "message": "Cola durante la generación"
+  },
+  "tooltipQueueWhileGenerating": {
+    "message": "Pon tu próximo mensaje en cola y envíalo automáticamente cuando el modelo termine"
+  },
+  "queueButtonTitle": {
+    "message": "Encolar mensaje"
+  },
+  "toastMessageQueued": {
+    "message": "En cola ($1)"
+  },
+  "queuedPanelTitle": {
+    "message": "Mensajes en cola"
+  },
+  "queuedPanelSubtitleGenerating": {
+    "message": "Se enviará automáticamente al terminar esta respuesta"
+  },
+  "queuedPanelSubtitleIdle": {
+    "message": "Listo para enviar"
+  },
+  "queuedPanelRemove": {
+    "message": "Eliminar"
+  },
   "labelDisableAnimations": {
     "message": "Desactivar animaciones de menú"
   },

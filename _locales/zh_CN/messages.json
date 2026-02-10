@@ -98,6 +98,30 @@
   "tooltipCinemaMode": {
     "message": "全宽聊天，更好地查看代码"
   },
+  "labelQueueWhileGenerating": {
+    "message": "生成时排队"
+  },
+  "tooltipQueueWhileGenerating": {
+    "message": "在模型生成期间将下一条消息加入队列，并在结束后自动发送"
+  },
+  "queueButtonTitle": {
+    "message": "加入队列"
+  },
+  "toastMessageQueued": {
+    "message": "已加入队列（$1）"
+  },
+  "queuedPanelTitle": {
+    "message": "队列消息"
+  },
+  "queuedPanelSubtitleGenerating": {
+    "message": "将于本次回复结束后自动发送"
+  },
+  "queuedPanelSubtitleIdle": {
+    "message": "准备发送"
+  },
+  "queuedPanelRemove": {
+    "message": "移除"
+  },
   "sectionAnimations": {
     "message": "动画"
   },

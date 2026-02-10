@@ -48,6 +48,36 @@ body {
   transition: height 0.2s ease-in-out; /* Smooth resize for no results */
 }
 
+/* --- A11y / Utilities --- */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.flex-spacer { flex-grow: 1; }
+.flex-1 { flex: 1; }
+.range-value { min-width: 3ch; text-align: right; display: inline-block; }
+.row-label-with-icon { display: flex; align-items: center; gap: 6px; }
+
+.settings-json-textarea {
+  width: 100%;
+  font-family: 'Courier New', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--popup-border);
+  background: var(--popup-input-bg);
+  color: var(--popup-text);
+  resize: vertical;
+}
+
 /* --- Aurora Scrollbar --- */
 ::-webkit-scrollbar {
   width: 8px;

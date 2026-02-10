@@ -1,7 +1,6 @@
 /* Aurora for ChatGPT - Main Stylesheet */
 
-/* Import Google Fonts for custom font support */
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+/* Perf: Google Fonts are lazy-loaded by content.js only when the user selects a custom font. */
 
 :root {
   /* Base Colors & Background */
@@ -208,6 +207,30 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) [data-aurora-glass="true"] {
   backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate)) !important;
   /* Removed background transition to prevent open glitches */
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Dialog navigation arrows (image/media viewer): avoid overly highlighted glass tiles */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button.shrink-0.btn-secondary.relative.btn[data-aurora-glass="true"],
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[aria-label*="previous" i][data-aurora-glass="true"],
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[aria-label*="next" i][data-aurora-glass="true"],
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[aria-label*="предыдущ" i][data-aurora-glass="true"],
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[aria-label*="следующ" i][data-aurora-glass="true"],
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[title*="previous" i][data-aurora-glass="true"],
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[title*="next" i][data-aurora-glass="true"] {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button.shrink-0.btn-secondary.relative.btn[data-aurora-glass="true"]:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[aria-label*="previous" i][data-aurora-glass="true"]:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[aria-label*="next" i][data-aurora-glass="true"]:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[aria-label*="предыдущ" i][data-aurora-glass="true"]:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[aria-label*="следующ" i][data-aurora-glass="true"]:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[title*="previous" i][data-aurora-glass="true"]:hover,
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[title*="next" i][data-aurora-glass="true"]:hover {
+  background: color-mix(in oklab, currentColor 10%, transparent) !important;
+  border-color: color-mix(in oklab, currentColor 14%, transparent) !important;
 }
 
 /* Menu/Popover Opening Animation (smooth, natural feel) */
@@ -1220,9 +1243,6 @@ html:not(.cgpt-light-mode) .qs-color-dot {
 .qs-select-options::-webkit-scrollbar {
   display: none;
 }
-html.cgpt-light-mode .qs-select-options {
-  /* This rule is now empty as variables handle light mode */
-}
 
 .qs-select-option {
   display: flex;
@@ -1346,9 +1366,6 @@ html[data-custom-font="poppins"] * {
 }
 
 /* System font - no changes needed */
-html[data-custom-font="system"] {
-  /* Use default system fonts */
-}
 
 html.cgpt-light-mode .qs-pill.active {
   background: linear-gradient(135deg, #4f8cff 0%, #3b7ce8 100%);
@@ -1524,8 +1541,8 @@ html.cgpt-ambient-on.cgpt-light-mode ::-webkit-scrollbar-thumb:hover {
 html.cgpt-ambient-on button[role="switch"] {
   background-color: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   transition: all 0.3s ease !important;
 }
 
@@ -1545,8 +1562,8 @@ html.cgpt-ambient-on button[role="switch"] > span {
 #aurora-welcome-overlay .welcome-btn.primary {
   background: rgba(79, 140, 255, 0.25) !important;
   border: 1px solid rgba(79, 140, 255, 0.4) !important;
-  backdrop-filter: blur(12px) saturate(160%);
   -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
   color: white !important;
   box-shadow: 0 4px 15px rgba(79, 140, 255, 0.2);
   text-shadow: 0 1px 2px rgba(0,0,0,0.2);
@@ -1673,6 +1690,7 @@ div.absolute.start-0.top-2.hidden.h-full.items-end.bg-linear-to-r.from-white but
 div.absolute.end-0.top-2.hidden.h-full.bg-linear-to-l.from-white button {
   background: var(--switch-bg) !important;
   border: 1px solid var(--switch-border) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
   backdrop-filter: blur(4px) !important;
   color: var(--theme-text-primary) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
@@ -1690,6 +1708,7 @@ div.absolute.end-0.top-2.hidden.h-full.bg-linear-to-l.from-white button:hover {
 /* Targeting the container that holds the project modal trigger */
 div.flex.justify-between.max-md\:flex-col.max-md\:gap-4:has([data-testid="project-modal-trigger"]) {
   background: var(--switch-bg) !important;
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   border: 1px solid var(--switch-border) !important;
   box-shadow: var(--switch-shadow) !important;
@@ -1702,6 +1721,7 @@ div.flex.justify-between.max-md\:flex-col.max-md\:gap-4:has([data-testid="projec
 /* Apply Glass to the main container only */
 div[data-radix-popper-content-wrapper] > div[role="dialog"] {
   background-color: var(--switch-bg) !important;
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   border: 1px solid var(--switch-border) !important;
   box-shadow: var(--switch-shadow) !important;
@@ -1740,6 +1760,7 @@ input[name="search"] {
 div.relative.z-10.grow div.rounded-md,
 div:has(> div > input#search) {
   background: var(--switch-bg) !important;
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   border: none !important;
   box-shadow: none !important;
@@ -1754,6 +1775,7 @@ div.bg-token-main-surface-primary:has(input#search) {
 button.btn.relative.btn-secondary.w-full {
   background: var(--switch-bg) !important;
   border: 1px solid var(--switch-border) !important;
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
 }
 
@@ -1768,6 +1790,7 @@ button.btn.relative.btn-secondary.w-full:hover {
 /* Outer sticky wrapper containing search and category tabs */
 div.bg-token-bg-primary.sticky.top-14.z-30 {
   background: var(--switch-bg) !important;
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   border: none !important;
   box-shadow: none !important;
@@ -1790,8 +1813,8 @@ div.bg-token-main-surface-primary.sticky.top-14.z-10 {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
   padding-bottom: 0 !important;
 }
 
@@ -1804,6 +1827,7 @@ div.bg-token-main-surface-primary.sticky.top-14.z-10 div.cursor-pointer.border-b
   border-radius: 9999px !important; /* Force pill shape */
   padding: 6px 16px !important;
   margin-right: 6px !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   backdrop-filter: blur(8px) !important;
   color: var(--theme-text-primary) !important;
   box-shadow: none !important;
@@ -1833,6 +1857,7 @@ div.bg-token-main-surface-primary.sticky.top-14.z-10 .absolute.start-0 {
 div.bg-token-main-surface-primary.sticky.top-14.z-10 .absolute.end-0 button,
 div.bg-token-main-surface-primary.sticky.top-14.z-10 .absolute.start-0 button {
   background: var(--switch-bg) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
   backdrop-filter: blur(4px) !important;
   border: 1px solid var(--switch-border) !important;
   border-radius: 50% !important;
@@ -1846,6 +1871,7 @@ a.gizmo-link,
 a[class*="gizmo-link"],
 div.grid a.group {
   background: var(--switch-bg) !important;
+  -webkit-backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   backdrop-filter: blur(var(--clear-blur)) saturate(var(--clear-saturate)) !important;
   border: 1px solid var(--switch-border) !important;
   box-shadow: var(--switch-shadow) !important;
@@ -1994,4 +2020,227 @@ html.cgpt-cinema-mode form[data-type="unified-composer"] {
   max-width: min(95vw, 1200px) !important;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* ========================================================================
+   MESSAGE QUEUE - Queue While Generating
+   ======================================================================== */
+.aurora-queue-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-left: 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: transform 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.aurora-queue-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+html.cgpt-light-mode .aurora-queue-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+html.cgpt-light-mode .aurora-queue-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.aurora-queue-btn svg {
+  width: 16px;
+  height: 16px;
+  opacity: 0.92;
+}
+
+.aurora-queue-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #4f8cff;
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.aurora-queue-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%) translateY(8px);
+  opacity: 0;
+  z-index: 999999;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 12px;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.aurora-queue-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.aurora-queue-panel {
+  position: fixed;
+  z-index: 999999;
+  max-height: 220px;
+  overflow: hidden;
+  border-radius: 14px;
+  padding: 10px;
+  background: var(--aurora-glass-bg);
+  border: 1px solid var(--aurora-glass-border);
+  -webkit-backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate));
+  backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate));
+  box-shadow: inset 0 0 2px 0 var(--aurora-glass-glow), var(--aurora-glass-shadow);
+  color: #fff;
+}
+
+html.cgpt-light-mode .aurora-queue-panel {
+  color: #000;
+}
+
+.aurora-queue-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.aurora-queue-panel-title {
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+}
+
+.aurora-queue-panel-subtitle {
+  margin-top: 2px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.aurora-queue-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 180px;
+  overflow: auto;
+}
+
+.aurora-queue-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 8px;
+  border-radius: 12px;
+}
+
+.aurora-queue-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+html.cgpt-light-mode .aurora-queue-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.aurora-queue-item-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(79, 140, 255, 0.2);
+  border: 1px solid rgba(79, 140, 255, 0.35);
+  flex: 0 0 auto;
+}
+
+html.cgpt-light-mode .aurora-queue-item-num {
+  background: rgba(79, 140, 255, 0.14);
+}
+
+.aurora-queue-item-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.aurora-queue-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.aurora-queue-item-time {
+  font-size: 10px;
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.aurora-queue-item-text {
+  font-size: 12px;
+  line-height: 1.25;
+  opacity: 0.95;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.aurora-queue-remove {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  opacity: 0.75;
+  cursor: pointer;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  transition: opacity 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.aurora-queue-remove:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+html.cgpt-light-mode .aurora-queue-remove:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.1);
 }

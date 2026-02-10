@@ -1,8 +1,9 @@
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>__MSG_popupTitle__</title>
   <link rel="stylesheet" href="popup.css">
 </head>
@@ -13,14 +14,15 @@
     <h1 data-i18n="popupTitle">__MSG_popupTitle__</h1>
   </header>
 
-  <div class="search-wrapper">
-    <input type="search" id="settingsSearch" data-i18n-placeholder="placeholderSearch" autocomplete="off">
-    <button id="clearSearchBtn" class="clear-search-btn" hidden title="__MSG_tooltipClearSearch__"
-      data-i18n-title="tooltipClearSearch">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
+	  <div class="search-wrapper">
+	    <label class="sr-only" for="settingsSearch" data-i18n="placeholderSearch">Search</label>
+	    <input type="search" id="settingsSearch" placeholder="__MSG_placeholderSearch__" data-i18n-placeholder="placeholderSearch" autocomplete="off">
+	    <button id="clearSearchBtn" class="clear-search-btn" hidden title="__MSG_tooltipClearSearch__"
+	      data-i18n-title="tooltipClearSearch" aria-label="Clear search" data-i18n-aria-label="tooltipClearSearch">
+	      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+	        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+	        <line x1="18" y1="6" x2="6" y2="18"></line>
+	        <line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     </button>
   </div>
@@ -71,312 +73,319 @@
             <span class="holiday-title" data-i18n="labelHolidayMode">Holiday Mode</span>
             <span class="holiday-subtitle" data-i18n="tooltipHolidayMode">Snow, lights & festive background</span>
           </div>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="holidayMode">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
+	        </div>
+	        <label class="switch">
+	          <input type="checkbox" id="holidayMode" aria-label="Holiday Mode" data-i18n-aria-label="labelHolidayMode">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
       <div class="master-toggle-row">
         <button type="button" id="masterToggleBtn" class="master-toggle-btn" data-i18n="labelAuroraActivated">Aurora activated</button>
       </div>
 
       <div class="section-header" data-i18n="sectionBackground">Background</div>
       <div class="row">
-        <div class="label" data-i18n="labelPreset">__MSG_labelPreset__</div>
-        <div class="custom-select-wrapper">
-          <div class="custom-select" id="bgPreset">
-            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
-              </svg>
-            </button>
-            <div class="select-options" role="listbox"></div>
-          </div>
-        </div>
-      </div>
+	        <div class="label" data-i18n="labelPreset">__MSG_labelPreset__</div>
+	        <div class="custom-select-wrapper">
+	          <div class="custom-select" id="bgPreset">
+	            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Preset" data-i18n-aria-label="labelPreset">
+	              <span class="select-label"></span>
+	              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
+	                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+	                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
+	              </svg>
+	            </button>
+	            <div class="select-options" role="listbox" aria-label="Preset" data-i18n-aria-label="labelPreset"></div>
+	          </div>
+	        </div>
+	      </div>
       <div class="row">
         <input type="text" id="bgUrl" placeholder="__MSG_placeholderBgUrl__" data-i18n-placeholder="placeholderBgUrl">
       </div>
+	      <div class="row">
+	        <div class="file-input-wrapper">
+	          <label for="bgFile" class="file-input-label" data-i18n="buttonChooseFile">__MSG_buttonChooseFile__</label>
+	          <input type="file" id="bgFile" accept="image/*, video/mp4, video/webm, video/ogg">
+	          <div class="flex-spacer" aria-hidden="true"></div>
+	          <button id="clearBg" data-i18n="buttonReset">__MSG_buttonReset__</button>
+	        </div>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelBlur">__MSG_labelBlur__</div>
+	        <input type="range" id="blurSlider" min="0" max="150" step="1" aria-label="Blur" data-i18n-aria-label="labelBlur">
+	        <span id="blurValue" class="range-value">60</span>px
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelAutoContrast">Auto-Contrast (Images)</div>
+	        <label class="switch" title="Automatically adjust overlay darkness based on background brightness">
+	          <input type="checkbox" id="autoContrast" aria-label="Auto-Contrast" data-i18n-aria-label="labelAutoContrast">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
       <div class="row">
-        <div class="file-input-wrapper">
-          <label for="bgFile" class="file-input-label" data-i18n="buttonChooseFile">__MSG_buttonChooseFile__</label>
-          <input type="file" id="bgFile" accept="image/*, video/mp4, video/webm, video/ogg">
-          <div style="flex-grow: 1;"></div>
-          <button id="clearBg" data-i18n="buttonReset">__MSG_buttonReset__</button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelBlur">__MSG_labelBlur__</div>
-        <input type="range" id="blurSlider" min="0" max="150" step="1">
-        <span id="blurValue" style="min-width: 3ch; text-align: right;">60</span>px
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelAutoContrast">Auto-Contrast (Images)</div>
-        <label class="switch" title="Automatically adjust overlay darkness based on background brightness">
-          <input type="checkbox" id="autoContrast">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelScaling">__MSG_labelScaling__</div>
-        <div class="custom-select-wrapper">
-          <div class="custom-select" id="bgScalingSelector">
-            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
-              </svg>
-            </button>
-            <div class="select-options" role="listbox"></div>
-          </div>
-        </div>
-      </div>
+	        <div class="label" data-i18n="labelScaling">__MSG_labelScaling__</div>
+	        <div class="custom-select-wrapper">
+	          <div class="custom-select" id="bgScalingSelector">
+	            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Scaling" data-i18n-aria-label="labelScaling">
+	              <span class="select-label"></span>
+	              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
+	                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+	                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
+	              </svg>
+	            </button>
+	            <div class="select-options" role="listbox" aria-label="Scaling" data-i18n-aria-label="labelScaling"></div>
+	          </div>
+	        </div>
+	      </div>
       <div class="section-header" data-i18n="sectionAppearance">Appearance</div>
       <div class="row">
-        <div class="label" data-i18n="labelTheme">__MSG_labelTheme__</div>
-        <div class="custom-select-wrapper">
-          <div class="custom-select" id="themeSelector">
-            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
-              </svg>
-            </button>
-            <div class="select-options" role="listbox"></div>
-          </div>
-        </div>
-      </div>
+	        <div class="label" data-i18n="labelTheme">__MSG_labelTheme__</div>
+	        <div class="custom-select-wrapper">
+	          <div class="custom-select" id="themeSelector">
+	            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Theme" data-i18n-aria-label="labelTheme">
+	              <span class="select-label"></span>
+	              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
+	                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+	                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
+	              </svg>
+	            </button>
+	            <div class="select-options" role="listbox" aria-label="Theme" data-i18n-aria-label="labelTheme"></div>
+	          </div>
+	        </div>
+	      </div>
       <div class="row">
-        <div class="label" data-i18n="labelGlassStyle">__MSG_labelGlassStyle__</div>
-        <div class="custom-select-wrapper">
-          <div class="custom-select" id="appearanceSelector">
-            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
-              </svg>
-            </button>
-            <div class="select-options" role="listbox"></div>
-          </div>
-        </div>
-      </div>
+	        <div class="label" data-i18n="labelGlassStyle">__MSG_labelGlassStyle__</div>
+	        <div class="custom-select-wrapper">
+	          <div class="custom-select" id="appearanceSelector">
+	            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Glass style" data-i18n-aria-label="labelGlassStyle">
+	              <span class="select-label"></span>
+	              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
+	                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+	                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
+	              </svg>
+	            </button>
+	            <div class="select-options" role="listbox" aria-label="Glass style" data-i18n-aria-label="labelGlassStyle"></div>
+	          </div>
+	        </div>
+	      </div>
       <div class="row">
-        <div class="label" data-i18n="labelCustomFont">Custom Font</div>
-        <div class="custom-select-wrapper">
-          <div class="custom-select" id="fontSelector">
-            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
-              </svg>
-            </button>
-            <div class="select-options" role="listbox"></div>
-          </div>
-        </div>
-      </div>
-      <div class="section-header" data-i18n="sectionHolidayEffects">Holiday Effects</div>
-      <div class="row">
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-snowflake"><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></svg>
-          <div class="label" data-i18n="labelSnowfall">Let it snow</div>
-        </div>
-        <label class="switch" title="Enable snowing animation" data-i18n-title="tooltipSnowfall">
-          <input type="checkbox" id="enableSnowfall">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-      <div class="row">
-        <div class="label">Snow Type</div>
-        <div class="custom-select-wrapper">
-          <div class="custom-select" id="snowTypeSelector">
-            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="select-label">Standard</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
-              </svg>
-            </button>
-            <div class="select-options" role="listbox"></div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelNewYear">New Year '26</div>
-        <label class="switch" title="Enable New Year garland" data-i18n-title="tooltipNewYear">
-          <input type="checkbox" id="enableNewYear">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
+	        <div class="label" data-i18n="labelCustomFont">Custom Font</div>
+	        <div class="custom-select-wrapper">
+	          <div class="custom-select" id="fontSelector">
+	            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Custom font" data-i18n-aria-label="labelCustomFont">
+	              <span class="select-label"></span>
+	              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
+	                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+	                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
+	              </svg>
+	            </button>
+	            <div class="select-options" role="listbox" aria-label="Custom font" data-i18n-aria-label="labelCustomFont"></div>
+	          </div>
+	        </div>
+	      </div>
+	      <div class="section-header" data-i18n="sectionHolidayEffects">Holiday Effects</div>
+	      <div class="row">
+	        <div class="row-label-with-icon">
+	          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-snowflake"><line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></svg>
+	          <div class="label" data-i18n="labelSnowfall">Let it snow</div>
+	        </div>
+	        <label class="switch" title="Enable snowing animation" data-i18n-title="tooltipSnowfall">
+	          <input type="checkbox" id="enableSnowfall" aria-label="Snowfall" data-i18n-aria-label="labelSnowfall">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	      <div class="row">
+	        <div class="label">Snow Type</div>
+	        <div class="custom-select-wrapper">
+	          <div class="custom-select" id="snowTypeSelector">
+	            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Snow Type">
+	              <span class="select-label">Standard</span>
+	              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
+	                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+	                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
+	              </svg>
+	            </button>
+	            <div class="select-options" role="listbox" aria-label="Snow Type"></div>
+	          </div>
+	        </div>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelNewYear">New Year '26</div>
+	        <label class="switch" title="Enable New Year garland" data-i18n-title="tooltipNewYear">
+	          <input type="checkbox" id="enableNewYear" aria-label="New Year" data-i18n-aria-label="labelNewYear">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
       <div class="section-header" data-i18n="sectionAnimations">Animations</div>
-      <div class="row">
-        <div class="label" data-i18n="labelDisableAnimations">__MSG_labelDisableAnimations__</div>
-        <label class="switch" title="__MSG_tooltipDisableAnimations__" data-i18n-title="tooltipDisableAnimations">
-          <input type="checkbox" id="disableAnimations">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelDisableAnimations">__MSG_labelDisableAnimations__</div>
+	        <label class="switch" title="__MSG_tooltipDisableAnimations__" data-i18n-title="tooltipDisableAnimations">
+	          <input type="checkbox" id="disableAnimations" aria-label="Disable animations" data-i18n-aria-label="labelDisableAnimations">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
       <div class="section-header" data-i18n="sectionAudio">Audio</div>
-      <div class="row">
-        <div class="label" data-i18n="labelHapticSound">UI Haptic Sound</div>
-        <label class="switch" title="Play subtle glass sounds on interaction" data-i18n-title="tooltipHapticSound">
-          <input type="checkbox" id="soundEnabled">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelHapticSound">UI Haptic Sound</div>
+	        <label class="switch" title="Play subtle glass sounds on interaction" data-i18n-title="tooltipHapticSound">
+	          <input type="checkbox" id="soundEnabled" aria-label="UI Haptic Sound" data-i18n-aria-label="labelHapticSound">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
     </div>
 
     <!-- Behavior Tab -->
-    <div id="behavior" class="tab-pane">
-      <div class="row">
-        <div class="label" data-i18n="labelLegacyComposer">__MSG_labelLegacyComposer__</div>
-        <label class="switch" title="__MSG_tooltipLegacyComposer__" data-i18n-title="tooltipLegacyComposer">
-          <input type="checkbox" id="legacyComposer">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelCinemaMode">Cinema Mode</div>
-        <label class="switch" title="Full-width chat layout for better code viewing" data-i18n-title="tooltipCinemaMode">
-          <input type="checkbox" id="cinemaMode">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelDefaultModel">__MSG_labelDefaultModel__</div>
-        <div class="custom-select-wrapper">
-          <div class="custom-select" id="defaultModelSelector">
-            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
-              </svg>
-            </button>
-            <div class="select-options" role="listbox"></div>
-          </div>
-        </div>
-      </div>
+	    <div id="behavior" class="tab-pane">
+	      <div class="row">
+	        <div class="label" data-i18n="labelLegacyComposer">__MSG_labelLegacyComposer__</div>
+	        <label class="switch" title="__MSG_tooltipLegacyComposer__" data-i18n-title="tooltipLegacyComposer">
+	          <input type="checkbox" id="legacyComposer" aria-label="Legacy composer" data-i18n-aria-label="labelLegacyComposer">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelCinemaMode">Cinema Mode</div>
+	        <label class="switch" title="Full-width chat layout for better code viewing" data-i18n-title="tooltipCinemaMode">
+	          <input type="checkbox" id="cinemaMode" aria-label="Cinema Mode" data-i18n-aria-label="labelCinemaMode">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelQueueWhileGenerating">Queue While Generating</div>
+	        <label class="switch" title="Queue your next message and auto-send when the model finishes" data-i18n-title="tooltipQueueWhileGenerating">
+	          <input type="checkbox" id="queueWhileGenerating" aria-label="Queue While Generating" data-i18n-aria-label="labelQueueWhileGenerating">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelDefaultModel">__MSG_labelDefaultModel__</div>
+	        <div class="custom-select-wrapper">
+	          <div class="custom-select" id="defaultModelSelector">
+	            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Default model" data-i18n-aria-label="labelDefaultModel">
+	              <span class="select-label"></span>
+	              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
+	                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+	                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
+	              </svg>
+	            </button>
+	            <div class="select-options" role="listbox" aria-label="Default model" data-i18n-aria-label="labelDefaultModel"></div>
+	          </div>
+	        </div>
+	      </div>
       <div class="row" id="defaultModelCustomRow" hidden>
         <input type="text" id="defaultModelCustomInput" placeholder="__MSG_placeholderDefaultModel__"
           data-i18n-placeholder="placeholderDefaultModel">
       </div>
-      <div class="row">
-        <div class="label" data-i18n="labelShowTokenCounter">Show token/word counter</div>
-        <label class="switch" title="__MSG_tooltipShowTokenCounter__" data-i18n-title="tooltipShowTokenCounter">
-          <input type="checkbox" id="showTokenCounter">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-      <div class="section-header" data-i18n="sectionImportExport">Import/Export Settings</div>
-      <div class="row">
-        <button id="exportSettings" style="flex: 1;" data-i18n="buttonExportSettings">Export Settings</button>
-        <button id="importSettings" style="flex: 1;" data-i18n="buttonImportSettings">Import Settings</button>
-      </div>
-      <div class="row" id="importExportTextAreaRow" hidden>
-        <textarea id="settingsJson" placeholder="Paste JSON here or click Export..." rows="5"
-          style="width: 100%; font-family: 'Courier New', monospace; font-size: 11px; padding: 8px; border-radius: 6px; border: 1px solid var(--popup-border); background: var(--popup-input-bg); color: var(--popup-text); resize: vertical;"></textarea>
-      </div>
-    </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelShowTokenCounter">Show token/word counter</div>
+	        <label class="switch" title="__MSG_tooltipShowTokenCounter__" data-i18n-title="tooltipShowTokenCounter">
+	          <input type="checkbox" id="showTokenCounter" aria-label="Show token/word counter" data-i18n-aria-label="labelShowTokenCounter">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	      <div class="section-header" data-i18n="sectionImportExport">Import/Export Settings</div>
+	      <div class="row">
+	        <button id="exportSettings" class="flex-1" data-i18n="buttonExportSettings">Export Settings</button>
+	        <button id="importSettings" class="flex-1" data-i18n="buttonImportSettings">Import Settings</button>
+	      </div>
+	      <div class="row" id="importExportTextAreaRow" hidden>
+	        <textarea id="settingsJson" placeholder="Paste JSON here or click Export..." rows="5"
+	          class="settings-json-textarea"></textarea>
+	      </div>
+	    </div>
 
     <!-- Visibility Tab -->
-    <div id="visibility" class="tab-pane">
-      <div class="row">
-        <div class="label" data-i18n="labelFocusMode">__MSG_labelFocusMode__</div>
-        <label class="switch" title="__MSG_tooltipFocusMode__" data-i18n-title="tooltipFocusMode">
-          <input type="checkbox" id="focusMode">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelHideQuickSettings">__MSG_labelHideQuickSettings__</div>
-        <label class="switch" title="__MSG_tooltipHideQuickSettings__" data-i18n-title="tooltipHideQuickSettings">
-          <input type="checkbox" id="hideQuickSettings">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelHideGpt5Limit">__MSG_labelHideGpt5Limit__</div>
-        <label class="switch" title="__MSG_tooltipHideGpt5Limit__" data-i18n-title="tooltipHideGpt5Limit">
-          <input type="checkbox" id="hideGpt5Limit">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelHideUpgradeButtons">__MSG_labelHideUpgradeButtons__</div>
-        <label class="switch" title="__MSG_tooltipHideUpgradeButtons__" data-i18n-title="tooltipHideUpgradeButtons">
-          <input type="checkbox" id="hideUpgradeButtons">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-    </div>
+	    <div id="visibility" class="tab-pane">
+	      <div class="row">
+	        <div class="label" data-i18n="labelFocusMode">__MSG_labelFocusMode__</div>
+	        <label class="switch" title="__MSG_tooltipFocusMode__" data-i18n-title="tooltipFocusMode">
+	          <input type="checkbox" id="focusMode" aria-label="Focus Mode" data-i18n-aria-label="labelFocusMode">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelHideQuickSettings">__MSG_labelHideQuickSettings__</div>
+	        <label class="switch" title="__MSG_tooltipHideQuickSettings__" data-i18n-title="tooltipHideQuickSettings">
+	          <input type="checkbox" id="hideQuickSettings" aria-label="Hide Quick Settings" data-i18n-aria-label="labelHideQuickSettings">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelHideGpt5Limit">__MSG_labelHideGpt5Limit__</div>
+	        <label class="switch" title="__MSG_tooltipHideGpt5Limit__" data-i18n-title="tooltipHideGpt5Limit">
+	          <input type="checkbox" id="hideGpt5Limit" aria-label="Hide GPT-5 limit" data-i18n-aria-label="labelHideGpt5Limit">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelHideUpgradeButtons">__MSG_labelHideUpgradeButtons__</div>
+	        <label class="switch" title="__MSG_tooltipHideUpgradeButtons__" data-i18n-title="tooltipHideUpgradeButtons">
+	          <input type="checkbox" id="hideUpgradeButtons" aria-label="Hide Upgrade Buttons" data-i18n-aria-label="labelHideUpgradeButtons">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	    </div>
 
     <!-- Privacy Tab -->
-    <div id="privacy" class="tab-pane">
-      <div class="section-header" data-i18n="sectionDataMasking">Data Masking</div>
-      <div class="row">
-        <div class="label" data-i18n="labelEnableDataMasking">Enable Data Masking</div>
-        <label class="switch" title="__MSG_tooltipEnableDataMasking__" data-i18n-title="tooltipEnableDataMasking">
-          <input type="checkbox" id="dataMaskingEnabled">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelRandomGeneration">Use Random Generation</div>
-        <label class="switch" title="__MSG_tooltipRandomGeneration__" data-i18n-title="tooltipRandomGeneration">
-          <input type="checkbox" id="maskingRandomMode">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
+	    <div id="privacy" class="tab-pane">
+	      <div class="section-header" data-i18n="sectionDataMasking">Data Masking</div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelEnableDataMasking">Enable Data Masking</div>
+	        <label class="switch" title="__MSG_tooltipEnableDataMasking__" data-i18n-title="tooltipEnableDataMasking">
+	          <input type="checkbox" id="dataMaskingEnabled" aria-label="Enable Data Masking" data-i18n-aria-label="labelEnableDataMasking">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelRandomGeneration">Use Random Generation</div>
+	        <label class="switch" title="__MSG_tooltipRandomGeneration__" data-i18n-title="tooltipRandomGeneration">
+	          <input type="checkbox" id="maskingRandomMode" aria-label="Use Random Generation" data-i18n-aria-label="labelRandomGeneration">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
       <div class="section-header" data-i18n="sectionStreamerMode">Streamer Mode</div>
-      <div class="row">
-        <div class="label" data-i18n="labelBlurChatHistory">Blur chat history (Streamer mode)</div>
-        <label class="switch" title="__MSG_tooltipBlurChatHistory__" data-i18n-title="tooltipBlurChatHistory">
-          <input type="checkbox" id="blurChatHistory">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelBlurAvatar">Blur user avatar</div>
-        <label class="switch" title="__MSG_tooltipBlurAvatar__" data-i18n-title="tooltipBlurAvatar">
-          <input type="checkbox" id="blurAvatar">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelBlurChatHistory">Blur chat history (Streamer mode)</div>
+	        <label class="switch" title="__MSG_tooltipBlurChatHistory__" data-i18n-title="tooltipBlurChatHistory">
+	          <input type="checkbox" id="blurChatHistory" aria-label="Blur chat history" data-i18n-aria-label="labelBlurChatHistory">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelBlurAvatar">Blur user avatar</div>
+	        <label class="switch" title="__MSG_tooltipBlurAvatar__" data-i18n-title="tooltipBlurAvatar">
+	          <input type="checkbox" id="blurAvatar" aria-label="Blur user avatar" data-i18n-aria-label="labelBlurAvatar">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
     </div>
 
     <!-- Voice Tab -->
-    <div id="voice" class="tab-pane">
-      <div class="row">
-        <div class="label" data-i18n="labelVoiceColor">__MSG_labelVoiceColor__</div>
-        <div class="custom-select-wrapper">
-          <div class="custom-select" id="voiceColorSelector">
-            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false">
-              <span class="color-dot"></span>
-              <span class="select-label"></span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
-              </svg>
-            </button>
-            <div class="select-options" role="listbox"></div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="label" data-i18n="labelCuteVoice">__MSG_labelCuteVoice__</div>
-        <label class="switch" title="__MSG_tooltipCuteVoice__" data-i18n-title="tooltipCuteVoice">
-          <input type="checkbox" id="cuteVoiceUI">
-          <span class="track"><span class="thumb"></span></span>
-        </label>
-      </div>
-    </div>
+	    <div id="voice" class="tab-pane">
+	      <div class="row">
+	        <div class="label" data-i18n="labelVoiceColor">__MSG_labelVoiceColor__</div>
+	        <div class="custom-select-wrapper">
+	          <div class="custom-select" id="voiceColorSelector">
+	            <button type="button" class="select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Voice color" data-i18n-aria-label="labelVoiceColor">
+	              <span class="color-dot"></span>
+	              <span class="select-label"></span>
+	              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"
+	                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+	                <polyline points="4.5 6.5 8 9.5 11.5 6.5"></polyline>
+	              </svg>
+	            </button>
+	            <div class="select-options" role="listbox" aria-label="Voice color" data-i18n-aria-label="labelVoiceColor"></div>
+	          </div>
+	        </div>
+	      </div>
+	      <div class="row">
+	        <div class="label" data-i18n="labelCuteVoice">__MSG_labelCuteVoice__</div>
+	        <label class="switch" title="__MSG_tooltipCuteVoice__" data-i18n-title="tooltipCuteVoice">
+	          <input type="checkbox" id="cuteVoiceUI" aria-label="Cute Voice UI" data-i18n-aria-label="labelCuteVoice">
+	          <span class="track"><span class="thumb"></span></span>
+	        </label>
+	      </div>
+	    </div>
   </main>
 
   <div id="donationModal" class="donation-modal" hidden>
@@ -389,16 +398,16 @@
 
       <div class="ticket-section">
         <label data-i18n="feedbackYourTicketId">__MSG_feedbackYourTicketId__</label>
-        <div class="ticket-display">
-          <code id="ticketIdDisplay">#AUR-....</code>
-          <button id="copyTicketBtn" title="__MSG_feedbackCopyIdTooltip__" data-i18n-title="feedbackCopyIdTooltip">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-          </button>
-        </div>
+	        <div class="ticket-display">
+	          <code id="ticketIdDisplay">#AUR-....</code>
+	          <button id="copyTicketBtn" title="__MSG_feedbackCopyIdTooltip__" data-i18n-title="feedbackCopyIdTooltip" aria-label="Copy ticket ID" data-i18n-aria-label="feedbackCopyIdTooltip">
+	            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+	              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+	              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+	              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+	            </svg>
+	          </button>
+	        </div>
         <div class="copy-feedback" id="copyFeedback" data-i18n="feedbackCopied">__MSG_feedbackCopied__</div>
       </div>
 
@@ -407,9 +416,9 @@
         <span><span data-i18n="feedbackDonatePre">__MSG_feedbackDonatePre__</span><b><span data-i18n="ticketIdLabel">__MSG_ticketIdLabel__</span></b><span data-i18n="feedbackDonatePost">__MSG_feedbackDonatePost__</span></span>
       </div>
 
-      <a href="https://ko-fi.com/testtm" target="_blank" id="kofiBtn" class="kofi-btn">
-        <span data-i18n="feedbackSupportKofi">__MSG_feedbackSupportKofi__</span>
-      </a>
+	      <a href="https://ko-fi.com/testtm" target="_blank" rel="noopener noreferrer" id="kofiBtn" class="kofi-btn">
+	        <span data-i18n="feedbackSupportKofi">__MSG_feedbackSupportKofi__</span>
+	      </a>
 
       <button id="closeDonationModal" class="close-modal-link" data-i18n="feedbackClose">__MSG_feedbackClose__</button>
     </div>
