@@ -438,7 +438,8 @@
 
       // Idle and queue has work: attempt to send next.
       if (!generating && !this.pending && this.queue.length) {
-        this.maybeStartAutoSend(composer, sendBtn);
+        // If the feature is off, keep the queue UI but never auto-send or inject text.
+        if (this.isEnabled()) this.maybeStartAutoSend(composer, sendBtn);
       }
     }
 
@@ -497,14 +498,22 @@
         return;
       }
 
+      // Safety: do not inject queued text into the composer when the feature is disabled.
+      // (Users can toggle the feature off to cancel queued follow-ups.)
+      if (!this.isEnabled()) return;
+
       const draft = AuroraComposerLocator.getText(composer);
       AuroraComposerLocator.setText(composer, next.text);
 
       const attemptSend = () => {
-        if (!this.isEnabled()) return;
-
         const cNow = AuroraComposerLocator.findActive() || composer;
         if (!cNow || !cNow.isConnected) return;
+
+        if (!this.isEnabled()) {
+          // Feature disabled after we injected the queued text: restore user's draft if safe.
+          this.restoreDraftIfSafe(cNow, draft, next.text);
+          return;
+        }
 
         const formNow = AuroraComposerLocator.getForm(cNow);
         const hintedBtn = (sendBtnHint && sendBtnHint.isConnected) ? sendBtnHint : null;
@@ -537,7 +546,7 @@
       // Try twice: React can mount/enable Send slightly after the input event.
       requestAnimationFrame(() => {
         attemptSend();
-        if (!this.pending) setTimeout(attemptSend, 140);
+        if (this.isEnabled() && !this.pending) setTimeout(attemptSend, 140);
       });
     }
 

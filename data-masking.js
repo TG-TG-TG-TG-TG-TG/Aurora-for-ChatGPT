@@ -247,11 +247,14 @@
             }
         }
 
-        runScan(deadline) {
-            if (!this.settings.dataMaskingEnabled || !this.settings.extensionEnabled) {
-                this.scanQueue.length = 0;
-                return;
-            }
+	        runScan(deadline) {
+	            if (!this.settings.dataMaskingEnabled || !this.settings.extensionEnabled) {
+	                this.scanQueue.length = 0;
+	                // If we drop the queue early, also drop the dedupe set.
+	                // Otherwise roots (e.g. document.body) remain permanently "queued" and re-enqueue is skipped.
+	                this.queuedRoots = new WeakSet();
+	                return;
+	            }
 
             const start = performance.now();
             const TIME_BUDGET_MS = 8;
