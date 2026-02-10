@@ -23,19 +23,6 @@
   }
 
   class AuroraComposerLocator {
-    static findFromTarget(target) {
-      if (!target || target.nodeType !== 1) return null;
-
-      const t = target;
-      if (t.id === 'prompt-textarea' && isLikelyVisible(t)) return t;
-      if ((t.tagName === 'TEXTAREA' || t.tagName === 'INPUT') && isLikelyVisible(t)) return t;
-
-      const ce = t.closest?.('[contenteditable="true"][role="textbox"]');
-      if (ce && isLikelyVisible(ce)) return ce;
-
-      return null;
-    }
-
     static findActive() {
       for (const selector of COMPOSER_SELECTORS) {
         const candidates = document.querySelectorAll(selector);
@@ -320,6 +307,10 @@
 
     shutdown() {
       // Keep the keydown listener (cheap) so re-enable works without re-instantiation.
+      if (this.pending) {
+        const composer = AuroraComposerLocator.findActive();
+        if (composer) this.restoreDraftIfSafe(composer, this.pending.draft, this.pending.text);
+      }
       this.queue = [];
       this.pending = null;
       this.ui.removeAll();
@@ -457,12 +448,12 @@
       if (e.key !== 'Enter') return;
       if (e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
 
-      const composerFromTarget = AuroraComposerLocator.findFromTarget(e.target) || AuroraComposerLocator.findActive();
-      if (!composerFromTarget) return;
       const t = e.target;
-      if (t !== composerFromTarget && !(composerFromTarget.contains && composerFromTarget.contains(t))) return;
+      const composer = AuroraComposerLocator.findActive();
+      if (!composer) return;
+      if (t !== composer && !(composer.contains && composer.contains(t))) return;
 
-      const form = AuroraComposerLocator.getForm(composerFromTarget);
+      const form = AuroraComposerLocator.getForm(composer);
       const generating = !!this.findStopButton(form);
       if (!generating) return;
 
@@ -470,7 +461,7 @@
       e.preventDefault();
       e.stopPropagation();
 
-      const ok = this.enqueueFromComposer(composerFromTarget);
+      const ok = this.enqueueFromComposer(composer);
       if (ok) this.ui.showToast(this.getMessage('toastMessageQueued', String(this.queue.length)));
     }
 

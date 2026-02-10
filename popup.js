@@ -32,7 +32,6 @@ const TOGGLE_KEYS = [
 
 // --- Element Cache (populated once on DOMContentLoaded) ---
 const $ = {};
-let selectsInitialized = false;
 let listenersAttached = false;
 
 // --- Helpers ---

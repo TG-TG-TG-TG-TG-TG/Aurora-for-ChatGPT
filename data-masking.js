@@ -117,7 +117,7 @@
                         }
                     });
                 }
-            } catch (e) { }
+            } catch (e) { /* ignore */ }
         }
 
         startObserver() {

@@ -95,10 +95,10 @@
     const pointerInit = { bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true };
     try {
       legacyTrigger.dispatchEvent(new PointerEvent('pointerover', pointerInit));
-    } catch (e) {}
+    } catch (e) { /* ignore */ }
     try {
       legacyTrigger.dispatchEvent(new PointerEvent('pointerenter', pointerInit));
-    } catch (e) {}
+    } catch (e) { /* ignore */ }
     legacyTrigger.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
     legacyTrigger.focus();
     legacyTrigger.click();
