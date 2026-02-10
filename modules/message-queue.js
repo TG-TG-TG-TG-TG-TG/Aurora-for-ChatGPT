@@ -296,7 +296,7 @@
       this.getMessage = getMessage;
 
       this.queue = []; // [{ text, href, at, timeLabel }]
-      this.pending = null; // { attemptedAt, text, draft, href }
+      this.pending = null; // { attemptedAt, text, draft, href, queuedItem }
       this.lastHref = location.href;
 
       this.ui = new AuroraMessageQueueUI({ getMessage });
@@ -365,8 +365,15 @@
         return;
       }
 
-      // If feature is off and there is no queued work, do nothing (and remove UI).
-      if (!this.isEnabled() && !this.hasWork()) {
+      // If the feature is turned off, treat it as "cancel queued follow-ups":
+      // flush any queued/pending work and remove the UI so nothing can be auto-sent later.
+      if (!this.isEnabled()) {
+        if (this.pending) {
+          const composer = AuroraComposerLocator.findActive();
+          if (composer) this.restoreDraftIfSafe(composer, this.pending.draft, this.pending.text);
+        }
+        this.queue = [];
+        this.pending = null;
         this.ui.removeAll();
         return;
       }
@@ -419,12 +426,14 @@
           this.restoreDraftIfSafe(composer, this.pending.draft, this.pending.text);
           this.pending = null;
         } else if (generating) {
-          // Confirmed: generation started => we can drop the queued item.
-          if (this.queue.length && this.queue[0].href === this.pending.href && this.queue[0].text === this.pending.text) {
-            this.queue.shift();
-          } else {
-            this.queue.shift();
+          // Confirmed: generation started => drop only the queued item that matches this.pending.
+          const queuedItem = this.pending.queuedItem;
+          let idx = -1;
+          if (queuedItem) idx = this.queue.indexOf(queuedItem);
+          if (idx === -1) {
+            idx = this.queue.findIndex((q) => q && q.href === this.pending.href && q.text === this.pending.text);
           }
+          if (idx !== -1) this.queue.splice(idx, 1);
           this.ui.updateBadge(this.queue.length);
           this.restoreDraftIfSafe(composer, this.pending.draft, this.pending.text);
           this.pending = null;
@@ -438,8 +447,7 @@
 
       // Idle and queue has work: attempt to send next.
       if (!generating && !this.pending && this.queue.length) {
-        // If the feature is off, keep the queue UI but never auto-send or inject text.
-        if (this.isEnabled()) this.maybeStartAutoSend(composer, sendBtn);
+        this.maybeStartAutoSend(composer, sendBtn);
       }
     }
 
@@ -520,7 +528,7 @@
         const btnNow = (!hintedBtn || hintedBtn.disabled) ? this.findSendButton(formNow) : hintedBtn;
         if (btnNow && !btnNow.disabled) {
           btnNow.click();
-          this.pending = { attemptedAt: Date.now(), text: next.text, draft, href: next.href };
+          this.pending = { attemptedAt: Date.now(), text: next.text, draft, href: next.href, queuedItem: next };
           this.schedulePulse(120);
           return;
         }
@@ -530,7 +538,7 @@
         if (formNow && typeof formNow.requestSubmit === 'function') {
           try {
             formNow.requestSubmit();
-            this.pending = { attemptedAt: Date.now(), text: next.text, draft, href: next.href };
+            this.pending = { attemptedAt: Date.now(), text: next.text, draft, href: next.href, queuedItem: next };
             this.schedulePulse(120);
             return;
           } catch (e) {
