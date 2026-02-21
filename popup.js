@@ -13,7 +13,7 @@ const FEEDBACK_API_URL = 'https://auroraforchatgpt.tnemoroccan.workers.dev';
 const DEFAULTS = {
   legacyComposer: false, theme: 'auto', appearance: 'clear', hideGpt5Limit: false,
   hideUpgradeButtons: false, disableAnimations: false, focusMode: false,
-  hideQuickSettings: false, customBgUrl: '', backgroundBlur: '60',
+  hideQuickSettings: false, queueWhileGenerating: false, customBgUrl: '', backgroundBlur: '60',
   backgroundScaling: 'cover', voiceColor: 'default', cuteVoiceUI: false,
   hasSeenWelcomeScreen: false, defaultModel: '', customFont: 'system',
   showTokenCounter: false, blurChatHistory: false, blurAvatar: false,
@@ -25,14 +25,13 @@ const DEFAULTS = {
 
 const TOGGLE_KEYS = [
   'legacyComposer', 'hideGpt5Limit', 'hideUpgradeButtons', 'disableAnimations',
-  'focusMode', 'hideQuickSettings', 'showTokenCounter', 'blurChatHistory',
+  'focusMode', 'hideQuickSettings', 'queueWhileGenerating', 'showTokenCounter', 'blurChatHistory',
   'blurAvatar', 'soundEnabled', 'autoContrast', 'dataMaskingEnabled',
   'maskingRandomMode', 'enableSnowfall', 'enableNewYear', 'cuteVoiceUI', 'cinemaMode'
 ];
 
 // --- Element Cache (populated once on DOMContentLoaded) ---
 const $ = {};
-let selectsInitialized = false;
 let listenersAttached = false;
 
 // --- Helpers ---
@@ -40,6 +39,14 @@ const getMessage = (key) => chrome?.i18n?.getMessage(key) || key;
 
 // --- Main Initialization (Zero-Latency) ---
 document.addEventListener('DOMContentLoaded', () => {
+  // Keep <html lang="..."> in sync with the browser UI language (basic a11y).
+  try {
+    const uiLang = chrome?.i18n?.getUILanguage?.() || 'en';
+    document.documentElement.lang = String(uiLang).toLowerCase();
+  } catch (e) {
+    // ignore
+  }
+
   // 1. Cache all DOM elements ONCE (eliminates repeated querySelectorAll)
   cacheElements();
   
@@ -132,6 +139,7 @@ function cacheElements() {
   $.i18nElements = document.querySelectorAll('[data-i18n]');
   $.i18nPlaceholders = document.querySelectorAll('[data-i18n-placeholder]');
   $.i18nTitles = document.querySelectorAll('[data-i18n-title]');
+  $.i18nAriaLabels = document.querySelectorAll('[data-i18n-aria-label]');
   $.rows = document.querySelectorAll('.row');
   
   // Custom selects (containers)
@@ -565,6 +573,7 @@ function applyLocalization() {
   $.i18nElements?.forEach(el => el.textContent = getMessage(el.dataset.i18n));
   $.i18nPlaceholders?.forEach(el => el.placeholder = getMessage(el.dataset.i18nPlaceholder));
   $.i18nTitles?.forEach(el => el.title = getMessage(el.dataset.i18nTitle));
+  $.i18nAriaLabels?.forEach(el => el.setAttribute('aria-label', getMessage(el.dataset.i18nAriaLabel)));
 }
 
 function setupTabs() {

@@ -348,6 +348,17 @@ function updateTokenCounter(text) {
 /**
  * Find the composer textarea
  */
+let composerNotFoundLogged = false;
+
+function isLikelyVisibleComposer(el) {
+    if (!el || !el.isConnected) return false;
+    // Some ChatGPT composers are contenteditable; only check disabled when supported.
+    if ('disabled' in el && el.disabled) return false;
+    const rect = el.getBoundingClientRect?.();
+    if (!rect) return false;
+    return rect.width >= 20 && rect.height >= 16;
+}
+
 function findComposerTextarea() {
     // Try multiple selectors to find the textarea
     const selectors = [
@@ -363,15 +374,21 @@ function findComposerTextarea() {
     for (const selector of selectors) {
         const elements = document.querySelectorAll(selector);
         for (const el of elements) {
-            // Check if element is visible and not disabled
-            if (el.offsetParent !== null && !el.disabled) {
-                console.log('[Aurora Token Counter] Found textarea:', selector);
+            // Visibility check must not rely on offsetParent; it can be null for fixed-position elements.
+            if (isLikelyVisibleComposer(el)) {
+                composerNotFoundLogged = false;
+                // Intentionally keep as log (not warn) to avoid noisy on-screen diagnostics.
+                console.log('[Aurora Token Counter] Found composer:', selector);
                 return el;
             }
         }
     }
 
-    console.warn('[Aurora Token Counter] Textarea not found, will retry...');
+    // Do not spam warnings on pages that have no composer (e.g. /codex views).
+    if (!composerNotFoundLogged) {
+        composerNotFoundLogged = true;
+        console.log('[Aurora Token Counter] Composer not found, will retry...');
+    }
     return null;
 }
 
@@ -425,13 +442,6 @@ function setupTextareaMonitoring() {
     detachTextareaListeners();
     currentTextarea = textarea;
     console.log('[Aurora Token Counter] Monitoring textarea');
-
-    // Update on input (debounced to prevent expensive calls on every keystroke)
-    const rawListener = () => {
-        if (!isTokenCounterEnabled) return;
-        const text = textarea.value || textarea.textContent || '';
-        updateTokenCounter(text);
-    };
     
     // Debounce the expensive token counting (150ms), but update word count immediately
     currentTextareaListener = () => {

@@ -98,6 +98,30 @@
   "tooltipCinemaMode": {
     "message": "Chat pleine largeur pour mieux voir le code"
   },
+  "labelQueueWhileGenerating": {
+    "message": "File d'attente pendant la génération"
+  },
+  "tooltipQueueWhileGenerating": {
+    "message": "Mettez votre prochain message en file et envoyez-le automatiquement quand le modèle termine"
+  },
+  "queueButtonTitle": {
+    "message": "Mettre en file"
+  },
+  "toastMessageQueued": {
+    "message": "En file ($1)"
+  },
+  "queuedPanelTitle": {
+    "message": "Messages en file"
+  },
+  "queuedPanelSubtitleGenerating": {
+    "message": "Envoi automatique après cette réponse"
+  },
+  "queuedPanelSubtitleIdle": {
+    "message": "Prêt à envoyer"
+  },
+  "queuedPanelRemove": {
+    "message": "Supprimer"
+  },
   "sectionAnimations": {
     "message": "Animations"
   },

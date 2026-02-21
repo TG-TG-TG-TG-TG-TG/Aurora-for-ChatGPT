@@ -98,6 +98,30 @@
   "tooltipCinemaMode": {
     "message": "Full-width chat for better code viewing"
   },
+  "labelQueueWhileGenerating": {
+    "message": "Queue While Generating"
+  },
+  "tooltipQueueWhileGenerating": {
+    "message": "Queue your next message and auto-send when the model finishes"
+  },
+  "queueButtonTitle": {
+    "message": "Queue message"
+  },
+  "toastMessageQueued": {
+    "message": "Queued ($1)"
+  },
+  "queuedPanelTitle": {
+    "message": "Queued messages"
+  },
+  "queuedPanelSubtitleGenerating": {
+    "message": "Will auto-send after this reply"
+  },
+  "queuedPanelSubtitleIdle": {
+    "message": "Ready to send"
+  },
+  "queuedPanelRemove": {
+    "message": "Remove"
+  },
   "sectionAnimations": {
     "message": "Animations"
   },

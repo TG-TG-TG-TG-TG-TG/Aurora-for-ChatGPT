@@ -59,13 +59,17 @@
 
     class DataMaskingEngine {
         constructor() {
-            this.originalData = new Map();
-            this.dataIdCounter = 0;
+            this.originalData = new Map(); // reserved for potential restore feature
             this.settings = { dataMaskingEnabled: false, maskingRandomMode: false, extensionEnabled: true };
             this.initialized = false;
             this.observer = null;
             this.pendingNodes = [];
             this.processQueued = false;
+
+            // Chunked scanning queue to avoid long tasks on large DOM subtrees.
+            this.scanQueue = []; // [{ root, walker }]
+            this.scanScheduled = false;
+            this.queuedRoots = new WeakSet();
         }
 
         async init() {
@@ -113,7 +117,7 @@
                         }
                     });
                 }
-            } catch (e) { }
+            } catch (e) { /* ignore */ }
         }
 
         startObserver() {
@@ -144,7 +148,9 @@
 
             const target = document.body || document.documentElement;
             if (target) {
-                this.observer.observe(target, { childList: true, subtree: true, characterData: true });
+                // Perf: do not observe characterData (streaming text updates fire constantly).
+                // We only mask newly added nodes; this matches the current implementation.
+                this.observer.observe(target, { childList: true, subtree: true });
             }
         }
 
@@ -197,15 +203,10 @@
 
             for (const [type, pattern] of Object.entries(PATTERNS)) {
                 pattern.lastIndex = 0;
-                const matches = [...text.matchAll(pattern)];
-                for (const match of matches) {
-                    const original = match[0];
-                    const mask = this.getMask(type, original);
-                    const dataId = `m-${this.dataIdCounter++}`;
-                    this.originalData.set(dataId, { original, type, node });
-                    text = text.replace(original, mask);
+                text = text.replace(pattern, (match) => {
                     modified = true;
-                }
+                    return this.getMask(type, match);
+                });
             }
 
             if (modified) node.textContent = text;
@@ -213,22 +214,94 @@
 
         maskElement(element) {
             if (!element || !this.settings.dataMaskingEnabled || !this.settings.extensionEnabled) return;
+            // Queue scans; chunk processing avoids blocking the main thread for large inserts.
+            this.enqueueScan(element);
+        }
 
-            const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
-                acceptNode: (node) => {
-                    if (!node.textContent?.trim()) return NodeFilter.FILTER_REJECT;
-                    const p = node.parentElement;
-                    if (!p || ['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'INPUT', 'TEXTAREA'].includes(p.tagName)) {
-                        return NodeFilter.FILTER_REJECT;
-                    }
-                    return NodeFilter.FILTER_ACCEPT;
+        enqueueScan(root) {
+            if (!root || !this.settings.dataMaskingEnabled || !this.settings.extensionEnabled) return;
+            // WeakSet prevents flooding the queue with the same root repeatedly.
+            if (root.nodeType === Node.ELEMENT_NODE || root.nodeType === Node.DOCUMENT_NODE || root.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+                if (this.queuedRoots.has(root)) return;
+                this.queuedRoots.add(root);
+            }
+
+            this.scanQueue.push({ root, walker: null });
+            this.scheduleScan();
+        }
+
+        scheduleScan() {
+            if (this.scanScheduled) return;
+            if (!this.settings.dataMaskingEnabled || !this.settings.extensionEnabled) return;
+
+            this.scanScheduled = true;
+            const run = (deadline) => {
+                this.scanScheduled = false;
+                this.runScan(deadline);
+            };
+
+            if (window.requestIdleCallback) {
+                window.requestIdleCallback(run, { timeout: 800 });
+            } else {
+                setTimeout(() => run(null), 16);
+            }
+        }
+
+	        runScan(deadline) {
+	            if (!this.settings.dataMaskingEnabled || !this.settings.extensionEnabled) {
+	                this.scanQueue.length = 0;
+	                // If we drop the queue early, also drop the dedupe set.
+	                // Otherwise roots (e.g. document.body) remain permanently "queued" and re-enqueue is skipped.
+	                this.queuedRoots = new WeakSet();
+	                return;
+	            }
+
+            const start = performance.now();
+            const TIME_BUDGET_MS = 8;
+            const NODE_LIMIT = 220;
+
+            while (this.scanQueue.length > 0) {
+                const task = this.scanQueue[0];
+                const root = task.root;
+
+                if (!task.walker) {
+                    task.walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+                        acceptNode: (node) => {
+                            if (!node.textContent?.trim()) return NodeFilter.FILTER_REJECT;
+                            const p = node.parentElement;
+                            if (!p || ['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'INPUT', 'TEXTAREA'].includes(p.tagName)) {
+                                return NodeFilter.FILTER_REJECT;
+                            }
+                            return NodeFilter.FILTER_ACCEPT;
+                        }
+                    });
                 }
-            });
 
-            const nodes = [];
-            let n;
-            while (n = walker.nextNode()) nodes.push(n);
-            nodes.forEach(node => this.maskTextNode(node));
+                let processed = 0;
+                let done = false;
+                while (processed < NODE_LIMIT) {
+                    const node = task.walker.nextNode();
+                    if (!node) { done = true; break; }
+                    this.maskTextNode(node);
+                    processed++;
+
+                    if (deadline && typeof deadline.timeRemaining === 'function' && deadline.timeRemaining() < 3) break;
+                    if (performance.now() - start > TIME_BUDGET_MS) break;
+                }
+
+                if (done) {
+                    this.scanQueue.shift();
+                    try { this.queuedRoots.delete(root); } catch (e) { /* ignore */ }
+                    continue;
+                }
+
+                // Not done yet; continue later.
+                break;
+            }
+
+            if (this.scanQueue.length > 0) {
+                this.scheduleScan();
+            }
         }
 
         restore() {

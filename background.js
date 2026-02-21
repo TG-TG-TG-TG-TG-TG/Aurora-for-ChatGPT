@@ -7,6 +7,7 @@ const DEFAULTS = {
   disableAnimations: false,
   focusMode: false,
   hideQuickSettings: false,
+  queueWhileGenerating: false,
   customBgUrl: '',
   backgroundBlur: '60',
   backgroundScaling: 'cover',
