@@ -62,7 +62,7 @@
             this.originalData = new Map(); // reserved for potential restore feature
             this.settings = { dataMaskingEnabled: false, maskingRandomMode: false, extensionEnabled: true };
             this.initialized = false;
-            this.observer = null;
+            this.observerCallback = null;
             this.pendingNodes = [];
             this.processQueued = false;
 
@@ -121,19 +121,17 @@
         }
 
         startObserver() {
-            if (this.observer) return;
+            if (this.observerCallback) return;
 
-            this.observer = new MutationObserver((mutations) => {
+            this.observerCallback = ({ addedElements, addedTexts }) => {
                 if (!this.settings.dataMaskingEnabled || !this.settings.extensionEnabled) return;
 
-                for (const mutation of mutations) {
-                    for (const node of mutation.addedNodes) {
-                        if (node.nodeType === Node.ELEMENT_NODE) {
-                            this.pendingNodes.push(node);
-                        } else if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
-                            this.maskTextNode(node);
-                        }
-                    }
+                if (addedElements && addedElements.length > 0) {
+                    this.pendingNodes.push(...addedElements);
+                }
+
+                if (addedTexts && addedTexts.length > 0) {
+                    addedTexts.forEach(node => this.maskTextNode(node));
                 }
 
                 if (this.pendingNodes.length > 0 && !this.processQueued) {
@@ -144,20 +142,15 @@
                         this.processQueued = false;
                     });
                 }
-            });
+            };
 
-            const target = document.body || document.documentElement;
-            if (target) {
-                // Perf: do not observe characterData (streaming text updates fire constantly).
-                // We only mask newly added nodes; this matches the current implementation.
-                this.observer.observe(target, { childList: true, subtree: true });
-            }
+            window.AuroraExt?.centralObserver?.subscribe(this.observerCallback);
         }
 
         stopObserver() {
-            if (this.observer) {
-                this.observer.disconnect();
-                this.observer = null;
+            if (this.observerCallback) {
+                window.AuroraExt?.centralObserver?.unsubscribe(this.observerCallback);
+                this.observerCallback = null;
             }
         }
 

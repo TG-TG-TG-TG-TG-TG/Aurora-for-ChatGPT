@@ -308,32 +308,57 @@
       }, 150);
 
       let renderFrameId = null;
-      const domObserver = new MutationObserver((mutations) => {
+      this.domObserverCallback = ({ addedElements }) => {
         if (document.hidden || !isEnabled()) return;
         if (renderFrameId) return;
 
         let urgentUiUpdate = false;
         const newNodesToProcess = [];
         const slowGlassNodes = [];
+        
+        // Fast paths - preallocate arrays and avoid function calls in the hot loop
+        const elements = addedElements || [];
+        const len = elements.length;
 
-        for (const m of mutations) {
-          for (const n of m.addedNodes) {
-            if (n.nodeType !== 1) continue;
+        for (let i = 0; i < len; i++) {
+            const n = elements[i];
             newNodesToProcess.push(n);
 
-            if (
-              n.classList.contains('popover') ||
-              n.getAttribute('role') === 'dialog' ||
-              n.getAttribute('role') === 'menu' ||
-              n.querySelector?.('.popover, [role="dialog"], [role="menu"]')
-            ) {
-              urgentUiUpdate = true;
-            }
+            // We use a high-performance TreeWalker rather than querySelector/getElementsByClassName
+            // This is O(N) over only the exact sub-nodes, bypassing the browser's CSS matcher
+            let needsWalk = !urgentUiUpdate || (slowGlassNodes.length < 3);
+            
+            if (needsWalk) {
+                const walker = document.createTreeWalker(n, NodeFilter.SHOW_ELEMENT, null, false);
+                let current = walker.currentNode;
+                
+                while (current) {
+                    // 1. Check for Urgent UI Updates (popovers, dialogs, menus)
+                    if (!urgentUiUpdate) {
+                        const cl = current.classList;
+                        if (cl && cl.contains('popover')) {
+                            urgentUiUpdate = true;
+                        } else {
+                            const role = current.getAttribute && current.getAttribute('role');
+                            if (role === 'dialog' || role === 'menu') {
+                                urgentUiUpdate = true;
+                            }
+                        }
+                    }
 
-            if (slowGlassNodes.length < 3 && this.glass.hasSlowHints(n)) {
-              slowGlassNodes.push(n);
+                    // 2. Check for slow glass hints
+                    if (slowGlassNodes.length < 3 && this.glass.hasSlowHints(current)) {
+                        slowGlassNodes.push(current);
+                    }
+
+                    // Early exit if we found everything we need in this subtree
+                    if (urgentUiUpdate && slowGlassNodes.length >= 3) {
+                       break;
+                    }
+
+                    current = walker.nextNode();
+                }
             }
-          }
         }
 
         renderFrameId = requestAnimationFrame(() => {
@@ -362,9 +387,11 @@
         });
 
         if (isEnabled()) debouncedOtherChecks();
-      });
+      };
 
-      if (document.body) domObserver.observe(document.body, { childList: true, subtree: true });
+      if (window.AuroraExt?.centralObserver) {
+          window.AuroraExt.centralObserver.subscribe(this.domObserverCallback);
+      }
 
       const themeObserver = new MutationObserver(() => {
         const s = getSettings();

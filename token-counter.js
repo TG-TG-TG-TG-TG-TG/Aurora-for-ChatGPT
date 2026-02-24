@@ -2,7 +2,7 @@
 // This module provides real-time token and word counting for the ChatGPT composer
 
 let tokenCounterElement = null;
-let textareaObserver = null;
+let textareaObserverCallback = null;
 let currentTextarea = null;
 let currentTextareaListener = null;
 let retryTimeoutId = null;
@@ -411,9 +411,9 @@ function clearMonitoringArtifacts() {
         clearTimeout(debouncedUpdateTimer);
         debouncedUpdateTimer = null;
     }
-    if (textareaObserver) {
-        textareaObserver.disconnect();
-        textareaObserver = null;
+    if (textareaObserverCallback) {
+        window.AuroraExt?.centralObserver?.unsubscribe(textareaObserverCallback);
+        textareaObserverCallback = null;
     }
     detachTextareaListeners();
 }
@@ -463,23 +463,20 @@ function setupTextareaMonitoring() {
     currentTextareaListener();
 
     // Watch for textarea replacement (ChatGPT may recreate it)
-    if (textareaObserver) {
-        textareaObserver.disconnect();
+    if (textareaObserverCallback) {
+        window.AuroraExt?.centralObserver?.unsubscribe(textareaObserverCallback);
     }
 
-    textareaObserver = new MutationObserver(() => {
+    textareaObserverCallback = () => {
         // Early exit if feature disabled (defensive check for race conditions)
-        if (!isTokenCounterEnabled || !textareaObserver) return;
+        if (!isTokenCounterEnabled || !textareaObserverCallback) return;
         const newTextarea = findComposerTextarea();
         if (newTextarea && newTextarea !== currentTextarea) {
             setupTextareaMonitoring();
         }
-    });
+    };
 
-    textareaObserver.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
+    window.AuroraExt?.centralObserver?.subscribe(textareaObserverCallback);
 }
 
 /**
