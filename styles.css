@@ -199,7 +199,39 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(.popover[data-radix-menu-con
 
 /* --- UNIFIED GLASS ENGINE --- */
 /* This is the master selector for ALL elements that receive a glass effect. */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) [data-aurora-glass="true"] {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(
+  [data-aurora-glass="true"],
+  .popover.bg-token-main-surface-primary[data-radix-menu-content],
+  .popover.bg-token-main-surface-primary[role="dialog"],
+  div[role="dialog"][class*="shadow-long"],
+  .popover.bg-token-main-surface-primary.max-w-xs,
+  div.sticky.top-14.bg-token-main-surface-primary,
+  textarea.bg-token-main-surface-primary.border-token-border-default,
+  .bg-token-main-surface-primary.sticky.top-\[-1px\],
+  form[data-type="unified-composer"] > div > div,
+  div[data-message-author-role="assistant"] pre,
+  .agent-turn pre,
+  #cgpt-qs-panel,
+  .py-3.px-3.rounded-3xl.bg-token-main-surface-tertiary,
+  .divide-token-border-default.bg-token-main-surface-primary.mx-1.mt-1,
+  button[aria-label="Scroll down"],
+  .active\:opacity-1.border-none.rounded-xl.flex.shadow-long.btn-secondary.relative.btn,
+  .shrink-0.btn-secondary.relative.btn,
+  .shrink-0.btn-danger-outline.relative.btn,
+  .justify-between.items-center.flex > .btn-small.btn-secondary.relative.btn,
+  .hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary,
+  .p-4.rounded-lg.justify-stretch.items-center.flex-col.w-full.flex.relative.bg-token-main-surface-primary,
+  .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary,
+  .p-3.border.rounded-\[10px\].w-full.btn-secondary,
+  [role="tooltip"],
+  [role="alert"],
+  [role="status"],
+  .absolute.z-30.h-8.w-8.rounded-full.bg-token-main-surface-primary,
+  button.h-9.w-9.rounded-full.bg-black,
+  .h-9.rounded-full.bg-token-bg-accent-static,
+  div[role="dialog"]:has(input#search[placeholder="Search GPTs"]),
+  div.bg-token-bg-primary.w-full.block:has(ul[class*="divide-y"])
+) {
   /* Default: "Dimmed" Glass Style */
   background: var(--aurora-glass-bg) !important;
   border: 1px solid var(--aurora-glass-border) !important;
@@ -208,6 +240,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) [data-aurora-glass="true"] {
   backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate)) !important;
   /* Removed background transition to prevent open glitches */
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  will-change: filter, backdrop-filter;
 }
 
 /* Dialog navigation arrows (image/media viewer): avoid overly highlighted glass tiles */
@@ -235,9 +268,13 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) [role="dialog"] button[title*="n
 }
 
 /* Menu/Popover Opening Animation (smooth, natural feel) */
-html.cgpt-ambient-on:not(.cgpt-animations-disabled):not(.cgpt-legacy-composer) .popover[data-aurora-glass="true"],
-html.cgpt-ambient-on:not(.cgpt-animations-disabled):not(.cgpt-legacy-composer) [role="menu"][data-aurora-glass="true"],
-html.cgpt-ambient-on:not(.cgpt-animations-disabled):not(.cgpt-legacy-composer) [data-radix-menu-content][data-aurora-glass="true"] {
+html.cgpt-ambient-on:not(.cgpt-animations-disabled):not(.cgpt-legacy-composer) :is(
+  .popover[data-aurora-glass="true"],
+  [role="menu"][data-aurora-glass="true"],
+  [data-radix-menu-content][data-aurora-glass="true"],
+  .popover.bg-token-main-surface-primary[data-radix-menu-content],
+  .popover.bg-token-main-surface-primary[role="dialog"]
+) {
   animation: menu-pop-open 280ms cubic-bezier(0.32, 0.72, 0, 1);
   transform-origin: var(--radix-popper-transform-origin, top center);
   will-change: transform, opacity;
@@ -284,7 +321,7 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"] button:hov
 }
 
 /* Updated to target the wrapper div which now holds the background */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-aurora-glass="true"]:has(> ul[class*="divide-y"]) {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(div[data-aurora-glass="true"], div.bg-token-bg-primary.w-full.block):has(> ul[class*="divide-y"]) {
   /* Add padding and rounded corners for better appearance */
   border-radius: var(--glass-radius) !important;
   margin-top: 4px !important;
@@ -382,7 +419,7 @@ html.cgpt-cute-voice-on .min-h-bloop::after { right: 45px; transform: rotate(35d
 html.cgpt-cute-voice-on .min-h-bloop > canvas { position: relative; z-index: 1; }
 
 /* --- Focus Mode Rules --- */
-html.cgpt-focus-mode-on .flex-shrink-0[class*="bg-token-sidebar-surface-primary"], html.cgpt-focus-mode-on header#page-header, html.cgpt-focus-mode-on main .gizmo-suggestions, html.cgpt-focus-mode-on main .text-4xl.font-semibold { display: none !important; }
+html.cgpt-focus-mode-on :is(.stage-sidebar-pure-surface, #stage-slideover-sidebar), html.cgpt-focus-mode-on header#page-header, html.cgpt-focus-mode-on main .gizmo-suggestions, html.cgpt-focus-mode-on main .text-4xl.font-semibold { display: none !important; }
 html.cgpt-focus-mode-on #thread-bottom-container { visibility: hidden !important; }
 html.cgpt-focus-mode-on main .flex.h-full.flex-col { padding-top: 1.25rem; }
 
@@ -852,20 +889,21 @@ html.cgpt-light-mode .aurora-setup-bar .track { background: rgba(0,0,0,0.2); }
 
 /* --- Sidebar Styles --- */
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface) {
   position: relative;
   background: transparent !important;
-  border-radius: var(--glass-radius);
   overflow: hidden;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .bg-token-bg-elevated-secondary,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-bg-"]:not([class*="bg-token-bg-elevated-secondary"]),
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar [class*="bg-token-surface"] {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar {
+  border-radius: var(--glass-radius);
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface) :is(.bg-token-bg-elevated-secondary, [class*="bg-token-bg-"]:not([class*="bg-token-bg-elevated-secondary"]), [class*="bg-token-surface"], [class*="bg-token-sidebar-surface"], [class*="bg-\("], .bg-\(--sidebar-surface-primary\)) {
   background-color: transparent !important;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface)::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -880,22 +918,18 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::before
   transition: none;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar > * {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface) > * {
   position: relative;
   z-index: 1;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky {
-  position: sticky;
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface) :is(.sticky, .tall\:sticky) {
   isolation: isolate;
   background: transparent !important;
   border-radius: var(--glass-radius);
-  contain: paint;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky::before,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky::before {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface) :is(.sticky, .tall\:sticky)::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -908,18 +942,16 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:
   box-shadow: 0 1px 0 var(--sidebar-sticky-highlight) inset, var(--sidebar-glass-shadow);
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .sticky > *,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .tall\:sticky > * {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface) :is(.sticky, .tall\:sticky) > * {
   position: relative;
   z-index: 1;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .hover\:bg-token-surface-hover:hover,
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar .focus-visible\:bg-token-surface-hover:focus-visible {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface) :is(.hover\:bg-token-surface-hover:hover, .focus-visible\:bg-token-surface-hover:focus-visible) {
   background-color: color-mix(in oklab, currentColor 7%, transparent) !important;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) #stage-slideover-sidebar::after {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface)::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -969,11 +1001,9 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-thre
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky,
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .tall\:sticky {
-  position: sticky;
   isolation: isolate;
   background: transparent !important;
   border-radius: var(--activity-glass-radius, var(--glass-radius, 18px));
-  contain: paint;
 }
 
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) section[data-testid="screen-threadFlyOut"] .sticky::before,
@@ -1977,11 +2007,24 @@ html.cgpt-ambient-on div[id^="radix-"] [class*="bg-token-main-surface"] {
   background: transparent !important;
 }
 
+/* Ensure tab panels inside dialogs are transparent so the ambient blur/glass background shows through */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="dialog"], [data-aurora-glass="true"]) [role="tabpanel"] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
 /* Style the listbox items hover state */
 html.cgpt-ambient-on [role="dialog"] li[role="option"]:hover,
 html.cgpt-ambient-on [role="dialog"] .dark\:hover\:bg-white\/10:hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
   background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Settings Dialog Sidebar (Tab List) Glass Blur */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-settings-tab-list="true"] {
+  background: var(--sidebar-glass-bg) !important;
+  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat)) !important;
+  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat)) !important;
 }
 
 /* Light mode adjustments for dropdown */
