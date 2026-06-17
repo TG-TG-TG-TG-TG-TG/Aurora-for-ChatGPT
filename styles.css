@@ -224,6 +224,8 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(
   .p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary,
   .p-3.border.rounded-\[10px\].w-full.btn-secondary,
   [role="tooltip"],
+  .bg-token-bg-tooltip,
+  [class*="bg-token-bg-tooltip"],
   [role="alert"],
   [role="status"],
   .absolute.z-30.h-8.w-8.rounded-full.bg-token-main-surface-primary,
@@ -370,12 +372,12 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-message-author-role="as
 
 /* --- Tooltip Polishing --- */
 /* Hide the solid arrow to create a floating glass effect */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-black[data-state*="open"]) [data-radix-popper-arrow] {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-token-bg-tooltip, [class*="bg-token-bg-tooltip"], .bg-black[data-state*="open"]) [data-radix-popper-arrow] {
   display: none !important;
 }
 
 /* 1. Apply Glass to the Tooltip Container (Base & Root .bg-black override) */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-black[data-state*="open"]) {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-token-bg-tooltip, [class*="bg-token-bg-tooltip"], .bg-black[data-state*="open"]) {
   background: var(--aurora-glass-bg) !important;
   background-color: var(--aurora-glass-bg) !important; /* Explicitly override color */
   border: 1px solid var(--aurora-glass-border) !important;
@@ -387,11 +389,20 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-black[
 
 /* 2. AGGRESSIVE Child Cleanup (The "Nuclear" Fix) */
 /* Forces ANY child element (div, span, etc.) inside the tooltip to be transparent. */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-black[data-state*="open"]) * {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-token-bg-tooltip, [class*="bg-token-bg-tooltip"], .bg-black[data-state*="open"]) * {
   background-color: transparent !important;
   background-image: none !important;
   box-shadow: none !important;
   border: none !important;
+}
+
+/* 3. Text Visibility Fixes for Tooltips */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-token-bg-tooltip, [class*="bg-token-bg-tooltip"], .bg-black[data-state*="open"]) :is(.text-token-text-primary, .text-token-text-secondary, div, span, kbd) {
+  color: var(--theme-text-primary) !important;
+}
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is([role="tooltip"], .bg-token-bg-tooltip, [class*="bg-token-bg-tooltip"], .bg-black[data-state*="open"]) :is(.text-token-text-tertiary, kbd span) {
+  color: var(--theme-text-secondary) !important;
+  opacity: 0.8;
 }
 
 /* --- Light Mode Color Overrides --- */
@@ -959,6 +970,14 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(#stage-slideover-sidebar, .s
   pointer-events: none;
   border-radius: inherit;
   background: var(--sidebar-gradient-overlay);
+}
+
+/* Fix text and SVG visibility in light mode sidebar, popovers, dialogs, and menus */
+html.cgpt-ambient-on.cgpt-light-mode :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface, .popover, [role="menu"], [data-radix-menu-content], [role="dialog"]) :is(div, span, a, button, svg, p, h1, h2, h3, li) {
+  color: var(--theme-text-primary) !important;
+}
+html.cgpt-ambient-on.cgpt-light-mode :is(#stage-slideover-sidebar, .stage-sidebar-pure-surface, .popover, [role="menu"], [data-radix-menu-content], [role="dialog"]) :is(.text-token-text-secondary, .text-token-text-tertiary, .text-gray-500, .text-gray-400) {
+  color: var(--theme-text-secondary) !important;
 }
 
 /* --- Activity Flyout Glass Treatment --- */
@@ -2022,9 +2041,10 @@ html.cgpt-ambient-on [role="dialog"] .dark\:hover\:bg-white\/10:hover {
 
 /* Settings Dialog Sidebar (Tab List) Glass Blur */
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) div[data-settings-tab-list="true"] {
-  background: var(--sidebar-glass-bg) !important;
-  -webkit-backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat)) !important;
-  backdrop-filter: blur(var(--sidebar-glass-blur)) saturate(var(--sidebar-glass-sat)) !important;
+  background: color-mix(in oklab, var(--aurora-glass-bg) 60%, transparent) !important;
+  border-inline-end: 1px solid var(--aurora-glass-border) !important;
+  -webkit-backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate)) !important;
+  backdrop-filter: blur(var(--aurora-glass-blur)) saturate(var(--aurora-glass-saturate)) !important;
 }
 
 /* Light mode adjustments for dropdown */

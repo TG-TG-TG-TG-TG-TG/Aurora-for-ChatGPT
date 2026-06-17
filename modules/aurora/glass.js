@@ -42,6 +42,8 @@
     '.p-4.rounded-xl.my-4.bg-token-bg-tertiary.text-token-text-secondary',
     '.p-3.border.rounded-\\[10px\\].w-full.btn-secondary',
     '[role="tooltip"]',
+    '.bg-token-bg-tooltip',
+    '[class*="bg-token-bg-tooltip"]',
     /* Toast Notifications */
     '[role="alert"]',
     '[role="status"]',
