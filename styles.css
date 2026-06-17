@@ -150,10 +150,11 @@ html.cgpt-appearance-clear.cgpt-light-mode {
 html.cgpt-ambient-on,
 html.cgpt-ambient-on body {
   background: transparent !important;
+  overflow: hidden !important;
 }
 
 /* --- Background Container & Media --- */
-#cgpt-ambient-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-color: var(--theme-bg-color); opacity: 0; transition: opacity 0.5s ease-in-out; contain: paint; }
+#cgpt-ambient-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-color: var(--theme-bg-color); opacity: 0; transition: opacity 0.5s ease-in-out; contain: paint; overflow: hidden; }
 html.cgpt-bg-anim-disabled #cgpt-ambient-bg { transition: none; }
 #cgpt-ambient-bg.bg-visible { opacity: 1; }
 #cgpt-ambient-bg .media-layer { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 750ms ease-in-out; }

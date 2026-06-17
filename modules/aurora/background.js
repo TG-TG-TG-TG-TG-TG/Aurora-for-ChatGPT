@@ -13,11 +13,23 @@
   }
 
   function ensureAppOnTop() {
+    if (!document.body) return;
+    // Skip extension-inserted elements to avoid targeting the background container or quick settings as the app container
+    let firstChild = document.body.firstElementChild;
+    while (firstChild && (
+      firstChild.id === cfg.ID || 
+      firstChild.id === cfg.STYLE_ID || 
+      firstChild.id === cfg.QS_BUTTON_ID || 
+      firstChild.id === cfg.QS_PANEL_ID || 
+      firstChild.id === 'aurora-welcome-overlay'
+    )) {
+      firstChild = firstChild.nextElementSibling;
+    }
     const app =
       document.getElementById('__next') ||
       document.querySelector('#root') ||
       document.querySelector('main') ||
-      document.body?.firstElementChild;
+      firstChild;
     if (!app) return;
     const cs = getComputedStyle(app);
     if (cs.position === 'static') app.style.position = 'relative';
@@ -30,7 +42,7 @@
     wrap.setAttribute('aria-hidden', 'true');
     wrap.style.setProperty('--cgpt-bg-blur-radius', '60px');
     wrap.style.setProperty('--cgpt-object-fit', 'cover');
-    Object.assign(wrap.style, { position: 'fixed', inset: '0', zIndex: '-1', pointerEvents: 'none' });
+    Object.assign(wrap.style, { position: 'fixed', inset: '0', zIndex: '-1', pointerEvents: 'none', overflow: 'hidden' });
 
     const createLayerContent = () => `
       <div class="animated-bg">
@@ -390,6 +402,7 @@
       else document.addEventListener('DOMContentLoaded', add, { once: true });
     } else {
       node.classList.add('bg-visible');
+      ensureAppOnTop();
       updateBackgroundImage();
     }
   }
