@@ -24,6 +24,8 @@
     'div.sticky.top-14.bg-token-main-surface-primary',
     'textarea.bg-token-main-surface-primary.border-token-border-default',
     '.bg-token-main-surface-primary.sticky.top-\\[-1px\\]',
+    'div.absolute.top-full > div.bg-surface-primary',
+    'div.absolute.top-full > div[class*="bg-surface"]',
     /* Composer & Code Blocks */
     'form[data-type="unified-composer"] > div > div',
     'div[data-message-author-role="assistant"] pre',

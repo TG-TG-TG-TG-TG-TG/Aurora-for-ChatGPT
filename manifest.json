@@ -88,13 +88,13 @@
     {
       "resources": [
         "icons/*",
-        "santa_hat_cutout_v2.png",
-        "Left.png",
-        "Right.png",
-        "ChatGPT-Logo.svg.png",
-        "Santa.mp4",
-        "Aurora/grok-4.webp",
-        "Aurora/christmas-bg.webp",
+        "assets/santa_hat_cutout_v2.png",
+        "assets/Left.png",
+        "assets/Right.png",
+        "assets/ChatGPT-Logo.svg.png",
+        "assets/Santa.mp4",
+        "assets/grok-4.webp",
+        "assets/christmas-bg.webp",
         "_locales/*/messages.json",
         "vendor/tiktoken-lite/*",
         "vendor/tiktoken-lite/encoders/*"
