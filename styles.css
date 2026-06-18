@@ -232,7 +232,9 @@ html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(
   button.h-9.w-9.rounded-full.bg-black,
   .h-9.rounded-full.bg-token-bg-accent-static,
   div[role="dialog"]:has(input#search[placeholder="Search GPTs"]),
-  div.bg-token-bg-primary.w-full.block:has(ul[class*="divide-y"])
+  div.bg-token-bg-primary.w-full.block:has(ul[class*="divide-y"]),
+  div.absolute.top-full > div.bg-surface-primary,
+  div.absolute.top-full > div[class*="bg-surface"]
 ) {
   /* Default: "Dimmed" Glass Style */
   background: var(--aurora-glass-bg) !important;
@@ -310,24 +312,22 @@ html.cgpt-ambient-on.cgpt-light-mode:not(.cgpt-legacy-composer) .p-3.border.roun
 html.cgpt-ambient-on:not(.cgpt-legacy-composer) .shrink-0.btn-danger-outline.relative.btn:hover { background: color-mix(in oklab, #ef4444 15%, transparent) !important; }
 
 /*
- * @name Suggestion Chips Fix
- * @description Makes the inner buttons of suggestion lists transparent
- *              to reveal the parent's glass effect.
-*/
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"] button {
+ * @name Suggestion Chips & Search Dropdowns Fix
+ * @description Makes search suggestion list containers transparent/glassmorphic,
+ *              clears button backgrounds, and polishes hover effects.
+ */
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(div.absolute.top-full > div, div[data-aurora-glass="true"], div.bg-token-bg-primary.w-full.block):has(> ul) {
+  border-radius: var(--glass-radius) !important;
+  margin-top: 6px !important;
+  overflow: hidden !important;
+}
+
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(ul[class*="divide-y"], ul.divide-token-border-light) button {
   background-color: transparent !important;
 }
 
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) ul[class*="divide-y"] button:hover {
+html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(ul[class*="divide-y"], ul.divide-token-border-light) :is(button:hover, .group:hover button) {
   background: var(--menu-item-hover) !important;
-}
-
-/* Updated to target the wrapper div which now holds the background */
-html.cgpt-ambient-on:not(.cgpt-legacy-composer) :is(div[data-aurora-glass="true"], div.bg-token-bg-primary.w-full.block):has(> ul[class*="divide-y"]) {
-  /* Add padding and rounded corners for better appearance */
-  border-radius: var(--glass-radius) !important;
-  margin-top: 4px !important;
-  /* Ensure the container doesn't have extra background layers */
 }
 
 /* Code Blocks & Children */
