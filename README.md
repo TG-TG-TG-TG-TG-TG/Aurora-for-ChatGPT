@@ -1,41 +1,16 @@
-# Aurora-for-ChatGPT V1.6.0 🎄
+# Aurora for ChatGPT V1.7.0
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT/blob/main/LICENSE)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Coming_Soon-lightgrey.svg)](https://github.com/TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/TG-TG-TG-TG-TG-TG/Aurora-for-ChatGPT/pulls)
 
-**The "Holiday Edition" Update ❄️🎄✨**
+> [!NOTE]
+> The extension is now fully working with the latest version of the ChatGPT website.
 
-Bring a stunning **Glassmorphism theme**, **Privacy Suite**, **Real-time Token Counting**, and now **Festive Holiday Mode** to ChatGPT.
-Not affiliated with OpenAI. Built for power users who want a cleaner, safer, and cozier experience.
+Bring a stunning **Glassmorphism theme**, **Privacy Suite**, and **Real-time Token Counting** to ChatGPT.
+Not affiliated with OpenAI. Built for power users who want a cleaner, safer, and more personalized experience.
 
 > **Enjoying the extension?** Please consider dropping a **Star ⭐** on this repository to show your support! It helps visibility a ton.
-
----
-
-## 🎄 What's New in V1.6.0 — Holiday Edition
-
-> *'Tis the season to make ChatGPT magical!*
-
-### ✨ Holiday Mode (One-Click Festive Vibes)
-Enable **snowfall + garland lights + Christmas background** with a single toggle! Available in:
-- 🎛️ Extension popup (prominent banner at top)
-- ⚙️ Quick Settings panel on ChatGPT
-
-### 🎅 Festive Welcome Screen
-New users are greeted with **"Happy Holidays! 🎄"** and a warm seasonal message in all 5 supported languages.
-
-### ⚡ Performance Optimizations
-- **Zero-latency popup** — Settings panel opens instantly via background caching
-- **GPU-accelerated holiday effects** — Snow and garland now use pure CSS animations
-- **Debounced token counting** — Smoother typing experience with less CPU usage
-- **Memory leak fixes** — Cleaner observer cleanup in token counter
-
-### 🔧 Under the Hood
-- Removed dead code (~50 lines cleaned up)
-- Fixed triple-initialization in data masking engine
-- Duplicate CSS imports removed for faster load times
-- All 5 locale files updated with festive translations
 
 ---
 
@@ -60,14 +35,12 @@ Clone the repo **OR** Download/Extract the zip → Navigate to `chrome://extensi
 
 ## Highlights
 
-*   🎄 **Holiday Mode** — One toggle for snowfall, garland lights, and Christmas background
 *   🎨 **Unified Glass Engine** — High-performance, glitch-free glassmorphism
 *   📊 **Real-Time Token Counter** — Live word count and token usage with budget warnings
 *   🛡️ **Privacy Suite** — Streamer Mode (blur history/avatars) and Data Masking
 *   🔊 **Audio Haptics** — Subtle UI sound effects for a tactile feel
 *   🔤 **Custom Fonts** — Inter, Roboto, Montserrat, and more
 *   🖼️ **Custom Backgrounds & Auto-Contrast** — Upload your own images
-*   ❄️ **Seasonal Effects** — Snow, festive lights, Christmas background preset
 *   🌍 **Multi-language support** — 5 languages with intelligent detection
 *   🔒 **Private** — All processing happens locally
 
@@ -77,13 +50,13 @@ Clone the repo **OR** Download/Extract the zip → Navigate to `chrome://extensi
 
 Aurora for ChatGPT now supports **5 languages** with intelligent language detection:
 
-| Language | Code | Holiday Greeting |
-|----------|------|------------------|
-| 🇬🇧 English | `en` | "Happy Holidays! 🎄" |
-| 🇪🇸 Español | `es` | "¡Felices Fiestas! 🎄" |
-| 🇷🇺 Русский | `ru` | "С Праздниками! 🎄" |
-| 🇫🇷 Français | `fr` | "Joyeuses Fêtes ! 🎄" |
-| 🇨🇳 简体中文 | `zh_CN` | "节日快乐！🎄" |
+| Language | Code |
+|----------|------|
+| 🇬🇧 English | `en` |
+| 🇪🇸 Español | `es` |
+| 🇷🇺 Русский | `ru` |
+| 🇫🇷 Français | `fr` |
+| 🇨🇳 简体中文 | `zh_CN` |
 
 **How it works:**
 1. 🎯 **ChatGPT language priority** — Automatically detects your ChatGPT interface language
@@ -101,7 +74,7 @@ For more details, see [LOCALIZATION.md](./LOCALIZATION.md)
 3. Switch **Developer mode** on (top right).
 4. Click **Load unpacked** and pick the project folder.
 5. Pin the extension from the puzzle icon.
-6. Open ChatGPT and enjoy your **aurora glow**. 🎄
+6. Open ChatGPT and enjoy your **aurora glow**.
 
 ---
 
@@ -113,7 +86,6 @@ This section will be updated once the extension is published on the Chrome Web S
 
 ## Usage
 
-*   **🎄 Holiday Mode**: Toggle once to enable snowfall, lights, and Christmas background all at once
 *   **Token Counter**: View live stats in the bottom widget; color changes as you near limits
 *   **Privacy Controls**: Use the shield icon for Blur History, Blur Avatars, or Data Masking
 *   **Customization**: Open the popup to change backgrounds, fonts, or enable Light Mode
@@ -125,7 +97,6 @@ This section will be updated once the extension is published on the Chrome Web S
 
 *   **Glass Engine**: Intelligently tags UI elements to apply blur without breaking layout
 *   **Auto-Contrast**: Analyzes your background image to ensure text remains readable
-*   **Holiday Effects**: GPU-accelerated CSS animations for smooth performance
 
 ---
 
@@ -153,7 +124,6 @@ This section will be updated once the extension is published on the Chrome Web S
 *   **WASM Token Counting**: Lightweight `tiktoken` runs directly in the browser
 *   **Data Masking**: Regex patterns obfuscate sensitive data in the DOM visually
 *   **Zero-Latency Toggles**: State changes apply instantly via background service worker caching
-*   **GPU Holiday Effects**: Snow and garland use `transform3d` and CSS animations for 60fps performance
 
 ## Star History
 
